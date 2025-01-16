@@ -1,3 +1,5 @@
+import { Button } from '@/components/button';
+
 function App() {
 	return (
 		<>
@@ -6,6 +8,7 @@ function App() {
 				cusan dae atque, et temporibus labore magnam reiciendis nulla
 				saepe inventore sit omnis, a impedit suscipit fuga? Laboriosam
 				hic blanditiis qui busd am minus vero?
+				<Button onClick={() => alert('Hey')}>Leo</Button>
 			</div>
 		</>
 	);
