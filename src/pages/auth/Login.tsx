@@ -1,6 +1,9 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
 	Form,
@@ -9,44 +12,20 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from '@/components/form';
-import { Input } from '@/components/input';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/button';
-import { Link } from 'react-router-dom';
+	Input,
+	Button,
+	PasswordInput,
+} from '@/components';
 import { login } from '@/api/auth';
 
 const formSchema = z.object({
-	email: z.string(),
-	password: z.string(),
+	email: z.string().email({ message: 'Email required' }),
+	password: z.string().min(1, { message: 'Password required' }),
 });
 
-// Testing the login function with fetch
-// export const login = async (data: { email: string; password: string }) => {
-// 	try {
-// 		const response = await fetch(
-// 			'http://localhost:8081/api/v1/auth/login',
-// 			{
-// 				method: 'POST',
-// 				headers: {
-// 					'Content-Type': 'application/json',
-// 				},
-// 				body: JSON.stringify(data),
-// 			}
-// 		);
-
-// 		if (!response.ok) {
-// 			throw new Error('Failed to login. Please check your credentials.');
-// 		}
-
-// 		return await response.json(); // Assuming the server responds with JSON.
-// 	} catch (error) {
-// 		console.error('Error during login:', error);
-// 		throw error; // Re-throw to handle in the component.
-// 	}
-// };
-
 const Login = () => {
+	const navigate = useNavigate();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -57,8 +36,25 @@ const Login = () => {
 
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
 		await login(data)
-			.then((response) => console.log(response.data))
-			.catch((e) => console.log(e, 'ERROR IS'));
+			.then((response) => {
+				if (response.data.code === 200) {
+					Cookies.set('token', response.data.data.accessToken);
+					Cookies.set(
+						'refresh-token',
+						response.data.data.refreshToken
+					);
+
+					navigate('/dashboard');
+					toast.success('Log in success');
+				}
+			})
+			.catch((e) => {
+				if (e.response.data) {
+					toast.error(e.response.data.message);
+				} else {
+					toast.error('Something went wrong');
+				}
+			});
 	};
 
 	return (
@@ -75,11 +71,16 @@ const Login = () => {
 							name="email"
 							render={({ field }) => (
 								<FormItem className="mb-3">
-									<FormLabel>Username</FormLabel>
+									<FormLabel>
+										Email
+										<span className="ml-1 text-red-500">
+											*
+										</span>
+									</FormLabel>
 									<FormControl>
 										<Input
 											className="border-black"
-											placeholder="Enter User Name"
+											placeholder="Enter Email"
 											type="text"
 											{...field}
 										/>
@@ -94,7 +95,12 @@ const Login = () => {
 							name="password"
 							render={({ field }) => (
 								<FormItem className="mb-3">
-									<FormLabel>Password</FormLabel>
+									<FormLabel>
+										Password
+										<span className="ml-1 text-red-500">
+											*
+										</span>
+									</FormLabel>
 									<FormControl>
 										<PasswordInput
 											className="border-black"

@@ -5,8 +5,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import MainLayout from '@/layouts/MainLayout';
-import Dashboard from '@/pages/dashboard/Dashboard';
 import NotFound from '@/pages/notFound/NotFound';
+import Dashboard from '@/pages/dashboard/Dashboard';
 
 type ChildRoute = {
 	path: string;
@@ -23,6 +23,7 @@ type Route = {
 
 const Router = () => {
 	const token = Cookies.get('token');
+
 	const userRole = 'admin';
 
 	const authRouteList = [
@@ -54,8 +55,6 @@ const Router = () => {
 			element: NotFound,
 		},
 	];
-
-	console.log(token);
 
 	return (
 		<>

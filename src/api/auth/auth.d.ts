@@ -9,7 +9,7 @@ interface LoginResponse {
 }
 
 interface RegisterRequest {
-	userName: string;
+	name: string;
 	email: string;
 	password: string;
 	confirmationPassword: string;
