@@ -1,50 +1,84 @@
-# React + TypeScript + Vite
+## Table of Content
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- [Overview](#overview)
+- [Pre-request](#pre-request)
+- [Installation](#installation)
+  - [Step 1 - Clone Frontend Project](#step-1---clone-frontend-project)
+    - [with **SSH**](#with-ssh)
+    - [with **HTTPS**](#with-https)
+    - [Navigate to the project directory](#navigate-to-the-project-directory)
+  - [Step 2 - Install dependencies](#step-2---install-dependencies)
+  - [Step 3 - Set up environment variables](#step-3---set-up-environment-variables)
+  - [Step 4 - Start the development](#step-4---start-the-development)
+- [Usage](#usage)
+- [Folder Structure](#folder-structure)
+- [License](#license)
+- [Contact](#contact)
 
-Currently, two official plugins are available:
+# Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Pre-request
 
-## Expanding the ESLint configuration
+**Node Version:** `18.16.0 (LTS)`
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+# Installation
 
-- Configure the top-level `parserOptions` property like this:
+## Step 1 - Clone Frontend Project
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### with **SSH**
+
+```bash
+  git clone git@github.com:EWSD-Group-3-2025/frontend.git
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### with **HTTPS**
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+git clone https://github.com/EWSD-Group-3-2025/frontend.git
 ```
+
+### Navigate to the project directory
+
+```bash
+cd frontend
+```
+
+## Step 2 - Install dependencies
+
+You can use npm or another package manager
+
+```bash
+npm install
+```
+
+## Step 3 - Set up environment variables
+
+copy `.env.example` to `.env`
+
+`VITE_BASE_URL` is your backend container URL
+`VITE_JWT_SECRET_KEY` is backend JWT secret key
+
+```bash
+VITE_BASE_URL=
+VITE_JWT_SECRET_KEY=
+```
+
+## Step 4 - Start the development
+
+```bash
+npm run dev
+```
+
+# Usage
+
+# Folder Structure
+
+# License
+
+This project is licensed under the [MIT License](/LICENSE).
+
+# Contact
+
+We'd love to hear from you! If you have any questions, suggestions, or feedback about this project, feel free to reach out.
+
+- **Email**: [pthu1@kmd.edu.mm](mailto:pthu1@kmd.edu.mm)
