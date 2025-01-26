@@ -39,7 +39,11 @@ function App() {
 			quos, error minus laborum quae pariatur soluta veniam
 			exercitationem. Eos maxime excepturi omnis mollitia, suscipit
 			voluptatem rerum ullam, eveniet expedita veritatis
-			consectetur.asdfasdfasdfasdfdsf dsafsd Magni.
+			consectetur.asdfasdfasdfasdfdsf dsafsd Magni. Lorem ipsum dolor sit,
+			amet consectetur adipisicing elit. Tempore quo quidem ullam
+			voluptates doloremque delectus, omnis labore cum architecto officia
+			distinctio esse deserunt perferendis voluptas accusantium fugiat
+			doloribus facilis pariatur!
 			<Router />
 			<Toaster position="top-center" richColors closeButton />
 		</>
