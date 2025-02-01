@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
@@ -17,6 +17,8 @@ import {
 	PasswordInput,
 } from '@/components';
 import { login } from '@/api/auth';
+import CONSTANTS from '@/constants';
+import { useAuth } from '@/context/auth.context';
 
 const formSchema = z.object({
 	email: z.string().email({ message: 'Email required' }),
@@ -24,7 +26,9 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+	const auth = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -38,9 +42,12 @@ const Login = () => {
 		await login(data)
 			.then((response) => {
 				if (response.data.code === 200) {
-					Cookies.set('token', response.data.data.accessToken);
 					Cookies.set(
-						'refresh-token',
+						CONSTANTS.ACCESS_TOKEN_KEY,
+						response.data.data.accessToken
+					);
+					Cookies.set(
+						CONSTANTS.REFRESH_TOKEN_KEY,
 						response.data.data.refreshToken
 					);
 
@@ -56,6 +63,12 @@ const Login = () => {
 				}
 			});
 	};
+
+	if (!auth.loading && auth.user) {
+		const from = location.state?.from?.pathname || '/';
+		navigate(from);
+		return;
+	}
 
 	return (
 		<div className="login flex h-screen items-center justify-center">

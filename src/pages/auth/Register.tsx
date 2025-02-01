@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
@@ -16,6 +16,7 @@ import {
 	PasswordInput,
 } from '@/components';
 import { register } from '@/api/auth';
+import { useAuth } from '@/context/auth.context';
 
 const formSchema = z
 	.object({
@@ -32,7 +33,9 @@ const formSchema = z
 	});
 
 const Register = () => {
+	const auth = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -48,7 +51,7 @@ const Register = () => {
 		await register(data)
 			.then((response) => {
 				if (response.data.code === 201) {
-					navigate('/');
+					navigate('/login');
 					toast.success('Register Successfully. Please login');
 				}
 			})
@@ -60,6 +63,13 @@ const Register = () => {
 				}
 			});
 	};
+
+	if (!auth.loading && auth.user) {
+		const from = location.state?.from?.pathname || '/';
+		navigate(from);
+		return;
+	}
+
 	return (
 		<div className="login flex h-screen items-center justify-center">
 			<div className="w-1/2 rounded-lg bg-slate-200 p-5 px-7 shadow lg:w-1/3">
