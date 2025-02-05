@@ -1,13 +1,82 @@
-'use client';
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuth } from '@/context/auth.context';
+import { useForm } from 'react-hook-form';
+import { login } from '@/features/auth/api';
+import Cookies from 'js-cookie';
+import CONSTANTS from '@/constants';
+import { toast } from 'sonner';
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form';
+
+const formSchema = z.object({
+	email: z
+		.string()
+		.trim()
+		.email({ message: 'Email required' })
+		.min(1, { message: 'Email required' }),
+	password: z.string().trim().min(1, { message: 'Password required' }),
+});
 
 export default function LoginPage() {
 	const [showPassword, setShowPassword] = useState(false);
+	const auth = useAuth();
+
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	const form = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			email: '',
+			password: '',
+		},
+	});
+
+	const onSubmit = async (data: z.infer<typeof formSchema>) => {
+		await login(data)
+			.then((response) => {
+				if (response.data.code === 200) {
+					Cookies.set(
+						CONSTANTS.ACCESS_TOKEN_KEY,
+						response.data.data.accessToken
+					);
+					Cookies.set(
+						CONSTANTS.REFRESH_TOKEN_KEY,
+						response.data.data.refreshToken
+					);
+
+					navigate('/dashboard');
+					toast.success('Log in success');
+				}
+			})
+			.catch((e) => {
+				console.log(e);
+
+				if (e.response.data) {
+					toast.error(e.response.data.message);
+				} else {
+					toast.error('Something went wrong');
+				}
+			});
+	};
+
+	if (!auth.loading && auth.user) {
+		const from = location.state?.from?.pathname || '/';
+		navigate(from);
+		return;
+	}
 
 	return (
 		<div className="container mx-auto flex w-full items-center justify-between px-4 py-8">
@@ -17,50 +86,97 @@ export default function LoginPage() {
 					<h1 className="mb-4 text-4xl font-semibold">
 						Log in to Frontent
 					</h1>
-
-					<form className="space-y-4">
-						<div>
-							<Input
-								type="email"
-								placeholder="name@work-email.com"
-								className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
-							/>
-						</div>
-						<div className="relative">
-							<Input
-								type={showPassword ? 'text' : 'password'}
-								placeholder="Password"
-								className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
-							/>
-							<button
-								type="button"
-								onClick={() => setShowPassword(!showPassword)}
-								className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-							>
-								{showPassword ? (
-									<EyeOffIcon className="h-5 w-5" />
-								) : (
-									<EyeIcon className="h-5 w-5" />
-								)}
-							</button>
-						</div>
-
-						<div className="flex items-center justify-between text-sm text-gray-400">
-							<Link
-								to="/forgot-password"
-								className="hover:text-white"
-							>
-								Forgot password?
-							</Link>
-						</div>
-
-						<Button
-							type="submit"
-							className="w-full bg-[#F87B73] text-white hover:bg-[#ff8e87]"
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="space-y-4"
 						>
-							Log in
-						</Button>
-					</form>
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem className="mb-3">
+										<FormLabel htmlFor="email">
+											Email
+											<span className="ml-1 text-red-500">
+												*
+											</span>
+										</FormLabel>
+										<FormControl>
+											<Input
+												id="email"
+												type="email"
+												placeholder="name@work-email.com"
+												className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem className="mb-3">
+										<FormLabel htmlFor="password">
+											Password
+											<span className="ml-1 text-red-500">
+												*
+											</span>
+										</FormLabel>
+										<FormControl>
+											<div className="relative">
+												<Input
+													id="password"
+													type={
+														showPassword
+															? 'text'
+															: 'password'
+													}
+													placeholder="Password"
+													className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
+													{...field}
+												/>
+												<button
+													type="button"
+													onClick={() =>
+														setShowPassword(
+															!showPassword
+														)
+													}
+													className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+												>
+													{showPassword ? (
+														<EyeOffIcon className="h-5 w-5" />
+													) : (
+														<EyeIcon className="h-5 w-5" />
+													)}
+												</button>
+											</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<div className="flex items-center justify-between text-sm text-gray-400">
+								<Link
+									to="/forgot-password"
+									className="hover:text-white"
+								>
+									Forgot password?
+								</Link>
+							</div>
+
+							<Button
+								type="submit"
+								className="w-full bg-[#F87B73] text-white hover:bg-[#ff8e87]"
+							>
+								Log in
+							</Button>
+						</form>
+					</Form>
 				</div>
 				{/* Illustration */}
 				<div className="w-full max-w-md">
