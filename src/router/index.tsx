@@ -2,11 +2,11 @@ import { createElement, ElementType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
 import MainLayout from '@/layouts/MainLayout';
 import NotFound from '@/pages/notFound/NotFound';
 import Dashboard from '@/pages/dashboard/Dashboard';
-import AuthGuard from '@/components/auth-guard';
+import AuthLayout from '@/layouts/AuthLayout';
+import AuthGuard from '@/features/auth/components/auth-guard';
 
 type ChildRoute = {
 	path: string;
@@ -28,10 +28,6 @@ const Router = () => {
 		{
 			path: '/login',
 			element: Login,
-		},
-		{
-			path: '/register',
-			element: Register,
 		},
 	];
 
@@ -79,13 +75,15 @@ const Router = () => {
 					)}
 				</Route>
 			))}
-			{authRouteList.map((route, i) => (
-				<Route
-					key={i}
-					path={route.path}
-					element={createElement(route.element)}
-				/>
-			))}
+			<Route element={<AuthLayout />}>
+				{authRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={createElement(route.element)}
+					/>
+				))}
+			</Route>
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
 	);

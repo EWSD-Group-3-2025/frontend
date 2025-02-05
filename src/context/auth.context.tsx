@@ -1,9 +1,9 @@
 import Cookies from 'js-cookie';
 import { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User } from '@/api/user';
 import CONSTANTS from '@/constants';
-import { getAuthAccount, logout as authLogout } from '@/api/auth';
+import { User } from '@/features/users/types';
+import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
 
 interface AuthContextProps {
 	user?: User | null;
@@ -58,11 +58,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const logout = async () => {
 		await logoutMutation.mutateAsync();
 	};
-
-	// if (error) {
-	// 	Cookies.remove(CONSTANTS.ACCESS_TOKEN_KEY);
-	// 	Cookies.remove(CONSTANTS.REFRESH_TOKEN_KEY);
-	// }
 
 	return (
 		<AuthContext.Provider

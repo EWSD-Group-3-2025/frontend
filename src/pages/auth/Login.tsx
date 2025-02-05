@@ -1,145 +1,78 @@
-import * as z from 'zod';
-import { toast } from 'sonner';
-import Cookies from 'js-cookie';
-import { useForm } from 'react-hook-form';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
+'use client';
 
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-	Input,
-	Button,
-	PasswordInput,
-} from '@/components';
-import { login } from '@/api/auth';
-import CONSTANTS from '@/constants';
-import { useAuth } from '@/context/auth.context';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const formSchema = z.object({
-	email: z.string().email({ message: 'Email required' }),
-	password: z.string().min(1, { message: 'Password required' }),
-});
-
-const Login = () => {
-	const auth = useAuth();
-	const navigate = useNavigate();
-	const location = useLocation();
-
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			email: '',
-			password: '',
-		},
-	});
-
-	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		await login(data)
-			.then((response) => {
-				if (response.data.code === 200) {
-					Cookies.set(
-						CONSTANTS.ACCESS_TOKEN_KEY,
-						response.data.data.accessToken
-					);
-					Cookies.set(
-						CONSTANTS.REFRESH_TOKEN_KEY,
-						response.data.data.refreshToken
-					);
-
-					navigate('/dashboard');
-					toast.success('Log in success');
-				}
-			})
-			.catch((e) => {
-				if (e.response.data) {
-					toast.error(e.response.data.message);
-				} else {
-					toast.error('Something went wrong');
-				}
-			});
-	};
-
-	if (!auth.loading && auth.user) {
-		const from = location.state?.from?.pathname || '/';
-		navigate(from);
-		return;
-	}
+export default function LoginPage() {
+	const [showPassword, setShowPassword] = useState(false);
 
 	return (
-		<div className="login flex h-screen items-center justify-center">
-			<div className="w-1/2 rounded-lg bg-slate-200 p-5 px-7 shadow lg:w-1/3">
-				<h1 className="text-center text-3xl font-bold text-current">
-					Log in
-				</h1>
+		<div className="container mx-auto flex w-full items-center justify-between px-4 py-8">
+			<div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-8 gap-y-8 md:flex-row md:justify-between">
+				{/* Login Form */}
+				<div className="w-full max-w-md">
+					<h1 className="mb-4 text-4xl font-semibold">
+						Log in to Frontent
+					</h1>
 
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<FormField
-							control={form.control}
-							name="email"
-							render={({ field }) => (
-								<FormItem className="mb-3">
-									<FormLabel>
-										Email
-										<span className="ml-1 text-red-500">
-											*
-										</span>
-									</FormLabel>
-									<FormControl>
-										<Input
-											className="border-black"
-											placeholder="Enter Email"
-											type="text"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+					<form className="space-y-4">
+						<div>
+							<Input
+								type="email"
+								placeholder="name@work-email.com"
+								className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
+							/>
+						</div>
+						<div className="relative">
+							<Input
+								type={showPassword ? 'text' : 'password'}
+								placeholder="Password"
+								className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
+							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword(!showPassword)}
+								className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+							>
+								{showPassword ? (
+									<EyeOffIcon className="h-5 w-5" />
+								) : (
+									<EyeIcon className="h-5 w-5" />
+								)}
+							</button>
+						</div>
 
-						<FormField
-							control={form.control}
-							name="password"
-							render={({ field }) => (
-								<FormItem className="mb-3">
-									<FormLabel>
-										Password
-										<span className="ml-1 text-red-500">
-											*
-										</span>
-									</FormLabel>
-									<FormControl>
-										<PasswordInput
-											className="border-black"
-											placeholder="Enter Your Password"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<Button className="mt-4" type="submit">
-							Submit
+						<div className="flex items-center justify-between text-sm text-gray-400">
+							<Link
+								to="/forgot-password"
+								className="hover:text-white"
+							>
+								Forgot password?
+							</Link>
+						</div>
+
+						<Button
+							type="submit"
+							className="w-full bg-[#F87B73] text-white hover:bg-[#ff8e87]"
+						>
+							Log in
 						</Button>
 					</form>
-				</Form>
-
-				<Link
-					to="/register"
-					className="relative mt-3 inline-block text-sm text-gray-700 transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-500 after:transition-all after:duration-300 hover:text-blue-500 hover:after:w-full"
-				>
-					Don't have an Account yet?
-				</Link>
+				</div>
+				{/* Illustration */}
+				<div className="w-full max-w-md">
+					<div className="relative h-[400px] w-full md:h-[600px]">
+						<img
+							src="/img/login_img.png"
+							alt="Decorative Illustration"
+							className="h-full w-full object-contain"
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
-};
-
-export default Login;
+}

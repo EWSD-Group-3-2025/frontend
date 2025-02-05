@@ -1,8 +1,8 @@
-import authRoutes from '@/api/auth/routes';
-import axios from '../';
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
-import { User } from '../user';
+import axios from 'axios';
+import authRoutes from './routes';
+import { User } from '@/features/users/types';
 
 export const login = async (body: LoginRequest) =>
 	await axios.post<HTTPResponse<LoginResponse>>(authRoutes.login, body);
