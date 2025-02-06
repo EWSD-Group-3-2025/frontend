@@ -73,7 +73,8 @@ export default function LoginPage() {
 	};
 
 	if (!auth.loading && auth.user) {
-		const from = location.state?.from?.pathname || '/';
+		// TODO change redirect based on user role
+		const from = location.state?.from?.pathname || '/dashboard/student';
 		navigate(from);
 		return;
 	}
@@ -185,7 +186,7 @@ export default function LoginPage() {
 							<Button
 								disabled={form.formState.isSubmitting}
 								type="submit"
-								className="w-full"
+								className="w-full text-neutral-200"
 							>
 								{form.formState.isSubmitting
 									? 'Logging...'
