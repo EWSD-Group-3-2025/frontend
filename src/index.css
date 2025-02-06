@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -63,6 +63,74 @@ body {
 		--chart-5: 340 75% 55%;
 	}
 }
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+} */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+html,
+body {
+	height: 100%;
+}
+
+@layer base {
+	:root {
+		/* Light Mode Theme */
+		--background: 0 0% 98%; /* Soft white background */
+		--foreground: 220 15% 20%; /* Dark gray text */
+		--card: 0 0% 100%; /* White cards */
+		--card-foreground: 220 15% 15%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 220 15% 20%;
+		--primary: 222 47% 55%; /* Blue primary */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 210 16% 93%; /* Light gray */
+		--secondary-foreground: 220 15% 20%;
+		--muted: 210 16% 90%;
+		--muted-foreground: 220 10% 40%;
+		--accent: 34 74% 50%; /* Orange accent */
+		--accent-foreground: 0 0% 100%;
+		--destructive: 0 84.2% 50%; /* Red */
+		--destructive-foreground: 0 0% 98%;
+		--border: 220 13% 80%;
+		--input: 220 13% 75%;
+		--ring: 222 47% 45%;
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		/* Dark Mode Theme */
+		--background: 220 15% 10%; /* Deep gray background */
+		--foreground: 0 0% 98%; /* White text */
+		--card: 220 15% 15%; /* Slightly lighter gray for cards */
+		--card-foreground: 0 0% 98%;
+		--popover: 220 15% 12%;
+		--popover-foreground: 0 0% 98%;
+		--primary: 222 47% 65%; /* Brighter blue primary */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 220 15% 18%; /* Slightly lighter gray */
+		--secondary-foreground: 0 0% 98%;
+		--muted: 220 15% 22%;
+		--muted-foreground: 220 10% 65%;
+		--accent: 34 74% 55%; /* Brighter orange */
+		--accent-foreground: 0 0% 100%;
+		--destructive: 0 70% 40%; /* Darker red */
+		--destructive-foreground: 0 0% 98%;
+		--border: 220 15% 25%;
+		--input: 220 15% 20%;
+		--ring: 222 47% 50%;
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border;
