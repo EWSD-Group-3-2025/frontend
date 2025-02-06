@@ -84,7 +84,7 @@ export default function LoginPage() {
 				{/* Login Form */}
 				<div className="w-full max-w-md">
 					<h1 className="mb-4 text-4xl font-semibold">
-						Log in to Frontent
+						Log in to Frontend
 					</h1>
 					<Form {...form}>
 						<form
