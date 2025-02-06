@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	// Fetch the user details if a refresh token is present
 	const {
 		isLoading,
-		data: user,
+		data: userResponse,
 		error,
 	} = useQuery({
 		queryKey: ['authUser'],
@@ -62,7 +62,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	return (
 		<AuthContext.Provider
 			value={{
-				user: user?.data.data,
+				user: !!userResponse
+					? { ...userResponse.data.data.user }
+					: null,
 				loading: isLoading,
 				login,
 				logout,
