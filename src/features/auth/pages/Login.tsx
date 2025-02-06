@@ -57,8 +57,9 @@ export default function LoginPage() {
 						CONSTANTS.REFRESH_TOKEN_KEY,
 						response.data.data.refreshToken
 					);
-					// TODO Redirect based on user role
-					navigate('/dashboard/student');
+					// TODO Redirect based on user role and use function from RRD
+					// navigate('/dashboard/student');
+					window.location.href = '/dashboard/student';
 					toast.success('Log in successful');
 				}
 			})
