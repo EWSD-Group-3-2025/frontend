@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import CONSTANTS from '@/constants';
 import { User } from '@/features/users/types';
 import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
+import { toast } from 'sonner';
 
 interface AuthContextProps {
 	user?: User | null;
@@ -22,11 +23,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const queryClient = useQueryClient();
 
 	// Fetch the user details if a refresh token is present
-	const {
-		isLoading,
-		data: userResponse,
-		error,
-	} = useQuery({
+	const { isLoading, data: userResponse } = useQuery({
 		queryKey: ['authUser'],
 		queryFn: async () => await getAuthAccount(),
 		retry: false,
@@ -49,9 +46,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			Cookies.remove(CONSTANTS.ACCESS_TOKEN_KEY);
 			Cookies.remove(CONSTANTS.REFRESH_TOKEN_KEY);
 			queryClient.removeQueries({ queryKey: ['authUser'] });
+			toast.success('Logout successful');
 		},
 		onError: () => {
 			queryClient.removeQueries({ queryKey: ['authUser'] });
+			toast.success('Failed to logout');
 		},
 	});
 

@@ -9,14 +9,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type User as UserType } from '@/features/users/types';
 import { LogOut, User } from 'lucide-react';
+import { useAuth } from '@/context/auth.context';
 
-interface UserButtonProps {
-	user?: UserType | null;
-}
-
-export function UserButton({ user }: UserButtonProps) {
+export function UserButton() {
+	const { user, logout } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
 
 	if (!user) {
@@ -62,7 +59,10 @@ export function UserButton({ user }: UserButtonProps) {
 					<User /> Profile
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem className="bg-red-500 text-white focus:bg-red-600 focus:text-neutral-100">
+				<DropdownMenuItem
+					onClick={logout}
+					className="bg-red-500 text-white focus:bg-red-600 focus:text-neutral-100"
+				>
 					<LogOut /> Log out
 				</DropdownMenuItem>
 			</DropdownMenuContent>

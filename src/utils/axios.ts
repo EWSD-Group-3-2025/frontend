@@ -1,6 +1,7 @@
 import CONSTANTS from '@/constants';
-import axios from 'axios';
-import Cookie from 'js-cookie';
+import authRoutes from '@/features/auth/api/routes';
+import axios, { InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
 
 export const baseURL = import.meta.env.VITE_BASE_URL + '/api';
 
@@ -20,7 +21,7 @@ let refreshPromise: Promise<string> | null = null;
 api.interceptors.request.use(
 	(request) => {
 		// Get access token and add to Authorization header
-		const accessToken = Cookie.get(CONSTANTS.ACCESS_TOKEN_KEY);
+		const accessToken = Cookies.get(CONSTANTS.ACCESS_TOKEN_KEY);
 		if (accessToken) {
 			request.headers.Authorization = `Bearer ${accessToken}`;
 		}
@@ -34,46 +35,38 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-	(response) => {
-		return response;
-	},
+	(response) => response,
 	async (error) => {
-		return Promise.reject(error);
-		//! TODO: Uncomment when backend refresh token api finish
-		// const originalRequest = error.config as InternalAxiosRequestConfig;
+		const originalRequest = error.config as InternalAxiosRequestConfig;
 
-		// if (originalRequest.url !== '/api/auth/refresh') {
-		// 	return Promise.reject(error);
-		// }
+		try {
+			if (!refreshPromise) {
+				const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 
-		// try {
-		// 	if (!refreshPromise) {
-		// 		const refreshToken = Cookie.get(CONSTANTS.REFRESH_TOKEN_KEY);
+				refreshPromise = api
+					.post(authRoutes.refreshToken, { refreshToken })
+					.then((res) => res.data.data.accessToken)
+					.finally(() => {
+						refreshPromise = null;
+					});
+			}
 
-		// 		refreshPromise = api
-		// 			.post('/api/auth/refresh', { refreshToken })
-		// 			.then((res) => res.data.accessToken)
-		// 			.finally(() => {
-		// 				refreshPromise = null;
-		// 			});
-		// 	}
+			const newAccessToken = await refreshPromise;
 
-		// 	const newAccessToken = await refreshPromise;
+			Cookies.set(CONSTANTS.ACCESS_TOKEN_KEY, newAccessToken, {
+				expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
+			});
+			originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-		// 	Cookie.set(CONSTANTS.ACCESS_TOKEN_KEY, newAccessToken, {
-		// 		expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
-		// 	});
-		// 	originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+			return api(originalRequest);
+		} catch (refreshTokenError) {
+			// Clear the cookie
+			Cookies.remove(CONSTANTS.ACCESS_TOKEN_KEY);
+			Cookies.remove(CONSTANTS.REFRESH_TOKEN_KEY);
 
-		// 	return api(originalRequest);
-		// } catch (refreshTokenError) {
-		// 	// Clear the cookie
-		// 	Cookie.remove(CONSTANTS.ACCESS_TOKEN_KEY);
-		// 	Cookie.remove(CONSTANTS.REFRESH_TOKEN_KEY);
-
-		// 	window.location.href = '/login';
-		// 	return Promise.reject(refreshTokenError);
-		// }
+			window.location.href = '/login';
+			return Promise.reject(refreshTokenError);
+		}
 	}
 );
 

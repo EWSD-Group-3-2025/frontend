@@ -19,6 +19,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
+import { cn } from '@/utils/stringUtils';
 
 const formSchema = z.object({
 	email: z
@@ -56,14 +57,12 @@ export default function LoginPage() {
 						CONSTANTS.REFRESH_TOKEN_KEY,
 						response.data.data.refreshToken
 					);
-
-					navigate('/dashboard');
-					toast.success('Log in success');
+					// TODO Redirect based on user role
+					navigate('/dashboard/student');
+					toast.success('Log in successful');
 				}
 			})
 			.catch((e) => {
-				console.log(e);
-
 				if (e.response.data) {
 					toast.error(e.response.data.message);
 				} else {
@@ -104,10 +103,12 @@ export default function LoginPage() {
 										</FormLabel>
 										<FormControl>
 											<Input
+												disabled={
+													form.formState.isSubmitting
+												}
 												id="email"
 												type="email"
 												placeholder="name@work-email.com"
-												className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
 												{...field}
 											/>
 										</FormControl>
@@ -129,6 +130,10 @@ export default function LoginPage() {
 										<FormControl>
 											<div className="relative">
 												<Input
+													disabled={
+														form.formState
+															.isSubmitting
+													}
 													id="password"
 													type={
 														showPassword
@@ -136,10 +141,13 @@ export default function LoginPage() {
 															: 'password'
 													}
 													placeholder="Password"
-													className="border-gray-600 bg-transparent text-white placeholder:text-gray-400"
 													{...field}
 												/>
 												<button
+													disabled={
+														form.formState
+															.isSubmitting
+													}
 													type="button"
 													onClick={() =>
 														setShowPassword(
@@ -163,17 +171,24 @@ export default function LoginPage() {
 							<div className="flex items-center justify-between text-sm text-gray-400">
 								<Link
 									to="/forgot-password"
-									className="hover:text-white"
+									className={cn(
+										'hover:underline',
+										form.formState.isSubmitting &&
+											'pointer-events-none'
+									)}
 								>
 									Forgot password?
 								</Link>
 							</div>
 
 							<Button
+								disabled={form.formState.isSubmitting}
 								type="submit"
-								className="w-full bg-[#F87B73] text-white hover:bg-[#ff8e87]"
+								className="w-full"
 							>
-								Log in
+								{form.formState.isSubmitting
+									? 'Logging...'
+									: 'Login'}
 							</Button>
 						</form>
 					</Form>
