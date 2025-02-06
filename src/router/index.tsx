@@ -1,12 +1,12 @@
-import Cookies from 'js-cookie';
 import { createElement, ElementType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import MainLayout from '@/layouts/MainLayout';
 import NotFound from '@/pages/notFound/NotFound';
-import Dashboard from '@/pages/dashboard/Dashboard';
+import AuthLayout from '@/layouts/AuthLayout';
+import AuthGuard from '@/features/auth/components/auth-guard';
+import { USER_ROLE } from '@/constants';
+import LoginPage from '@/features/auth/pages/Login';
+import StudentDashboard from '@/features/users/pages/student/Dashboard';
+import EndUserLayout from '@/layouts/EndUserLayout';
 
 type ChildRoute = {
 	path: string;
@@ -22,32 +22,18 @@ type Route = {
 };
 
 const Router = () => {
-	const token = Cookies.get('token');
-
-	const userRole = 'admin';
-
 	const authRouteList = [
 		{
-			path: '/',
-			element: Login,
-		},
-		{
-			path: '/register',
-			element: Register,
+			path: '/login',
+			element: LoginPage,
 		},
 	];
 
-	const routeList: Route[] = [
+	const studentRouteList = [
 		{
-			path: '/dashboard',
-			element: MainLayout,
-			children: [
-				{
-					path: '/dashboard',
-					element: Dashboard,
-					role: ['admin'],
-				},
-			],
+			path: '/dashboard/student',
+			element: StudentDashboard,
+			role: [USER_ROLE.STUDENT],
 		},
 		{
 			name: 'Not Found',
@@ -57,40 +43,34 @@ const Router = () => {
 	];
 
 	return (
-		<>
-			{token ? (
-				<Routes>
-					{routeList.map((route, i) => (
-						<Route
-							key={i}
-							path={route.path}
-							element={createElement(route.element)}
-						>
-							{route.children?.map((subRoute, j) =>
-								userRole && subRoute.role.includes(userRole) ? (
-									<Route
-										key={j}
-										path={subRoute?.path}
-										element={<subRoute.element />}
-									/>
-								) : null
-							)}
-						</Route>
-					))}
-				</Routes>
-			) : (
-				<Routes>
-					{authRouteList.map((route, i) => (
-						<Route
-							key={i}
-							path={route.path}
-							element={createElement(route.element)}
-						/>
-					))}
-					<Route path="*" element={<Navigate to="/" replace />} />
-				</Routes>
-			)}
-		</>
+		<Routes>
+			{/* Student Routes */}
+			<Route element={<EndUserLayout />}>
+				{studentRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
+			{/* Auth Routes */}
+			<Route element={<AuthLayout />}>
+				{authRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={createElement(route.element)}
+					/>
+				))}
+			</Route>
+			<Route path="*" element={<Navigate to="/" replace />} />
+		</Routes>
 	);
 };
 
