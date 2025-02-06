@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth.context';
 import { CircleX, Clock, Mail, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import UserProfileEditForm from './user-profile-edit-form';
 
 export default function UserProfile() {
 	const { user } = useAuth();
@@ -29,7 +29,10 @@ export default function UserProfile() {
 					<TabsTrigger value="contact">Contact</TabsTrigger>
 					<TabsTrigger value="edit">Edit</TabsTrigger>
 				</TabsList>
-				<TabsContent value="overview" className="space-y-5">
+				<TabsContent
+					value="overview"
+					className="space-y-5 focus-visible:ring-0 focus-visible:ring-offset-0"
+				>
 					<div className="mt-4 space-y-3 border px-3 py-2">
 						<div className="flex items-center gap-x-3">
 							<CircleX className="size-5" />{' '}
@@ -46,8 +49,8 @@ export default function UserProfile() {
 					</div>
 					<div>
 						<span>Contact information</span>
-						<div className="mt-3 flex items-center justify-between gap-x-2">
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100">
+						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
+							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
 								<Mail />
 								<div className="flex flex-col items-start">
 									<span className="text-xs">Email</span>
@@ -56,7 +59,7 @@ export default function UserProfile() {
 									</span>
 								</div>
 							</div>
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100">
+							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
 								<MessageCircle />
 								<div className="flex flex-col items-start">
 									<span className="text-xs">Chat</span>
@@ -68,7 +71,10 @@ export default function UserProfile() {
 						</div>
 					</div>
 				</TabsContent>
-				<TabsContent value="contact" className="space-y-5">
+				<TabsContent
+					value="contact"
+					className="space-y-5 focus-visible:ring-0 focus-visible:ring-offset-0"
+				>
 					<div className="mt-4 space-y-3 border px-3 py-2">
 						<div className="flex items-center gap-x-3">
 							<CircleX className="size-5" />{' '}
@@ -85,8 +91,8 @@ export default function UserProfile() {
 					</div>
 					<div>
 						<span>Contact information</span>
-						<div className="mt-3 flex items-center justify-between gap-x-2">
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100">
+						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
+							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
 								<Mail />
 								<div className="flex flex-col items-start">
 									<span className="text-xs">Email</span>
@@ -95,7 +101,7 @@ export default function UserProfile() {
 									</span>
 								</div>
 							</div>
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100">
+							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
 								<MessageCircle />
 								<div className="flex flex-col items-start">
 									<span className="text-xs">Chat</span>
@@ -107,8 +113,11 @@ export default function UserProfile() {
 						</div>
 					</div>
 				</TabsContent>
-				<TabsContent value="edit" className="space-y-5">
-					Change your password here.
+				<TabsContent
+					value="edit"
+					className="space-y-5 focus-visible:ring-0 focus-visible:ring-offset-0"
+				>
+					<UserProfileEditForm name={user?.name} />
 				</TabsContent>
 			</Tabs>
 		</div>

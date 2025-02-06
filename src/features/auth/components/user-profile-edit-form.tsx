@@ -10,6 +10,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/auth.context';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -17,13 +18,19 @@ const formSchema = z.object({
 	name: z.string().trim().min(1, { message: 'Name required' }),
 });
 
-export default function UserProfileEditForm() {
-	const { user } = useAuth();
+interface UserProfileEditFormProps {
+	name?: string;
+}
+
+export default function UserProfileEditForm({
+	name,
+}: UserProfileEditFormProps) {
+	const [isChangedFiled, setIsChangedFiled] = useState(false);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: user?.name,
+			name,
 		},
 	});
 
@@ -32,8 +39,17 @@ export default function UserProfileEditForm() {
 		console.log(data);
 	};
 
+	useEffect(() => {
+		// TODO Check if there any other way to check default value and form value
+		if (form.getValues('name') !== name) {
+			setIsChangedFiled(true);
+		} else {
+			setIsChangedFiled(false);
+		}
+	}, [form.getValues('name')]);
+
 	return (
-		<div>
+		<div className="mt-4">
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
@@ -50,6 +66,7 @@ export default function UserProfileEditForm() {
 								</FormLabel>
 								<FormControl>
 									<Input
+										defaultValue={name}
 										disabled={form.formState.isSubmitting}
 										id="name"
 										placeholder="John Doe"
@@ -61,7 +78,9 @@ export default function UserProfileEditForm() {
 						)}
 					/>
 					<Button
-						disabled={form.formState.isSubmitting}
+						disabled={
+							!isChangedFiled || form.formState.isSubmitting
+						}
 						type="submit"
 						className="w-full"
 					>
