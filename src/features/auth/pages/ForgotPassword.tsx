@@ -11,6 +11,7 @@ import {
 	FormControl,
 	FormField,
 	FormItem,
+	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -69,6 +70,12 @@ export default function ForgotPasswordPage() {
 								name="email"
 								render={({ field }) => (
 									<FormItem className="mb-3">
+										<FormLabel htmlFor="email">
+											Email
+											<span className="ml-1 text-red-500">
+												*
+											</span>
+										</FormLabel>
 										<FormControl>
 											<Input
 												disabled={

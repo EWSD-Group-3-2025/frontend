@@ -112,8 +112,8 @@ export default function VerifyOTPPage() {
 								className="w-full text-neutral-200 hover:text-neutral-300"
 							>
 								{form.formState.isSubmitting
-									? 'Sending...'
-									: 'Send'}
+									? 'Verifying...'
+									: 'Continue'}
 							</Button>
 						</form>
 					</Form>
