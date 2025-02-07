@@ -13,11 +13,13 @@ import { LogOut, User } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
 import ResponsiveModal from '@/components/responsive-modal';
 import UserProfile from './user-profile';
+import { useOpenProfileStore } from '../store/use-open-profile-store';
 
 export function UserButton() {
 	const { user, logout } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
-	const [isOpenProfile, setIsOpenProfile] = useState(false);
+	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
+		useOpenProfileStore();
 
 	if (!user) {
 		return null;

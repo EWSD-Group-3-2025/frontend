@@ -1,13 +1,25 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/auth.context';
-import { CircleX, Clock, Mail, MessageCircle } from 'lucide-react';
+import {
+	CircleX,
+	Clock,
+	Copy,
+	KeyRound,
+	Mail,
+	MessageCircle,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import UserProfileEditForm from './user-profile-edit-form';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { useOpenProfileStore } from '../store/use-open-profile-store';
 
 export default function UserProfile() {
 	const { user } = useAuth();
+	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
+		useOpenProfileStore();
 
 	return (
 		<div className="px-5 py-4">
@@ -50,24 +62,50 @@ export default function UserProfile() {
 					<div>
 						<span>Contact information</span>
 						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
-								<Mail />
-								<div className="flex flex-col items-start">
-									<span className="text-xs">Email</span>
-									<span className="text-sm text-blue-600">
-										{user?.email}
-									</span>
+							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+								<div className="flex items-center gap-x-2">
+									<Mail />
+									<div className="flex flex-col items-start">
+										<span className="text-xs">Email</span>
+										<span className="text-sm text-blue-600">
+											{user?.email}
+										</span>
+									</div>
 								</div>
+								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
-								<MessageCircle />
-								<div className="flex flex-col items-start">
-									<span className="text-xs">Chat</span>
-									<span className="text-sm text-blue-600">
-										{user?.email}
-									</span>
+							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+								<div className="flex items-center gap-x-2">
+									<MessageCircle />
+									<div className="flex flex-col items-start">
+										<span className="text-xs">Chat</span>
+										<span className="text-sm text-blue-600">
+											{user?.email}
+										</span>
+									</div>
 								</div>
+								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
+						</div>
+					</div>
+					<div>
+						<span>Settings</span>
+						<div className="mt-3 space-y-2">
+							<Link
+								to={'/forget-password'}
+								onClick={() => {
+									if (isOpenProfile) {
+										setIsOpenProfile(false);
+									}
+								}}
+							>
+								<Button
+									className="flex w-full items-center justify-start"
+									variant={'secondary'}
+								>
+									<KeyRound /> Change Password
+								</Button>
+							</Link>
 						</div>
 					</div>
 				</TabsContent>
@@ -92,23 +130,29 @@ export default function UserProfile() {
 					<div>
 						<span>Contact information</span>
 						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
-								<Mail />
-								<div className="flex flex-col items-start">
-									<span className="text-xs">Email</span>
-									<span className="text-sm text-blue-600">
-										{user?.email}
-									</span>
+							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+								<div className="flex items-center gap-x-2">
+									<Mail />
+									<div className="flex flex-col items-start">
+										<span className="text-xs">Email</span>
+										<span className="text-sm text-blue-600">
+											{user?.email}
+										</span>
+									</div>
 								</div>
+								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
-							<div className="flex w-full items-center gap-x-2 px-2 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900">
-								<MessageCircle />
-								<div className="flex flex-col items-start">
-									<span className="text-xs">Chat</span>
-									<span className="text-sm text-blue-600">
-										{user?.email}
-									</span>
+							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+								<div className="flex items-center gap-x-2">
+									<MessageCircle />
+									<div className="flex flex-col items-start">
+										<span className="text-xs">Chat</span>
+										<span className="text-sm text-blue-600">
+											{user?.email}
+										</span>
+									</div>
 								</div>
+								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
 						</div>
 					</div>

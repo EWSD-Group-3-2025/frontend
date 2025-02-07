@@ -186,7 +186,7 @@ export default function LoginPage() {
 							<Button
 								disabled={form.formState.isSubmitting}
 								type="submit"
-								className="w-full text-neutral-200"
+								className="w-full text-neutral-200 hover:text-neutral-300"
 							>
 								{form.formState.isSubmitting
 									? 'Logging...'
