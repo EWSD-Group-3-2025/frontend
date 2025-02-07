@@ -92,7 +92,7 @@ export default function UserProfile() {
 						<span>Settings</span>
 						<div className="mt-3 space-y-2">
 							<Link
-								to={'/forget-password'}
+								to={'/forgot-password'}
 								onClick={() => {
 									if (isOpenProfile) {
 										setIsOpenProfile(false);

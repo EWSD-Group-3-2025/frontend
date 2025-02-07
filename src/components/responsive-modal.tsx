@@ -15,7 +15,7 @@ export default function ResponsiveModal({
 	isOpen,
 	setIsOpen,
 }: ResponsiveModalProps) {
-	const isDesktop = useMedia('(min-width: 1024px)', true);
+	const isDesktop = useMedia('(min-width: 768px)', true);
 
 	if (isDesktop) {
 		return (

@@ -1,12 +1,15 @@
 import { createElement, ElementType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import NotFound from '@/pages/notFound/NotFound';
-import AuthLayout from '@/layouts/AuthLayout';
 import AuthGuard from '@/features/auth/components/auth-guard';
 import { USER_ROLE } from '@/constants';
 import LoginPage from '@/features/auth/pages/Login';
 import StudentDashboard from '@/features/users/pages/student/Dashboard';
 import EndUserLayout from '@/layouts/EndUserLayout';
+import StandaloneLayout from '@/layouts/StandaloneLayout';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
+import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
+import RestPasswordPage from '@/features/auth/pages/RestPassword';
 
 type ChildRoute = {
 	path: string;
@@ -42,8 +45,46 @@ const Router = () => {
 		},
 	];
 
+	const forgetPasswordRouteList = [
+		{
+			path: '/forgot-password',
+			element: ForgotPasswordPage,
+			role: [USER_ROLE.STUDENT],
+		},
+		{
+			path: '/verify-otp',
+			element: VerifyOTPPage,
+			role: [USER_ROLE.STUDENT],
+		},
+		{
+			path: '/reset-password',
+			element: RestPasswordPage,
+			role: [USER_ROLE.STUDENT],
+		},
+		{
+			name: 'Not Found',
+			path: '*',
+			element: NotFound,
+		},
+	];
+
 	return (
 		<Routes>
+			{/* Forget Password Routes */}
+			<Route element={<StandaloneLayout />}>
+				{forgetPasswordRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
 			{/* Student Routes */}
 			<Route element={<EndUserLayout />}>
 				{studentRouteList.map((route, i) => (
@@ -60,7 +101,7 @@ const Router = () => {
 			</Route>
 
 			{/* Auth Routes */}
-			<Route element={<AuthLayout />}>
+			<Route element={<StandaloneLayout />}>
 				{authRouteList.map((route, i) => (
 					<Route
 						key={i}

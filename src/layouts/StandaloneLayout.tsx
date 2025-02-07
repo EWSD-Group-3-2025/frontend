@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
 
-export default function AuthLayout() {
+export default function StandaloneLayout() {
 	return (
 		<div className="h-screen">
 			<div className="mx-auto flex max-w-6xl items-start justify-between px-5 py-3">
