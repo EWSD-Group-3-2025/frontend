@@ -48,12 +48,12 @@ export default function ResetPasswordPage() {
 		console.log(data);
 
 		toast.success('Successfully reset password');
-		navigate('/verify-otp');
+		navigate('/reset-password-successful');
 	};
 
 	return (
 		<div className="mt-10 flex flex-col items-center justify-center md:mt-20">
-			<Card className="max-w-[500px]">
+			<Card className="max-w-[500px] md:min-w-[500px]">
 				<CardHeader>
 					<Keyboard className="mx-auto mb-3 size-12 rounded-lg border p-2 hover:animate-pulse" />
 					<CardTitle className="text-center text-3xl">
@@ -146,7 +146,7 @@ export default function ResetPasswordPage() {
 															? 'text'
 															: 'password'
 													}
-													placeholder="Password"
+													placeholder="Confirm Password"
 													{...field}
 												/>
 												<button

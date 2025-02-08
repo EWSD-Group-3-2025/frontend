@@ -39,6 +39,13 @@ api.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config as InternalAxiosRequestConfig;
 
+		// If the error is not 400 and request auth user, that mean cause error by other api and directly reject error
+		if (
+			error.response?.status !== 400 &&
+			originalRequest.url !== '/v1/auth/me'
+		) {
+			return Promise.reject(error);
+		}
 		try {
 			if (!refreshPromise) {
 				const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);

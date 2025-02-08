@@ -24,14 +24,14 @@ export default function UserProfile() {
 	return (
 		<div className="px-5 py-4">
 			<div className="flex items-center gap-x-4">
-				<Avatar className="size-16">
+				<Avatar className="size-20">
 					<AvatarImage src={user?.name} alt={user?.name} />
-					<AvatarFallback>
+					<AvatarFallback className="text-4xl">
 						{user?.name.charAt(0).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 				<div>
-					<p className="text-xl font-medium">{user?.name}</p>
+					<p className="text-2xl font-medium">{user?.name}</p>
 				</div>
 			</div>
 			{/* Tabs */}

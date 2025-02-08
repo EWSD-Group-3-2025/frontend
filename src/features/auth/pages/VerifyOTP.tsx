@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 const formSchema = z.object({
-	otpCode: z.string().trim().min(4, { message: 'OTP code required' }),
+	otpCode: z.string().trim().min(6, { message: 'OTP code required' }),
 });
 
 export default function VerifyOTPPage() {
@@ -48,7 +48,7 @@ export default function VerifyOTPPage() {
 
 	return (
 		<div className="mt-10 flex flex-col items-center justify-center md:mt-20">
-			<Card className="min-w-[500px]">
+			<Card className="max-w-[500px] md:min-w-[500px]">
 				<CardHeader>
 					<Mail className="mx-auto mb-3 size-12 rounded-lg border p-2 hover:animate-pulse" />
 					<CardTitle className="text-center text-3xl">
@@ -68,7 +68,7 @@ export default function VerifyOTPPage() {
 								control={form.control}
 								name="otpCode"
 								render={({ field }) => (
-									<FormItem className="mb-3 flex items-center justify-center">
+									<FormItem className="mb-3 flex flex-col items-center justify-center">
 										<FormControl>
 											<InputOTP maxLength={6} {...field}>
 												<InputOTPGroup>

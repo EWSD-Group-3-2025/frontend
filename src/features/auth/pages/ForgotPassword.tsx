@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
 
 	return (
 		<div className="mt-10 flex flex-col items-center justify-center md:mt-20">
-			<Card className="max-w-[500px]">
+			<Card className="max-w-[500px] md:min-w-[500px]">
 				<CardHeader>
 					<Fingerprint className="mx-auto mb-3 size-12 rounded-lg border p-2 hover:animate-pulse" />
 					<CardTitle className="text-center text-3xl">

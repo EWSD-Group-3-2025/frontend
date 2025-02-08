@@ -9,7 +9,8 @@ import EndUserLayout from '@/layouts/EndUserLayout';
 import StandaloneLayout from '@/layouts/StandaloneLayout';
 import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
 import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
-import RestPasswordPage from '@/features/auth/pages/RestPassword';
+import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
+import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 
 type ChildRoute = {
 	path: string;
@@ -58,7 +59,12 @@ const Router = () => {
 		},
 		{
 			path: '/reset-password',
-			element: RestPasswordPage,
+			element: ResetPasswordPage,
+			role: [USER_ROLE.STUDENT],
+		},
+		{
+			path: '/reset-password-successful',
+			element: ResetPasswordSuccessPage,
 			role: [USER_ROLE.STUDENT],
 		},
 		{
@@ -76,11 +82,7 @@ const Router = () => {
 					<Route
 						key={i}
 						path={route.path}
-						element={
-							<AuthGuard>
-								{createElement(route.element)}
-							</AuthGuard>
-						}
+						element={createElement(route.element)}
 					></Route>
 				))}
 			</Route>
