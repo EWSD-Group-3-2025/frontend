@@ -9,12 +9,19 @@ export const login = async (body: LoginRequest) =>
 
 export const logout = async () => await api.post(authRoutes.logout);
 
-export const register = async (body: RegisterRequest) =>
-	await api.post<HTTPResponse<boolean>>(authRoutes.register, body);
-
 // Get authenticated user with access token and refresh token
 export const getAuthAccount = async () => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 	return await api.get<HTTPResponse<{ user: User }>>(authRoutes.getMe);
+};
+
+export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.patch<HTTPResponse<UpdateUserProfileRequest>>(
+		authRoutes.updateMe,
+		body
+	);
 };

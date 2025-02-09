@@ -21,6 +21,10 @@ export default function UserProfile() {
 	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
 		useOpenProfileStore();
 
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<div className="px-5 py-4">
 			<div className="flex items-center gap-x-4">
@@ -32,6 +36,9 @@ export default function UserProfile() {
 				</Avatar>
 				<div>
 					<p className="text-2xl font-medium">{user?.name}</p>
+					<p className="text-base text-muted-foreground">
+						@{user?.username}
+					</p>
 				</div>
 			</div>
 			{/* Tabs */}
@@ -103,7 +110,7 @@ export default function UserProfile() {
 									className="flex w-full items-center justify-start"
 									variant={'secondary'}
 								>
-									<KeyRound /> Change Password
+									<KeyRound /> Forgot Password
 								</Button>
 							</Link>
 						</div>
@@ -161,7 +168,10 @@ export default function UserProfile() {
 					value="edit"
 					className="space-y-5 focus-visible:ring-0 focus-visible:ring-offset-0"
 				>
-					<UserProfileEditForm name={user?.name} />
+					<UserProfileEditForm
+						name={user.name}
+						username={user.username}
+					/>
 				</TabsContent>
 			</Tabs>
 		</div>

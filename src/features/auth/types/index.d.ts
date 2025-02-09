@@ -1,3 +1,8 @@
+interface UpdateUserProfileRequest {
+	username: string;
+	name: string;
+}
+
 interface LoginRequest {
 	email: string;
 	password: string;
