@@ -11,6 +11,7 @@ import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
 import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
 import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
+import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
 
 type ChildRoute = {
 	path: string;
@@ -65,6 +66,11 @@ const Router = () => {
 		{
 			path: '/reset-password-successful',
 			element: ResetPasswordSuccessPage,
+			role: [USER_ROLE.STUDENT],
+		},
+		{
+			path: '/change-password',
+			element: ChangePasswordPage,
 			role: [USER_ROLE.STUDENT],
 		},
 		{

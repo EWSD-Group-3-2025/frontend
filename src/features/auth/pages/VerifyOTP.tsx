@@ -109,7 +109,7 @@ export default function VerifyOTPPage() {
 							<Button
 								disabled={form.formState.isSubmitting}
 								type="submit"
-								className="w-full text-neutral-200 hover:text-neutral-300"
+								className="w-full text-neutral-100 hover:text-neutral-200"
 							>
 								{form.formState.isSubmitting
 									? 'Verifying...'

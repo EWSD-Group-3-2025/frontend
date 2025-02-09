@@ -20,8 +20,5 @@ export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 
-	return await api.patch<HTTPResponse<UpdateUserProfileRequest>>(
-		authRoutes.updateMe,
-		body
-	);
+	return await api.patch<HTTPResponse>(authRoutes.updateMe, body);
 };

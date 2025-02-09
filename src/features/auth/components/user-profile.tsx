@@ -6,6 +6,7 @@ import {
 	Clock,
 	Copy,
 	KeyRound,
+	LockKeyholeOpen,
 	Mail,
 	MessageCircle,
 } from 'lucide-react';
@@ -97,7 +98,22 @@ export default function UserProfile() {
 					</div>
 					<div>
 						<span>Settings</span>
-						<div className="mt-3 space-y-2">
+						<div className="mt-3 flex flex-col gap-y-2">
+							<Link
+								to={'/change-password'}
+								onClick={() => {
+									if (isOpenProfile) {
+										setIsOpenProfile(false);
+									}
+								}}
+							>
+								<Button
+									className="flex w-full items-center justify-start"
+									variant={'secondary'}
+								>
+									<LockKeyholeOpen /> Change Password
+								</Button>
+							</Link>
 							<Link
 								to={'/forgot-password'}
 								onClick={() => {

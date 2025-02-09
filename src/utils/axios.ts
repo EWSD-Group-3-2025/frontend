@@ -27,6 +27,7 @@ api.interceptors.request.use(
 		}
 
 		request.headers['X-Request-Start-Time'] = Math.floor(Date.now() / 1000);
+
 		return request;
 	},
 	(error) => {
@@ -40,10 +41,8 @@ api.interceptors.response.use(
 		const originalRequest = error.config as InternalAxiosRequestConfig;
 
 		// If the error is not 400 and request auth user, that mean cause error by other api and directly reject error
-		if (
-			error.response?.status !== 400 &&
-			originalRequest.url !== '/v1/auth/me'
-		) {
+
+		if (originalRequest.url !== '/v1/auth/me') {
 			return Promise.reject(error);
 		}
 		try {

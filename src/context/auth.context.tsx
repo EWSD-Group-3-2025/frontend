@@ -29,17 +29,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		retry: false,
 	});
 
-	const login = (accessToken: string, refreshToken: string, user: User) => {
-		Cookies.set(CONSTANTS.ACCESS_TOKEN_KEY, accessToken, {
-			expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
-		});
-		Cookies.set(CONSTANTS.REFRESH_TOKEN_KEY, refreshToken, {
-			expires: CONSTANTS.REFRESH_TOKEN_EXPIRE,
-		});
-
-		queryClient.setQueryData(['authUser'], user);
-	};
-
 	const logoutMutation = useMutation({
 		mutationFn: async () => await authLogout(),
 		onSuccess: () => {
@@ -53,6 +42,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			toast.success('Failed to logout');
 		},
 	});
+
+	const login = (accessToken: string, refreshToken: string, user: User) => {
+		Cookies.set(CONSTANTS.ACCESS_TOKEN_KEY, accessToken, {
+			expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
+		});
+		Cookies.set(CONSTANTS.REFRESH_TOKEN_KEY, refreshToken, {
+			expires: CONSTANTS.REFRESH_TOKEN_EXPIRE,
+		});
+
+		queryClient.setQueryData(['authUser'], user);
+	};
 
 	const logout = async () => {
 		await logoutMutation.mutateAsync();
