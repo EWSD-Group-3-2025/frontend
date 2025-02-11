@@ -29,7 +29,7 @@ export default function UserProfile() {
 	return (
 		<div className="px-5 py-4">
 			<div className="flex items-center gap-x-4">
-				<Avatar className="size-20">
+				<Avatar className="size-20 border border-gray-300">
 					<AvatarImage src={user?.name} alt={user?.name} />
 					<AvatarFallback className="text-4xl">
 						{user?.name.charAt(0).toUpperCase()}

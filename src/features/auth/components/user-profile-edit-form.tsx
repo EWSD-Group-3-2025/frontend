@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { updateAuthAccount } from '../api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/auth.context';
 
 const formSchema = z.object({
 	name: z.string().trim().min(1, { message: 'Name required' }),
@@ -30,6 +31,7 @@ export default function UserProfileEditForm({
 	name,
 	username,
 }: UserProfileEditFormProps) {
+	const { userDataRefresh } = useAuth();
 	const queryClient = useQueryClient();
 	const [isChangedFiled, setIsChangedFiled] = useState(false);
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -49,10 +51,11 @@ export default function UserProfileEditForm({
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
 		// User profile update here
 		updateProfileMutation(data, {
-			onSuccess: ({ data }) => {
+			onSuccess: ({ data: resData }) => {
 				// Invalidate auth user query
+				userDataRefresh();
 				queryClient.invalidateQueries({ queryKey: ['authUser'] });
-				toast.success(data.message);
+				toast.success(resData.message);
 			},
 			onError: ({ message }) => {
 				toast.error(message);
@@ -60,17 +63,13 @@ export default function UserProfileEditForm({
 		});
 	};
 
+	// Watch the form
+	const watchedValues = form.watch(['name', 'username']);
 	useEffect(() => {
-		// TODO Check if there any other way to check default value and form value
-		if (
-			form.getValues('name') !== name &&
-			form.getValues('username') !== name
-		) {
-			setIsChangedFiled(true);
-		} else {
-			setIsChangedFiled(false);
-		}
-	}, [form.getValues('name'), form.getValues('username')]);
+		setIsChangedFiled(
+			watchedValues[0] !== name || watchedValues[1] !== username
+		);
+	}, [watchedValues, name, username]);
 
 	return (
 		<div className="mt-4">

@@ -39,9 +39,9 @@ export function UserButton() {
 						variant="ghost"
 						className="relative size-10 rounded-full"
 					>
-						<Avatar className="size-10">
+						<Avatar className="size-10 border border-gray-300">
 							<AvatarImage src={user?.name} alt={user?.name} />
-							<AvatarFallback>
+							<AvatarFallback className="text-xl">
 								{user?.name.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
@@ -50,7 +50,7 @@ export function UserButton() {
 				<DropdownMenuContent className="w-56" align="end" forceMount>
 					<DropdownMenuLabel className="font-normal">
 						<div className="flex items-center gap-x-2">
-							<Avatar className="size-8">
+							<Avatar className="size-8 border border-gray-300">
 								<AvatarImage
 									src={user?.name}
 									alt={user?.name}
