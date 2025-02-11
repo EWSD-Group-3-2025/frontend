@@ -14,14 +14,19 @@ import { useAuth } from '@/context/auth.context';
 import ResponsiveModal from '@/components/responsive-modal';
 import UserProfile from './user-profile';
 import { useOpenProfileStore } from '../store/use-open-profile-store';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function UserButton() {
-	const { user, logout } = useAuth();
+	const { user, logout, loading } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
 	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
 		useOpenProfileStore();
 
-	if (!user) {
+	if (!user && loading) {
+		return <Skeleton className="size-10 rounded-full" />;
+	}
+
+	if (!user && !loading) {
 		return null;
 	}
 
