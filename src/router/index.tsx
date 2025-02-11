@@ -12,6 +12,11 @@ import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
 import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
+import AdminLayout from '@/layouts/AdminLayout';
+import AdminDashboard from '@/features/users/pages/admin/Dashboard';
+import UserList from '@/features/users/pages/admin/UserList';
+import UserCreate from '@/features/users/pages/admin/UserCreate';
+import UserUpdate from '@/features/users/pages/admin/UserUpdate';
 
 type ChildRoute = {
 	path: string;
@@ -80,6 +85,34 @@ const Router = () => {
 		},
 	];
 
+	const adminRouteList = [
+		{
+			path: '/dashboard/admin',
+			element: AdminDashboard,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/users',
+			element: UserList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/users/create',
+			element: UserCreate,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/users/:id/update',
+			element: UserUpdate,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			name: 'Not Found',
+			path: '*',
+			element: NotFound,
+		},
+	];
+
 	return (
 		<Routes>
 			{/* Forget Password Routes */}
@@ -108,6 +141,21 @@ const Router = () => {
 				))}
 			</Route>
 
+			{/* Admin Routes */}
+			<Route element={<AdminLayout />}>
+				{adminRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
 			{/* Auth Routes */}
 			<Route element={<StandaloneLayout />}>
 				{authRouteList.map((route, i) => (
@@ -118,6 +166,7 @@ const Router = () => {
 					/>
 				))}
 			</Route>
+
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
 	);

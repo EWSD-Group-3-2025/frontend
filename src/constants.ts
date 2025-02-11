@@ -7,8 +7,32 @@ const CONSTANTS = {
 
 export enum USER_ROLE {
 	STUDENT = 'STUDENT',
+	ADMIN = 'ADMIN',
 	TUTOR = 'TUTOR',
 	STAFF = 'STAFF',
 }
+
+export const USER_ROLES = Object.freeze({
+	ADMIN: {
+		value: 1,
+		key: 'Admin',
+		label: 'Admin',
+	},
+	STAFF: {
+		value: 2,
+		key: 'Staff',
+		label: 'Staff',
+	},
+	STUDENT: {
+		value: 3,
+		key: 'Student',
+		label: 'Student',
+	},
+	TUTOR: {
+		value: 4,
+		key: 'Tutor',
+		label: 'Tutor',
+	},
+});
 
 export default CONSTANTS;
