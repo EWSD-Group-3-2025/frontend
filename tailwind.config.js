@@ -9,12 +9,23 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
 			},
+			boxShadow: {
+				wrapper: '0px 2px 5px hsl(var(--wrapper-shadow))',
+			},
+			fontFamily: {
+				roboto: ['Roboto', 'sans-serif'],
+				'roboto-slab': ['Roboto Slab', 'serif'],
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
+				},
+				font: {
+					black: '#0B1215',
+					white: '#FAF9F6',
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -62,6 +73,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))',
 				},
+				'badge-admin': 'hsl(var(--badge-admin))',
+				'badge-staff': 'hsl(var(--badge-staff))',
+				'badge-student': 'hsl(var(--badge-student))',
+				'badge-tutor': 'hsl(var(--badge-tutor))',
+				'container-bg': 'hsl(var(--wrapper-bg))',
+				'form-stroke': 'hsl(var(--form-stroke))',
+				'form-stroke-hover': 'hsl(var(--form-stroke-hover))',
 			},
 		},
 	},

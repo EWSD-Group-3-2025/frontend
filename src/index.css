@@ -6,7 +6,8 @@
 html,
 body {
 	height: 100%;
-	overflow-x: hidden;
+	/* overflow-x: hidden; */
+	@apply font-roboto;
 }
 
 @layer base {
@@ -28,7 +29,7 @@ body {
 		--destructive: 0 84.2% 60.2%;
 		--destructive-foreground: 210 40% 98%;
 		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
+		--input: 217.2 32.6% 17.5%;
 		--ring: 221.2 83.2% 53.3%;
 		--radius: 0.5rem;
 		--chart-1: 12 76% 61%;
@@ -44,6 +45,14 @@ body {
 		--sidebar-accent-foreground: 240 5.9% 10%;
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		--wrapper-bg: 0 0% 96%;
+		--wrapper-shadow: 0 0% 80% / 50%;
+		--form-stroke: 220 3.06% 50%;
+		--form-stroke-hover: 220 3.06% 10%;
+		--badge-admin: 187 76% 50%;
+		--badge-staff: 32 88% 50%;
+		--badge-student: 220 80% 50%;
+		--badge-tutor: 150 75% 40%;
 	}
 
 	.dark {
@@ -64,7 +73,7 @@ body {
 		--destructive: 0 62.8% 30.6%;
 		--destructive-foreground: 210 40% 98%;
 		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 17.5%;
+		--input: 214.3 31.8% 91.4%;
 		--ring: 224.3 76.3% 48%;
 		--chart-1: 220 70% 50%;
 		--chart-2: 160 60% 45%;
@@ -79,6 +88,14 @@ body {
 		--sidebar-accent-foreground: 240 4.8% 95.9%;
 		--sidebar-border: 240 3.7% 15.9%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		--wrapper-bg: 235 21% 21%;
+		--wrapper-shadow: 210 40% 98% / 40%;
+		--form-stroke: 220 4% 55%;
+		--form-stroke-hover: 220 4% 70%;
+		--badge-admin: 187 76% 45%;
+		--badge-staff: 32 88% 40%;
+		--badge-student: 220 80% 40%;
+		--badge-tutor: 150 75% 35%;
 	}
 }
 
