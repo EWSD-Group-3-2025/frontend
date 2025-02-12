@@ -35,4 +35,23 @@ export const USER_ROLES = Object.freeze({
 	},
 });
 
+export const itemsPerPage = Object.freeze([
+	{
+		value: 10,
+		label: '10/page',
+	},
+	{
+		value: 15,
+		label: '15/page',
+	},
+	{
+		value: 25,
+		label: '25/page',
+	},
+	{
+		value: 50,
+		label: '50/page',
+	},
+]);
+
 export default CONSTANTS;

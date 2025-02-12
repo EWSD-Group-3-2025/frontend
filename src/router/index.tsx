@@ -2,7 +2,6 @@ import { createElement, ElementType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import NotFound from '@/pages/notFound/NotFound';
 import AuthGuard from '@/features/auth/components/auth-guard';
-import { USER_ROLE } from '@/constants';
 import LoginPage from '@/features/auth/pages/Login';
 import StudentDashboard from '@/features/users/pages/student/Dashboard';
 import EndUserLayout from '@/layouts/EndUserLayout';
@@ -17,6 +16,8 @@ import AdminDashboard from '@/features/users/pages/admin/Dashboard';
 import UserList from '@/features/users/pages/admin/UserList';
 import UserCreate from '@/features/users/pages/admin/UserCreate';
 import UserUpdate from '@/features/users/pages/admin/UserUpdate';
+import { USER_ROLE } from '@/constants';
+import { DataTableDemo } from '@/features/users/pages/admin/Demo';
 
 type ChildRoute = {
 	path: string;
@@ -88,7 +89,7 @@ const Router = () => {
 	const adminRouteList = [
 		{
 			path: '/dashboard/admin',
-			element: AdminDashboard,
+			element: DataTableDemo,
 			role: [USER_ROLE.ADMIN],
 		},
 		{

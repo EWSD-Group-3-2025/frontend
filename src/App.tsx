@@ -15,7 +15,7 @@ function App() {
 					storageKey="ewsd-frontend-theme"
 				>
 					<Router />
-					<Toaster position="top-center" closeButton />
+					<Toaster richColors position="top-center" closeButton />
 				</ThemeProvider>
 			</QueryClientProvider>
 		</>
