@@ -34,7 +34,9 @@ const TutorList = () => {
 		},
 		{
 			id: 'name',
-			header: 'Name',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Name" />
+			),
 			accessorKey: 'name',
 		},
 		{

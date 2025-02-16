@@ -78,7 +78,6 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 
 	const selectedRoleId = form.watch('roleId');
 
-	// Determine field name dynamically
 	const getFieldName = () => {
 		switch (selectedRoleId) {
 			case '1':
@@ -86,15 +85,14 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 			case '2':
 				return 'department';
 			case '3':
-				return 'specialization';
-			case '4':
 				return 'course';
+			case '4':
+				return 'specialization';
 			default:
 				return 'name';
 		}
 	};
 
-	// Determine label and placeholder
 	const getInputProps = () => {
 		switch (selectedRoleId) {
 			case '1':
@@ -105,12 +103,12 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 			case '2':
 				return { label: 'Department', placeholder: 'Enter department' };
 			case '3':
+				return { label: 'Course', placeholder: 'Enter course' };
+			case '4':
 				return {
 					label: 'Specialization',
 					placeholder: 'Enter specialization',
 				};
-			case '4':
-				return { label: 'Course', placeholder: 'Enter course' };
 			default:
 				return null;
 		}
