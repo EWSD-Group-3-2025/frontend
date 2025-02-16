@@ -1,18 +1,22 @@
 import { createUser } from '@/features/users/api';
-import UserForm, { UserFormValue } from '@/features/users/pages/admin/UserForm';
+import { useUserBasePath } from '@/hooks/useUserBasePath';
+import UserForm, {
+	UserFormValue,
+} from '@/features/users/pages/management/UserForm';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const UserCreate = () => {
 	const navigate = useNavigate();
+	const baseURL = useUserBasePath();
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: UserFormValue) =>
 			await createUser(body as UserFormValue)
 				.then((response) => {
 					if (response.data.code === 201) {
-						navigate('/dashboard/admin/users');
+						navigate(`${baseURL}/users`);
 						toast.success(response.data.message);
 					}
 					return response.data;
@@ -20,14 +24,11 @@ const UserCreate = () => {
 				.catch((e) => {
 					if (e.response.data.code === 409) {
 						toast.error(
-							e.response?.data?.message ?? 'Request Failed',
-							{
-								description:
-									e.response?.data?.data ||
-									'Something went wrong. Please try again.',
-							}
+							e.response?.data?.message ?? 'Request Failed'
 						);
 					}
+					toast.error(e.response?.data?.message ?? 'Request Failed');
+					return e.response.data;
 				}),
 	});
 

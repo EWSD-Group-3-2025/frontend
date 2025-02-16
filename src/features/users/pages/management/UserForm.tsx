@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { objectToArray } from '@/utils';
 import { USER_ROLES } from '@/constants';
 import { useNavigate } from 'react-router-dom';
+import { useUserBasePath } from '@/hooks/useUserBasePath';
 
 type UserFormProps = {
 	formData?: UserFormValue;
@@ -31,16 +32,24 @@ type UserFormProps = {
 
 const userFormSchema = z.object({
 	name: z.string({ message: 'Name Required' }),
+	// .min(1, { message: 'Name Required' }),
 	username: z.string(),
 	email: z.string({ message: 'Email Required' }),
+	// .min(1, { message: 'Email Required' }),
 	roleId: z.string({ message: 'Role required' }),
+	// .min(1, { message: 'Role Required' }),
+	permissions: z.string().nullable(),
+	department: z.string().nullable(),
+	specialization: z.string().nullable(),
+	course: z.string().nullable(),
 });
 
 export type UserFormValue = z.infer<typeof userFormSchema>;
 
 const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 	const navigate = useNavigate();
-	const transform = objectToArray(USER_ROLES);
+	const baseURL = useUserBasePath();
+	const roles = objectToArray(USER_ROLES);
 
 	const form = useForm<UserFormValue>({
 		resolver: zodResolver(userFormSchema),
@@ -49,15 +58,63 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 			email: '',
 			username: '',
 			roleId: '',
+			permissions: '',
+			department: '',
+			specialization: '',
+			course: '',
 		},
 	});
 
 	function onSubmit(values: UserFormValue) {
-		console.log(values);
-		handleSubmit(values);
+		handleSubmit(values).then((e) => {
+			(e as unknown as HTTPFailResponse).data.forEach((err) => {
+				form.setError(err.field as keyof UserFormValue, {
+					type: 'server',
+					message: err.message,
+				});
+			});
+		});
 	}
 
-	console.log(form.formState.defaultValues);
+	const selectedRoleId = form.watch('roleId');
+
+	// Determine field name dynamically
+	const getFieldName = () => {
+		switch (selectedRoleId) {
+			case '1':
+				return 'permissions';
+			case '2':
+				return 'department';
+			case '3':
+				return 'specialization';
+			case '4':
+				return 'course';
+			default:
+				return 'name';
+		}
+	};
+
+	// Determine label and placeholder
+	const getInputProps = () => {
+		switch (selectedRoleId) {
+			case '1':
+				return {
+					label: 'Permissions',
+					placeholder: 'Enter permissions',
+				};
+			case '2':
+				return { label: 'Department', placeholder: 'Enter department' };
+			case '3':
+				return {
+					label: 'Specialization',
+					placeholder: 'Enter specialization',
+				};
+			case '4':
+				return { label: 'Course', placeholder: 'Enter course' };
+			default:
+				return null;
+		}
+	};
 
 	return (
 		<>
@@ -124,7 +181,7 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													{transform.map((role) => (
+													{roles.map((role) => (
 														<SelectItem
 															key={role.value}
 															value={role.value.toString()}
@@ -141,15 +198,48 @@ const UserForm = ({ formData, handleSubmit }: UserFormProps) => {
 								/>
 							</div>
 
-							<div className="flex flex-1 flex-col gap-3"></div>
+							<div className="flex flex-1 flex-col gap-3">
+								{selectedRoleId && getFieldName() && (
+									<FormField
+										control={form.control}
+										name={getFieldName()} // Dynamic field name
+										render={({ field }) => {
+											const inputProps = getInputProps();
+
+											return inputProps ? (
+												<FormItem>
+													<FormLabel>
+														{inputProps.label}
+													</FormLabel>
+													<FormControl>
+														<Input
+															placeholder={
+																inputProps.placeholder
+															}
+															{...field}
+															value={
+																field.value ??
+																''
+															}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											) : (
+												<FormItem>
+													<FormMessage />
+												</FormItem>
+											);
+										}}
+									/>
+								)}
+							</div>
 						</div>
 						<div className="mt-6 flex justify-end gap-2">
 							<Button
 								className="bg-slate-500 hover:bg-slate-500"
 								type="reset"
-								onClick={() =>
-									navigate('/dashboard/admin/users')
-								}
+								onClick={() => navigate(`${baseURL}/users`)}
 							>
 								Cancel
 							</Button>

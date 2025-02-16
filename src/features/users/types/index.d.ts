@@ -6,6 +6,11 @@ export interface User {
 	username: string;
 	email: string;
 	roleName: keyof typeof USER_ROLE;
+	status: boolean;
+	permissions: string | null;
+	department: string | null;
+	specialization: string | null;
+	course: string | null;
 }
 
 export interface ChangePasswordRequest {
