@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
 import authRoutes from './routes';
-import { User } from '@/features/users/types';
+import { AuthUser } from '@/features/users/types';
 import api from '@/utils/axios';
 
 export const login = async (body: LoginRequest) =>
@@ -13,7 +13,7 @@ export const logout = async () => await api.post(authRoutes.logout);
 export const getAuthAccount = async () => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
-	return await api.get<HTTPResponse<{ user: User }>>(authRoutes.getMe);
+	return await api.get<HTTPResponse<{ user: AuthUser }>>(authRoutes.getMe);
 };
 
 export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {

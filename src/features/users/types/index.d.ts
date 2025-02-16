@@ -13,6 +13,14 @@ export interface User {
 	course: string | null;
 }
 
+export interface AuthUser {
+	id: number;
+	name: string;
+	username: string;
+	email: string;
+	roleName: keyof typeof USER_ROLE;
+}
+
 export interface ChangePasswordRequest {
 	oldPassword: string;
 	newPassword: string;

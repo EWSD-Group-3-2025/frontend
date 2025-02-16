@@ -8,13 +8,13 @@ import {
 	QueryObserverResult,
 } from '@tanstack/react-query';
 import CONSTANTS from '@/constants';
-import { User } from '@/features/users/types';
+import { AuthUser } from '@/features/users/types';
 import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
 import { toast } from 'sonner';
 import { AxiosResponse } from 'axios';
 
 interface AuthContextProps {
-	user?: User | null;
+	user?: AuthUser | null;
 	loading: boolean;
 	assignLoginToken: (accessToken: string, refreshToken: string) => void;
 	logout: () => Promise<void>;
@@ -22,7 +22,7 @@ interface AuthContextProps {
 		QueryObserverResult<
 			AxiosResponse<
 				HTTPResponse<{
-					user: User;
+					user: AuthUser;
 				}>,
 				any
 			>,
