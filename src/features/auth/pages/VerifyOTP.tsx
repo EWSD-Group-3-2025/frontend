@@ -168,7 +168,14 @@ export default function VerifyOTPPage() {
 								render={({ field }) => (
 									<FormItem className="mb-3 flex flex-col items-center justify-center">
 										<FormControl>
-											<InputOTP maxLength={6} {...field}>
+											<InputOTP
+												disabled={
+													verifyOtpPending ||
+													form.formState.isSubmitting
+												}
+												maxLength={6}
+												{...field}
+											>
 												<InputOTPGroup>
 													<InputOTPSlot
 														className="size-12"
@@ -206,7 +213,10 @@ export default function VerifyOTPPage() {
 							/>
 							<div className="space-y-3">
 								<Button
-									disabled={form.formState.isSubmitting}
+									disabled={
+										verifyOtpPending ||
+										form.formState.isSubmitting
+									}
 									type="submit"
 									className="w-full text-neutral-100 hover:text-neutral-200"
 								>

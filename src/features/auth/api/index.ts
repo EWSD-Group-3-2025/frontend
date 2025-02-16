@@ -26,16 +26,8 @@ export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {
 export const forgotPassword = async (body: ForgotPasswordRequest) =>
 	await api.post<HTTPResponse>(authRoutes.forgotPassword, body);
 
-export const verifyOtp = async (body: VerifyOtpRequest) => {
-	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
-	if (!refreshToken) throw new Error('No refresh token found');
+export const verifyOtp = async (body: VerifyOtpRequest) =>
+	await api.post<HTTPResponse>(authRoutes.verifyOtp, body);
 
-	return await api.post<HTTPResponse>(authRoutes.verifyOtp, body);
-};
-
-export const resetPassword = async (body: ResetPasswordRequest) => {
-	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
-	if (!refreshToken) throw new Error('No refresh token found');
-
-	return await api.post<HTTPResponse>(authRoutes.resetPassword, body);
-};
+export const resetPassword = async (body: ResetPasswordRequest) =>
+	await api.post<HTTPResponse>(authRoutes.resetPassword, body);
