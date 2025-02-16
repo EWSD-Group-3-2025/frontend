@@ -16,6 +16,10 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { useLocation } from 'react-router-dom';
+import { USER_ROLE } from '@/constants';
+import { useAuth } from '@/context/auth.context';
+import { useState } from 'react';
 
 export function SidebarItem({
 	items,
@@ -24,22 +28,54 @@ export function SidebarItem({
 		title: string;
 		url: string;
 		icon?: LucideIcon;
-		isActive?: boolean;
+		role: (keyof typeof USER_ROLE)[];
 		items?: {
 			title: string;
 			url: string;
+			role: (keyof typeof USER_ROLE)[];
 		}[];
 	}[];
 }) {
+	const location = useLocation();
+	const { user } = useAuth();
+
+	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
+
+	const hasPermission = (roles: (keyof typeof USER_ROLE)[]) => {
+		return roles.some((role) => user?.roleName.includes(role));
+	};
+
+	// Filter sidebar items based on user role
+	const filteredItems = items
+		.filter((item) => hasPermission(item.role)) // Check parent-level permission
+		.map((item) => ({
+			...item,
+			items: item.items?.filter((subItem) => hasPermission(subItem.role)), // Check child-level permission
+		}));
+
+	const toggleCollapse = (title: string) => {
+		setOpenStates((prev) => ({ ...prev, [title]: !prev[title] }));
+	};
+
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				{items.map((item) =>
-					item.items && item.items.length > 0 ? (
+				{filteredItems.map((item) => {
+					const isActive =
+						location.pathname.startsWith(item.url) ||
+						(item.items?.some((subItem) =>
+							location.pathname.startsWith(subItem.url)
+						) ??
+							false);
+
+					const isOpen = openStates[item.title] ?? isActive;
+
+					return item.items && item.items.length > 0 ? (
 						<Collapsible
 							key={item.title}
 							asChild
-							defaultOpen={item.isActive}
+							open={isOpen}
+							onOpenChange={() => toggleCollapse(item.title)}
 							className="group/collapsible"
 						>
 							<SidebarMenuItem>
@@ -47,7 +83,9 @@ export function SidebarItem({
 									<SidebarMenuButton tooltip={item.title}>
 										{item.icon && <item.icon />}
 										<span>{item.title}</span>
-										<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+										<ChevronRight
+											className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+										/>
 									</SidebarMenuButton>
 								</CollapsibleTrigger>
 								<CollapsibleContent>
@@ -81,8 +119,8 @@ export function SidebarItem({
 								</a>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
-					)
-				)}
+					);
+				})}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

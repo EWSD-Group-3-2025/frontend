@@ -15,22 +15,22 @@ export enum USER_ROLE {
 export const USER_ROLES = Object.freeze({
 	ADMIN: {
 		value: 1,
-		key: 'Admin',
+		key: 'ADMIN',
 		label: 'Admin',
 	},
 	STAFF: {
 		value: 2,
-		key: 'Staff',
+		key: 'STAFF',
 		label: 'Staff',
 	},
 	STUDENT: {
 		value: 3,
-		key: 'Student',
+		key: 'STUDENT',
 		label: 'Student',
 	},
 	TUTOR: {
 		value: 4,
-		key: 'Tutor',
+		key: 'TUTOR',
 		label: 'Tutor',
 	},
 });

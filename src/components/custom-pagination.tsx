@@ -1,85 +1,106 @@
-import usePagination from '@/hooks/usePagination';
-import { itemsPerPage } from '@/constants';
-import { Button } from '@/components/ui/button';
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from '@/components/ui/pagination';
 
-interface PaginationProps {
-	pages: number;
-}
+type CustomPaginationProps = {
+	currentPage: number;
+	previousPage: () => void;
+	pageNumbers: (number | string)[];
+	setPageIndex: (index: number) => void;
+	nextPage: () => void;
+	totalPages: number;
+	pageSize: number;
+	setPageSize: (size: number) => void;
+};
 
-const Pagination = ({ pages }: PaginationProps) => {
-	const { page = 1, limit = 10, setFilter } = usePagination();
-
-	const handleSelect = (value: number) => {
-		setFilter({ limit: value, page: 1 });
-	};
-
+const CustomPagination = ({
+	currentPage,
+	previousPage,
+	pageNumbers,
+	setPageIndex,
+	nextPage,
+	totalPages,
+	pageSize,
+	setPageSize,
+}: CustomPaginationProps) => {
 	return (
-		<div className="me-4 flex items-center justify-end space-x-2 py-4">
-			<Button
-				variant={null}
-				size="sm"
-				onClick={() => setFilter({ page: page - 1 })}
-				disabled={page <= 1}
-				className="h-8 w-8"
-			>
-				<ChevronLeft className="text-new-button-primary" />
-			</Button>
+		<div className="mt-3 flex flex-wrap justify-end">
+			<Pagination className="m-0 w-fit justify-end">
+				<PaginationContent>
+					<PaginationItem>
+						<PaginationPrevious
+							href="#"
+							onClick={() => previousPage()}
+							className={
+								currentPage === 1
+									? 'pointer-events-none opacity-50'
+									: ''
+							}
+						/>
+					</PaginationItem>
 
-			{Array.from({ length: pages }, (_, i) => (
-				<Button
-					key={i}
-					variant={page === i + 1 ? 'default' : 'outline'}
-					onClick={() => setFilter({ page: i + 1 })}
-					className="m-0 h-8 w-8"
-				>
-					{i + 1}
-				</Button>
-			))}
-
-			<Button
-				variant={null}
-				size="sm"
-				onClick={() => setFilter({ page: page + 1 })}
-				disabled={page >= pages}
-				className="h-8 w-8"
-			>
-				<ChevronRight className="text-new-button-primary" />
-			</Button>
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild className="border-none">
-					<button
-						type="button"
-						className="flex h-7 w-24 items-center justify-between px-2 focus:outline-none"
-					>
-						{itemsPerPage.find((item) => item.value === limit)
-							?.label || 'Select'}
-						<ChevronDown className="text-new-button-primary ms-2" />
-					</button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					className="z-10 w-full max-w-xs -translate-x-6 rounded-md shadow-lg"
-					avoidCollisions
-				>
-					{itemsPerPage.map((item) => (
-						<DropdownMenuItem
-							key={item.value}
-							onClick={() => handleSelect(item.value)}
-							className="cursor-pointer p-2 hover:bg-gray-200"
-						>
-							{item.label}
-						</DropdownMenuItem>
+					{pageNumbers.map((page, index) => (
+						<PaginationItem key={index}>
+							{page === '...' ? (
+								<span className="px-2">...</span>
+							) : (
+								<PaginationLink
+									href="#"
+									isActive={page === currentPage}
+									onClick={() =>
+										setPageIndex((page as number) - 1)
+									}
+								>
+									{page}
+								</PaginationLink>
+							)}
+						</PaginationItem>
 					))}
-				</DropdownMenuContent>
-			</DropdownMenu>
+
+					<PaginationItem>
+						<PaginationNext
+							href="#"
+							onClick={() => nextPage()}
+							className={
+								currentPage === totalPages
+									? 'pointer-events-none opacity-50'
+									: ''
+							}
+						/>
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+			<div className="ms-3 flex items-center space-x-2">
+				<Select
+					onValueChange={(value) => setPageSize(Number(value))}
+					value={String(pageSize)}
+				>
+					<SelectTrigger className="w-16">
+						<SelectValue placeholder={pageSize} />
+					</SelectTrigger>
+					<SelectContent>
+						{[1, 5, 10, 20, 50, 100].map((size) => (
+							<SelectItem key={size} value={String(size)}>
+								{size}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
 		</div>
 	);
 };
 
-export default Pagination;
+export default CustomPagination;

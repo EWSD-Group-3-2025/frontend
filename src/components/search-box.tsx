@@ -1,11 +1,12 @@
 import { KeyboardEvent, useRef } from 'react';
 
-import useSearch from '@/hooks/useSearch';
-import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
+import { Input } from '@/components/ui/input';
+import { useSearch } from '@/store/useSearch';
+
 const SearchBox = () => {
-	const { setFilter } = useSearch();
+	const { setSearch } = useSearch();
 
 	const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -15,7 +16,7 @@ const SearchBox = () => {
 		}
 
 		searchTimeout.current = setTimeout(() => {
-			setFilter({ search: value });
+			setSearch(value);
 		}, 500);
 	};
 
@@ -24,14 +25,14 @@ const SearchBox = () => {
 			if (searchTimeout.current) {
 				clearTimeout(searchTimeout.current);
 			}
-			setFilter({ search: (e.target as HTMLInputElement).value });
+			setSearch((e.target as HTMLInputElement).value);
 		}
 	};
 
 	return (
-		<div className="relative mb-3">
+		<div className="relative min-w-32 max-w-60">
 			<Input
-				className="w-1/3 border-form-stroke pl-7 hover:border-form-stroke-hover"
+				className="w-full border-form-stroke pl-7 hover:border-form-stroke-hover"
 				type="search"
 				placeholder="Search . . ."
 				onChange={(e) => debouncedSearchText(e.target.value)}

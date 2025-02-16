@@ -16,3 +16,17 @@ interface HTTPResponse<T = Record<string, never>> {
 	message: string;
 	duration: number;
 }
+
+interface ValidationError {
+	field: string;
+	message: string;
+}
+
+interface HTTPFailResponse {
+	success: 0 | 1;
+	code: number;
+	meta: Meta;
+	data: ValidationError[];
+	message: string;
+	duration: number;
+}
