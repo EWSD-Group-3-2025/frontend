@@ -1,16 +1,34 @@
 import Cookies from 'js-cookie';
 import { createContext, useContext } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+	useQuery,
+	useMutation,
+	useQueryClient,
+	RefetchOptions,
+	QueryObserverResult,
+} from '@tanstack/react-query';
 import CONSTANTS from '@/constants';
 import { User } from '@/features/users/types';
 import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
 import { toast } from 'sonner';
+import { AxiosResponse } from 'axios';
 
 interface AuthContextProps {
 	user?: User | null;
 	loading: boolean;
-	login: (accessToken: string, refreshToken: string, user: User) => void;
+	assignLoginToken: (accessToken: string, refreshToken: string) => void;
 	logout: () => Promise<void>;
+	userDataRefresh: (options?: RefetchOptions) => Promise<
+		QueryObserverResult<
+			AxiosResponse<
+				HTTPResponse<{
+					user: User;
+				}>,
+				any
+			>,
+			Error
+		>
+	>;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -23,7 +41,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const queryClient = useQueryClient();
 
 	// Fetch the user details if a refresh token is present
-	const { isLoading, data: userResponse } = useQuery({
+	const {
+		isLoading,
+		data: userResponse,
+		refetch: userDataRefresh,
+	} = useQuery({
 		queryKey: ['authUser'],
 		queryFn: async () => await getAuthAccount(),
 		retry: false,
@@ -43,15 +65,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		},
 	});
 
-	const login = (accessToken: string, refreshToken: string, user: User) => {
+	const assignLoginToken = (accessToken: string, refreshToken: string) => {
 		Cookies.set(CONSTANTS.ACCESS_TOKEN_KEY, accessToken, {
 			expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
 		});
 		Cookies.set(CONSTANTS.REFRESH_TOKEN_KEY, refreshToken, {
 			expires: CONSTANTS.REFRESH_TOKEN_EXPIRE,
 		});
-
-		queryClient.setQueryData(['authUser'], user);
 	};
 
 	const logout = async () => {
@@ -65,8 +85,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 					? { ...userResponse.data.data.user }
 					: null,
 				loading: isLoading,
-				login,
+				assignLoginToken,
 				logout,
+				userDataRefresh,
 			}}
 		>
 			{children}

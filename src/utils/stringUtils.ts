@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
+export function convertNameToSlug(name: string): string {
+	return name.toLowerCase().replace(/\s+/g, '-');
+}
+
 export const buildURL = <T extends Record<string, string | number>>(
 	template: string,
 	values: T

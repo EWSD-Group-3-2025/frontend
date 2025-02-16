@@ -76,7 +76,7 @@ export default function ChangePasswordPage() {
 				navigate('/dashboard/student');
 			},
 			onError: (data: any) => {
-				toast.error(data?.response?.data?.data);
+				toast.error(data?.response?.data?.message);
 			},
 		});
 	};

@@ -16,11 +16,13 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { Fingerprint } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { forgotPassword } from '../api';
 
 const formSchema = z.object({
 	email: z
@@ -39,11 +41,23 @@ export default function ForgotPasswordPage() {
 		},
 	});
 
-	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		console.log(data);
+	const { mutate: forgotPasswordMutation, isPending: forgotPasswordPending } =
+		useMutation({
+			mutationFn: async ({ email }: ForgotPasswordRequest) =>
+				await forgotPassword({ email }),
+		});
 
-		toast.success('Successfully sent verification code');
-		navigate('/verify-otp');
+	const onSubmit = async (data: z.infer<typeof formSchema>) => {
+		// User profile update here
+		forgotPasswordMutation(data, {
+			onSuccess: ({ data: resData }) => {
+				toast.success(resData.message);
+				navigate(`/verify-otp?forgot-reset-email=${data.email}`);
+			},
+			onError: ({ message }) => {
+				toast.error(message);
+			},
+		});
 	};
 
 	return (
@@ -79,7 +93,9 @@ export default function ForgotPasswordPage() {
 										<FormControl>
 											<Input
 												disabled={
-													form.formState.isSubmitting
+													form.formState
+														.isSubmitting ||
+													forgotPasswordPending
 												}
 												id="email"
 												type="email"
@@ -92,7 +108,10 @@ export default function ForgotPasswordPage() {
 								)}
 							/>
 							<Button
-								disabled={form.formState.isSubmitting}
+								disabled={
+									form.formState.isSubmitting ||
+									forgotPasswordPending
+								}
 								type="submit"
 								className="w-full text-neutral-100 hover:text-neutral-200"
 							>

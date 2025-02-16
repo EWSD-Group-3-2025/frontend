@@ -22,9 +22,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { resetPassword } from '../api';
+import { useMutation } from '@tanstack/react-query';
 
 const formSchema = z.object({
-	password: z.string().trim().min(6, { message: 'Password required' }),
+	newPassword: z.string().trim().min(6, { message: 'New Password required' }),
 	confirmPassword: z
 		.string()
 		.trim()
@@ -39,16 +41,30 @@ export default function ResetPasswordPage() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			password: '',
+			newPassword: '',
 			confirmPassword: '',
 		},
 	});
 
-	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		console.log(data);
+	const { mutate: resetPasswordMutation, isPending: resetPasswordPending } =
+		useMutation({
+			mutationFn: async ({
+				newPassword,
+				confirmPassword,
+			}: ResetPasswordRequest) =>
+				await resetPassword({ newPassword, confirmPassword }),
+		});
 
-		toast.success('Successfully reset password');
-		navigate('/reset-password-successful');
+	const onSubmit = async (data: z.infer<typeof formSchema>) => {
+		resetPasswordMutation(data, {
+			onSuccess: ({ data: resData }) => {
+				toast.success(resData.message);
+				navigate('/reset-password-successful');
+			},
+			onError: ({ message }) => {
+				toast.error(message);
+			},
+		});
 	};
 
 	return (
@@ -71,12 +87,16 @@ export default function ResetPasswordPage() {
 							className="space-y-4"
 						>
 							<FormField
+								disabled={
+									resetPasswordPending ||
+									form.formState.isSubmitting
+								}
 								control={form.control}
-								name="password"
+								name="newPassword"
 								render={({ field }) => (
 									<FormItem className="mb-3">
-										<FormLabel htmlFor="password">
-											Password
+										<FormLabel htmlFor="newPassword">
+											New Password
 											<span className="ml-1 text-red-500">
 												*
 											</span>
@@ -88,13 +108,13 @@ export default function ResetPasswordPage() {
 														form.formState
 															.isSubmitting
 													}
-													id="password"
+													id="newPassword"
 													type={
 														showPassword
 															? 'text'
 															: 'password'
 													}
-													placeholder="Password"
+													placeholder="New Password"
 													{...field}
 												/>
 												<button
@@ -123,6 +143,10 @@ export default function ResetPasswordPage() {
 								)}
 							/>
 							<FormField
+								disabled={
+									resetPasswordPending ||
+									form.formState.isSubmitting
+								}
 								control={form.control}
 								name="confirmPassword"
 								render={({ field }) => (
@@ -175,7 +199,10 @@ export default function ResetPasswordPage() {
 								)}
 							/>
 							<Button
-								disabled={form.formState.isSubmitting}
+								disabled={
+									resetPasswordPending ||
+									form.formState.isSubmitting
+								}
 								type="submit"
 								className="w-full text-neutral-100 hover:text-neutral-200"
 							>
