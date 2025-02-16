@@ -3,17 +3,18 @@
 - [Overview](#overview)
 - [Pre-request](#pre-request)
 - [Installation](#installation)
-  - [Step 1 - Clone Frontend Project](#step-1---clone-frontend-project)
-    - [with **SSH**](#with-ssh)
-    - [with **HTTPS**](#with-https)
-    - [Navigate to the project directory](#navigate-to-the-project-directory)
-  - [Step 2 - Install dependencies](#step-2---install-dependencies)
-  - [Step 3 - Set up environment variables](#step-3---set-up-environment-variables)
-  - [Step 4 - Start the development](#step-4---start-the-development)
+    - [Step 1 - Clone Frontend Project](#step-1---clone-frontend-project)
+        - [with **SSH**](#with-ssh)
+        - [with **HTTPS**](#with-https)
+        - [Navigate to the project directory](#navigate-to-the-project-directory)
+    - [Step 2 - Install dependencies](#step-2---install-dependencies)
+    - [Step 3 - Set up environment variables](#step-3---set-up-environment-variables)
+    - [Step 4 - Start the development](#step-4---start-the-development)
 - [Usage](#usage)
 - [Folder Structure](#folder-structure)
 - [License](#license)
 - [Contact](#contact)
+    - [TODO](#todo)
 
 # Overview
 
@@ -82,3 +83,8 @@ This project is licensed under the [MIT License](/LICENSE).
 We'd love to hear from you! If you have any questions, suggestions, or feedback about this project, feel free to reach out.
 
 - **Email**: [pthu1@kmd.edu.mm](mailto:pthu1@kmd.edu.mm)
+
+## TODO
+
+- Fix timer in resend OTP code
+- Forgot password is not work without login (show refresh token error)

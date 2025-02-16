@@ -22,3 +22,12 @@ export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {
 
 	return await api.patch<HTTPResponse>(authRoutes.updateMe, body);
 };
+
+export const forgotPassword = async (body: ForgotPasswordRequest) =>
+	await api.post<HTTPResponse>(authRoutes.forgotPassword, body);
+
+export const verifyOtp = async (body: VerifyOtpRequest) =>
+	await api.post<HTTPResponse>(authRoutes.verifyOtp, body);
+
+export const resetPassword = async (body: ResetPasswordRequest) =>
+	await api.post<HTTPResponse>(authRoutes.resetPassword, body);

@@ -3,6 +3,19 @@ interface UpdateUserProfileRequest {
 	name: string;
 }
 
+interface ForgotPasswordRequest {
+	email: string;
+}
+
+interface VerifyOtpRequest {
+	otp: string;
+}
+
+interface ResetPasswordRequest {
+	newPassword: string;
+	confirmPassword: string;
+}
+
 interface LoginRequest {
 	email: string;
 	password: string;

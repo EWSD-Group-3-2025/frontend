@@ -8,8 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/context/auth.context';
 import { useForm } from 'react-hook-form';
 import { login } from '@/features/auth/api';
-import Cookies from 'js-cookie';
-import CONSTANTS from '@/constants';
 import { toast } from 'sonner';
 import {
 	Form,
@@ -49,16 +47,13 @@ export default function LoginPage() {
 		await login(data)
 			.then((response) => {
 				if (response.data.code === 200) {
-					Cookies.set(
-						CONSTANTS.ACCESS_TOKEN_KEY,
-						response.data.data.accessToken
-					);
-					Cookies.set(
-						CONSTANTS.REFRESH_TOKEN_KEY,
+					auth.assignLoginToken(
+						response.data.data.accessToken,
 						response.data.data.refreshToken
 					);
+
+					form.reset();
 					// TODO Redirect based on user role and use function from RRD
-					// navigate('/dashboard/student');
 					window.location.href = '/dashboard/student';
 					toast.success('Log in successful');
 				}
