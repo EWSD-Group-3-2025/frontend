@@ -13,7 +13,7 @@ import {
 import { Link } from 'react-router-dom';
 import { SidebarItem } from '@/components/sidebar-item';
 import { USER_ROLE } from '@/constants';
-import { useUserBasePath } from '@/features/users/hooks/useUserBasePath';
+import { useUserBasePath } from '@/hooks/useUserBasePath';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const baseURL = useUserBasePath();

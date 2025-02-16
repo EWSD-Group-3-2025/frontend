@@ -1,23 +1,29 @@
 import { createElement, ElementType } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import NotFound from '@/pages/notFound/NotFound';
-import AuthGuard from '@/features/auth/components/auth-guard';
-import LoginPage from '@/features/auth/pages/Login';
-import StudentDashboard from '@/features/users/pages/student/Dashboard';
-import EndUserLayout from '@/layouts/EndUserLayout';
-import StandaloneLayout from '@/layouts/StandaloneLayout';
-import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
-import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
-import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
-import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
-import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
-import AdminLayout from '@/layouts/AdminLayout';
-import AdminDashboard from '@/features/users/pages/admin/Dashboard';
-import UserList from '@/features/users/pages/admin/UserList';
-import UserCreate from '@/features/users/pages/admin/UserCreate';
-import UserUpdate from '@/features/users/pages/admin/UserUpdate';
+
 import { USER_ROLE } from '@/constants';
-import { DataTableDemo } from '@/features/users/pages/admin/Demo';
+import NotFound from '@/pages/notFound/NotFound';
+import LoginPage from '@/features/auth/pages/Login';
+import EndUserLayout from '@/layouts/EndUserLayout';
+import ManagementLayout from '@/layouts/ManagementLayout';
+import StandaloneLayout from '@/layouts/StandaloneLayout';
+import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
+import UserList from '@/features/users/pages/management/UserList';
+import AuthGuard from '@/features/auth/components/auth-guard';
+import UserCreate from '@/features/users/pages/management/UserCreate';
+import UserUpdate from '@/features/users/pages/management/UserUpdate';
+import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
+import AdminDashboard from '@/features/users/pages/admin/Dashboard';
+import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
+import StudentDashboard from '@/features/users/pages/student/Dashboard';
+import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
+import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
+import StaffDashboard from '@/features/users/pages/staff/Dashboard';
+import StaffList from '@/features/users/pages/management/StaffList';
+import StudentList from '@/features/users/pages/management/StudentList';
+import TutorList from '@/features/users/pages/management/TutorList';
+import AdminList from '@/features/users/pages/management/AdminList';
 
 type ChildRoute = {
 	path: string;
@@ -89,7 +95,22 @@ const Router = () => {
 	const adminRouteList = [
 		{
 			path: '/dashboard/admin',
-			element: DataTableDemo,
+			element: AdminDashboard,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/student/:username',
+			element: OtherUserDashboard,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/tutor/:username',
+			element: OtherUserDashboard,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/staff/:username',
+			element: OtherUserDashboard,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
@@ -106,6 +127,74 @@ const Router = () => {
 			path: '/dashboard/admin/users/:id/update',
 			element: UserUpdate,
 			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/staffs',
+			element: StaffList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/students',
+			element: StudentList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/tutors',
+			element: TutorList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/admins',
+			element: AdminList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			name: 'Not Found',
+			path: '*',
+			element: NotFound,
+		},
+	];
+
+	const staffRouteList = [
+		{
+			path: '/dashboard/staff',
+			element: StaffDashboard,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/users',
+			element: UserList,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/users/create',
+			element: UserCreate,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/users/:id/update',
+			element: UserUpdate,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/staffs',
+			element: StaffList,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/students',
+			element: StudentList,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/tutors',
+			element: TutorList,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/admins',
+			element: AdminList,
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			name: 'Not Found',
@@ -143,8 +232,23 @@ const Router = () => {
 			</Route>
 
 			{/* Admin Routes */}
-			<Route element={<AdminLayout />}>
+			<Route element={<ManagementLayout />}>
 				{adminRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
+			{/* Staff Routes */}
+			<Route element={<ManagementLayout />}>
+				{staffRouteList.map((route, i) => (
 					<Route
 						key={i}
 						path={route.path}

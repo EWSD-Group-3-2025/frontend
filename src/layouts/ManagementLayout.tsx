@@ -11,11 +11,11 @@ import {
 import { AppSidebar } from '@/components/app-sidebar';
 import { Separator } from '@/components/ui/separator';
 
-const AdminLayout = () => {
+const ManagementLayout = () => {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset>
+			<SidebarInset className="overflow-x-hidden">
 				<header className="mb-4 flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
 					<div className="flex items-center gap-2">
 						<SidebarTrigger className="-ml-1" />
@@ -38,4 +38,4 @@ const AdminLayout = () => {
 	);
 };
 
-export default AdminLayout;
+export default ManagementLayout;

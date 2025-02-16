@@ -1,9 +1,9 @@
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
 import api from '@/utils/axios';
-import { ChangePasswordRequest } from '../types';
+import { ChangePasswordRequest, User } from '../types';
 import userRoutes from './routes';
-import { UserFormValue } from '@/features/users/pages/admin/UserForm';
+import { UserFormValue } from '@/features/users/pages/management/UserForm';
 import { buildURL } from '@/utils';
 
 export const userChangePassword = async (body: ChangePasswordRequest) => {
@@ -14,7 +14,7 @@ export const userChangePassword = async (body: ChangePasswordRequest) => {
 };
 
 export const getAllUsers = async (params: string = '') =>
-	await api.get(`${userRoutes.users}?${params}`);
+	await api.get<HTTPResponse<User[]>>(userRoutes.users.concat(`?${params}`));
 
 export const createUser = async (body: UserFormValue) =>
 	await api.post(userRoutes.users, body);
@@ -23,4 +23,11 @@ export const updateUser = async (id: number, body: UserFormValue) =>
 	await api.put(buildURL(userRoutes.userId, { id }), body);
 
 export const showUser = async (id: number) =>
-	await api.get(buildURL(userRoutes.userId, { id }));
+	await api.get<HTTPResponse<UserFormValue>>(
+		buildURL(userRoutes.userId, { id })
+	);
+
+export const deleteUser = async (id: number) =>
+	await api.delete<HTTPResponse<boolean>>(
+		buildURL(userRoutes.userId, { id })
+	);
