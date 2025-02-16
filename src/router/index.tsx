@@ -24,6 +24,9 @@ import StaffList from '@/features/users/pages/management/StaffList';
 import StudentList from '@/features/users/pages/management/StudentList';
 import TutorList from '@/features/users/pages/management/TutorList';
 import AdminList from '@/features/users/pages/management/AdminList';
+import DepartmentList from '@/features/departments/pages/DepartmentList';
+import CourseList from '@/features/courses/pages/CourseList';
+import SpecializationList from '@/features/specialization/pages/SpecializationList';
 
 type ChildRoute = {
 	path: string;
@@ -99,6 +102,21 @@ const Router = () => {
 			role: [USER_ROLE.ADMIN],
 		},
 		{
+			path: '/dashboard/admin/departments',
+			element: DepartmentList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/courses',
+			element: CourseList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/specializations',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
 			path: '/dashboard/student/:username',
 			element: OtherUserDashboard,
 			role: [USER_ROLE.ADMIN],
@@ -160,6 +178,21 @@ const Router = () => {
 			path: '/dashboard/staff',
 			element: StaffDashboard,
 			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/departments',
+			element: DepartmentList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/staff/courses',
+			element: CourseList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/staff/specializations',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
 		},
 		{
 			path: '/dashboard/staff/users',

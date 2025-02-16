@@ -13,7 +13,7 @@ const UserCreate = () => {
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: UserFormValue) =>
-			await createUser(body as UserFormValue)
+			await createUser(body)
 				.then((response) => {
 					if (response.data.code === 201) {
 						navigate(`${baseURL}/users`);
@@ -22,11 +22,6 @@ const UserCreate = () => {
 					return response.data;
 				})
 				.catch((e) => {
-					if (e.response.data.code === 409) {
-						toast.error(
-							e.response?.data?.message ?? 'Request Failed'
-						);
-					}
 					toast.error(e.response?.data?.message ?? 'Request Failed');
 					return e.response.data;
 				}),

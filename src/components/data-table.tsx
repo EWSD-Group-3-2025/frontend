@@ -27,7 +27,7 @@ import CustomPagination from '@/components/custom-pagination';
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
-	isLoading: boolean;
+	isLoading?: boolean;
 	noDataText?: string;
 }
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutDashboard, Newspaper, UsersRound } from 'lucide-react';
+import { Cog, LayoutDashboard, Newspaper, UsersRound } from 'lucide-react';
 
 import {
 	Sidebar,
@@ -54,6 +54,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				{
 					title: 'Staffs',
 					url: `${baseURL}/staffs`,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+			],
+		},
+		{
+			title: 'Set up',
+			url: '#',
+			icon: Cog,
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+			items: [
+				{
+					title: 'Departments',
+					url: `${baseURL}/departments`,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Courses',
+					url: `${baseURL}/courses`,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Specializations',
+					url: `${baseURL}/specializations`,
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 			],

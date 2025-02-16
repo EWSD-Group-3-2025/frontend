@@ -74,7 +74,9 @@ const UserList = () => {
 							queryClient.invalidateQueries({
 								queryKey: ['get-all-users'],
 							});
+							toast.success(response.data.message);
 							setOpen(false);
+							setSelectedId(null);
 
 							return response.data;
 						}
@@ -83,6 +85,7 @@ const UserList = () => {
 					})
 					.catch((e) => {
 						setOpen(false);
+						setSelectedId(null);
 						toast.error(e.response.data.message ?? 'Request Fail', {
 							description:
 								e.response?.data?.data ??
@@ -109,7 +112,9 @@ const UserList = () => {
 		},
 		{
 			id: 'name',
-			header: 'Name',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Name" />
+			),
 			accessorKey: 'name',
 		},
 		{
@@ -169,6 +174,7 @@ const UserList = () => {
 						<Button
 							size="sm"
 							className="bg-red-500 transition-all duration-300 hover:bg-red-500 active:scale-105 dark:text-font-white"
+							disabled={!params.row.original.status}
 							onClick={() => {
 								setName(params.row.original.name);
 								setSelectedId(params.row.original.id);
