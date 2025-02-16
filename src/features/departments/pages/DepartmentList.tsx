@@ -23,10 +23,10 @@ import DeleteDialog from '@/components/delete-dialog';
 
 import {
 	createDepartment,
-	deleteDepartments,
+	deleteDepartment,
 	getAllDepartments,
-	showDepartments,
-	updateDepartments,
+	showDepartment,
+	updateDepartment,
 } from '@/features/departments/api';
 import { Input } from '@/components/ui/input';
 import { TagsInput } from '@/components/ui/tags-input';
@@ -97,7 +97,7 @@ const DepartmentList = () => {
 
 	const { mutateAsync: updateDepartmentFn } = useMutation({
 		mutationFn: async (body: DepartmentUpdateForm) =>
-			await updateDepartments(departmentId!, {
+			await updateDepartment(departmentId!, {
 				id: departmentId!,
 				name: body.name,
 			})
@@ -119,7 +119,7 @@ const DepartmentList = () => {
 		number
 	>({
 		mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
-			await deleteDepartments(id)
+			await deleteDepartment(id)
 				.then((response) => {
 					if (response.data.code === 200) {
 						queryClient.invalidateQueries({

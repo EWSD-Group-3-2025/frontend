@@ -1,24 +1,26 @@
-import Cookies from 'js-cookie';
-import CONSTANTS from '@/constants';
-import authRoutes from './routes';
-import { AuthUser } from '@/features/users/types';
+import { SpecializationCreateForm } from '@/features/specialization/pages/SpecializationList';
+import { buildURL } from '@/utils';
 import api from '@/utils/axios';
+import routes from '@/features/specialization/api/routes';
 
-export const login = async (body: LoginRequest) =>
-	await api.post<HTTPResponse<LoginResponse>>(authRoutes.login, body);
+export const getAllSpecializations = async () =>
+	await api.get<HTTPResponse<Specialization[]>>(routes.specializations);
 
-export const logout = async () => await api.post(authRoutes.logout);
+export const createSpecialization = async (body: SpecializationCreateForm) =>
+	await api.post<HTTPResponse<boolean>>(routes.specializations, body);
 
-// Get authenticated user with access token and refresh token
-export const getAuthAccount = async () => {
-	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
-	if (!refreshToken) throw new Error('No refresh token found');
-	return await api.get<HTTPResponse<{ user: AuthUser }>>(authRoutes.getMe);
-};
+export const updateSpecialization = async (id: number, body: Department) =>
+	await api.put<HTTPResponse<boolean>>(
+		buildURL(routes.specializationId, { id }),
+		body
+	);
 
-export const updateAuthAccount = async (body: UpdateUserProfileRequest) => {
-	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
-	if (!refreshToken) throw new Error('No refresh token found');
+export const showSpecialization = async (id: number) =>
+	await api.get<HTTPResponse<Specialization>>(
+		buildURL(routes.specializationId, { id })
+	);
 
-	return await api.patch<HTTPResponse>(authRoutes.updateMe, body);
-};
+export const deleteSpecialization = async (id: number) =>
+	await api.delete<HTTPResponse<boolean>>(
+		buildURL(routes.specializationId, { id })
+	);

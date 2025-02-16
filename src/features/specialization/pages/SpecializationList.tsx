@@ -21,19 +21,19 @@ import { Button } from '@/components/ui/button';
 import SearchBox from '@/components/search-box';
 import DeleteDialog from '@/components/delete-dialog';
 
-import {
-	createDepartment,
-	deleteDepartments,
-	getAllDepartments,
-	showDepartments,
-	updateDepartments,
-} from '@/features/departments/api';
 import { Input } from '@/components/ui/input';
 import { TagsInput } from '@/components/ui/tags-input';
 import { HeaderSorting } from '@/components/header-sorting';
 import ResponsiveModal from '@/components/responsive-modal';
 import ContainerWrapper from '@/components/container-wrapper';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
+import {
+	createSpecialization,
+	deleteSpecialization,
+	getAllSpecializations,
+	showSpecialization,
+	updateSpecialization,
+} from '@/features/specialization/api';
 
 const specializationCreateSchema = z.object({
 	name: z.array(z.string()).nonempty('Please at least one item'),
@@ -61,7 +61,7 @@ const SpecializationList = () => {
 	// const { data, isLoading } = useQuery<HTTPResponse<Specialization[]>>({
 	// 	queryKey: ['get-all-specializations'],
 	// 	queryFn: async (): Promise<HTTPResponse<Specialization[]>> =>
-	// await getAllDepartments().then((response) => {
+	// await getAllSpecializations().then((response) => {
 	// 			if (response.data.code === 200) {
 	// 				return response.data;
 	// 			}
@@ -73,7 +73,7 @@ const SpecializationList = () => {
 	// const { data: specializationShowData, isLoading } = useQuery<HTTPResponse<Specialization>>({
 	// 	queryKey: ['get-specialization-by-id'],
 	// 	queryFn: async (): Promise<HTTPResponse<Specialization>> =>
-	// await showDepartments(Number(specialization)).then((response) => {
+	// await showSpecialization(Number(specialization)).then((response) => {
 	// 			if (response.data.code === 200) {
 	// 				return response.data;
 	// 			}
@@ -85,7 +85,7 @@ const SpecializationList = () => {
 
 	const { mutateAsync: createSpecializationFn } = useMutation({
 		mutationFn: async (body: SpecializationCreateForm) =>
-			await createDepartment(body)
+			await createSpecialization(body)
 				.then((response) => {
 					if (response.data.code === 201) {
 						toast.success(response.data.message);
@@ -101,7 +101,7 @@ const SpecializationList = () => {
 
 	const { mutateAsync: updateSpecializationFn } = useMutation({
 		mutationFn: async (body: SpecializationUpdateForm) =>
-			await updateDepartments(specialization!, {
+			await updateSpecialization(specialization!, {
 				id: specialization!,
 				name: body.name,
 			})
@@ -123,7 +123,7 @@ const SpecializationList = () => {
 		number
 	>({
 		mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
-			await deleteDepartments(id)
+			await deleteSpecialization(id)
 				.then((response) => {
 					if (response.data.code === 200) {
 						queryClient.invalidateQueries({
@@ -153,7 +153,7 @@ const SpecializationList = () => {
 		}
 	};
 
-	const SpecializationListColumns: ColumnDef<Department>[] = [
+	const SpecializationListColumns: ColumnDef<Specialization>[] = [
 		{
 			id: 'id',
 			header: ({ column }) => (
@@ -200,7 +200,7 @@ const SpecializationList = () => {
 		},
 	];
 
-	const data: Department[] = [
+	const data: Specialization[] = [
 		{ id: 1, name: 'Alice Johnson' },
 		{ id: 2, name: 'Bob Smith' },
 		{ id: 3, name: 'Charlie Brown' },

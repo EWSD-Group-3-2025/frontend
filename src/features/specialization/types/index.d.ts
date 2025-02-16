@@ -1,4 +1,4 @@
 interface Specialization {
-	id: string;
+	id: number;
 	name: string;
 }

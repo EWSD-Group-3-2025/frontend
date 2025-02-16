@@ -146,7 +146,7 @@ const CourseList = () => {
 		}
 	};
 
-	const courseListColumns: ColumnDef<Department>[] = [
+	const courseListColumns: ColumnDef<Course>[] = [
 		{
 			id: 'id',
 			header: ({ column }) => (
@@ -193,7 +193,7 @@ const CourseList = () => {
 		},
 	];
 
-	const data: Department[] = [
+	const data: Course[] = [
 		{ id: 1, name: 'Alice Johnson' },
 		{ id: 2, name: 'Bob Smith' },
 		{ id: 3, name: 'Charlie Brown' },
