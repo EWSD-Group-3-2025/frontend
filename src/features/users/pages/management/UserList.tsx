@@ -76,6 +76,7 @@ const UserList = () => {
 							});
 							toast.success(response.data.message);
 							setOpen(false);
+							setSelectedId(null);
 
 							return response.data;
 						}
@@ -84,6 +85,7 @@ const UserList = () => {
 					})
 					.catch((e) => {
 						setOpen(false);
+						setSelectedId(null);
 						toast.error(e.response.data.message ?? 'Request Fail', {
 							description:
 								e.response?.data?.data ??

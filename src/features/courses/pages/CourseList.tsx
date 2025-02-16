@@ -1,17 +1,50 @@
-import ContainerWrapper from '@/components/container-wrapper';
+import * as z from 'zod';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { ColumnDef } from '@tanstack/react-table';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { Plus, SquarePen, Trash2 } from 'lucide-react';
+
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form';
 import DataTable from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import SearchBox from '@/components/search-box';
 import DeleteDialog from '@/components/delete-dialog';
+
+import {
+	createCourse,
+	deleteCourse,
+	getAllCourses,
+	showCourse,
+	updateCourse,
+} from '@/features/courses/api';
+import { Input } from '@/components/ui/input';
+import { TagsInput } from '@/components/ui/tags-input';
 import { HeaderSorting } from '@/components/header-sorting';
 import ResponsiveModal from '@/components/responsive-modal';
-import SearchBox from '@/components/search-box';
-import { Button } from '@/components/ui/button';
-import { deleteCourse } from '@/features/courses/api';
+import ContainerWrapper from '@/components/container-wrapper';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
-import { Plus, SquarePen, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+
+const courseCreateSchema = z.object({
+	name: z.array(z.string()).nonempty('Please at least one item'),
+});
+
+const courseUpdateSchema = z.object({
+	name: z.string().min(1, 'Name Required'),
+});
+
+export type CourseCreateForm = z.infer<typeof courseCreateSchema>;
+export type CourseUpdateForm = z.infer<typeof courseUpdateSchema>;
 
 const CourseList = () => {
 	const queryClient = useQueryClient();
@@ -20,6 +53,62 @@ const CourseList = () => {
 	const [name, setName] = useState('');
 	const [openModal, setOpenModal] = useState(false);
 	const [courseId, setCourseId] = useState<number | null>(null);
+
+	// const { data, isLoading } = useQuery<HTTPResponse<Course[]>>({
+	// 	queryKey: ['get-all-courses'],
+	// 	queryFn: async (): Promise<HTTPResponse<Course[]>> =>
+	// 		await getAllCourses().then((response) => {
+	// 			if (response.data.code === 200) {
+	// 				return response.data;
+	// 			}
+
+	// 			throw new Error('Fetch Course Listing Fail!');
+	// 		}),
+	// });
+
+	// const { data: courseShowData, isLoading } = useQuery<HTTPResponse<Course>>({
+	// 	queryKey: ['get-course-by-id'],
+	// 	queryFn: async (): Promise<HTTPResponse<Course>> =>
+	// 		await showCourse(Number(courseId)).then((response) => {
+	// 			if (response.data.code === 200) {
+	// 				return response.data;
+	// 			}
+
+	// 			throw new Error('Fetch Course Show Fail!');
+	// 		}),
+	// 	enabled: !!courseId,
+	// });
+
+	const { mutateAsync: createCourseFn } = useMutation({
+		mutationFn: async (body: CourseCreateForm) =>
+			await createCourse(body)
+				.then((response) => {
+					if (response.data.code === 201) {
+						toast.success(response.data.message);
+					}
+					return response.data;
+				})
+				.catch((e) => {
+					toast.error(e.response?.data?.message ?? 'Request Failed');
+
+					return e.response.data;
+				}),
+	});
+
+	const { mutateAsync: updateCourseFn } = useMutation({
+		mutationFn: async (body: CourseUpdateForm) =>
+			await updateCourse(courseId!, { id: courseId!, name: body.name })
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+					}
+					return response.data;
+				})
+				.catch((e) => {
+					toast.error(e.response?.data?.message ?? 'Request Failed');
+					return e.response.data;
+				}),
+	});
 
 	const { mutateAsync: deleteCourseFn } = useMutation<
 		HTTPResponse<boolean>,
@@ -31,14 +120,14 @@ const CourseList = () => {
 				.then((response) => {
 					if (response.data.code === 200) {
 						queryClient.invalidateQueries({
-							queryKey: ['get-all-users'],
+							queryKey: ['get-all-courses'],
 						});
 						setOpen(false);
 
 						return response.data;
 					}
 
-					throw new Error('User Delete Fail!');
+					throw new Error('Course Delete Fail!');
 				})
 				.catch((e) => {
 					setOpen(false);
@@ -80,6 +169,10 @@ const CourseList = () => {
 					<Button
 						size="sm"
 						className="me-3 transition-all duration-300 active:scale-105 dark:text-font-white"
+						onClick={() => {
+							setOpenModal(true);
+							setCourseId(params.row.original.id);
+						}}
 					>
 						<SquarePen />
 					</Button>
@@ -108,6 +201,28 @@ const CourseList = () => {
 		{ id: 5, name: 'Emily Davis' },
 	];
 
+	const createForm = useForm<CourseCreateForm>({
+		resolver: zodResolver(courseCreateSchema),
+		defaultValues: {
+			name: [],
+		},
+	});
+
+	const updateForm = useForm<CourseUpdateForm>({
+		resolver: zodResolver(courseUpdateSchema),
+		defaultValues: {
+			name: '',
+		},
+	});
+
+	function onSubmit(values: CourseCreateForm | CourseUpdateForm) {
+		if (courseId) {
+			updateCourseFn(values as CourseUpdateForm);
+		} else {
+			createCourseFn(values as CourseCreateForm);
+		}
+	}
+
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
@@ -130,11 +245,74 @@ const CourseList = () => {
 				/>
 			</ContainerWrapper>
 
-			<ResponsiveModal isOpen={openModal} setIsOpen={setOpenModal}>
+			<ResponsiveModal
+				className="sm:min-h-[50vh] md:min-h-[30vh]"
+				isOpen={openModal}
+				setIsOpen={() => {
+					setOpenModal(false);
+					setCourseId(null);
+					createForm.reset();
+					updateForm.reset();
+				}}
+			>
 				<div className="p-7">
-					<h2 className="font-roboto-slab text-3xl">
+					<h2 className="mb-5 font-roboto-slab text-3xl">
 						Course {courseId ? 'Update' : 'Create'}
 					</h2>
+					{courseId ? (
+						<Form {...updateForm}>
+							<form onSubmit={updateForm.handleSubmit(onSubmit)}>
+								<FormField
+									control={updateForm.control}
+									name="name"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Name</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="Please enter Course Name"
+													type=""
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<div className="mt-5 flex justify-end">
+									<Button type="submit">Submit</Button>
+								</div>
+							</form>
+						</Form>
+					) : (
+						<Form {...createForm}>
+							<form onSubmit={createForm.handleSubmit(onSubmit)}>
+								<FormField
+									control={createForm.control}
+									name="name"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Course Name</FormLabel>
+											<FormControl>
+												<TagsInput
+													value={field.value}
+													onValueChange={
+														field.onChange
+													}
+													placeholder="Please enter Course Name"
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<div className="mt-5 flex justify-end">
+									<Button type="submit">Submit</Button>
+								</div>
+							</form>
+						</Form>
+					)}
 				</div>
 			</ResponsiveModal>
 

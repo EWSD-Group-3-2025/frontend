@@ -1,8 +1,4 @@
 interface Course {
-	id: string;
+	id: number;
 	name: string;
-}
-
-interface CourseForm {
-	name: string[];
 }

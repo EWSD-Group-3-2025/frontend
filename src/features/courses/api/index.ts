@@ -1,11 +1,12 @@
 import routes from '@/features/courses/api/routes';
+import { CourseCreateForm } from '@/features/courses/pages/CourseList';
 import { buildURL } from '@/utils';
 import api from '@/utils/axios';
 
 export const getAllCourses = async () =>
 	await api.get<HTTPResponse<Course[]>>(routes.courses);
 
-export const createCourse = async (body: CourseForm) =>
+export const createCourse = async (body: CourseCreateForm) =>
 	await api.post<HTTPResponse<boolean>>(routes.courses, body);
 
 export const updateCourse = async (id: number, body: Course) =>

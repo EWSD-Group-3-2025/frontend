@@ -21,20 +21,25 @@ const UserUpdate = () => {
 					return response.data;
 				}
 
-				throw new Error('Fetch User Listing Fail!');
+				throw new Error('Fetch User Show Fail!');
 			}),
 	});
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: UserFormValue) =>
-			await updateUser(Number(id), body).then((response) => {
-				if (response.data.code === 200) {
-					navigate(`${baseURL}/users`);
-					toast.success(response.data.message);
-				}
+			await updateUser(Number(id), body)
+				.then((response) => {
+					if (response.data.code === 200) {
+						navigate(`${baseURL}/users`);
+						toast.success(response.data.message);
+					}
 
-				return response.data;
-			}),
+					return response.data;
+				})
+				.catch((e) => {
+					toast.error(e.response?.data?.message ?? 'Request Failed');
+					return e.response.data;
+				}),
 	});
 
 	return (
