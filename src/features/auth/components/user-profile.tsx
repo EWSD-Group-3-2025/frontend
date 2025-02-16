@@ -4,7 +4,6 @@ import { useAuth } from '@/context/auth.context';
 import {
 	CircleX,
 	Clock,
-	Copy,
 	KeyRound,
 	LockKeyholeOpen,
 	Mail,
@@ -29,7 +28,7 @@ export default function UserProfile() {
 	return (
 		<div className="px-5 py-4">
 			<div className="flex items-center gap-x-4">
-				<Avatar className="size-20 border border-gray-300">
+				<Avatar className="size-20 border border-gray-300 dark:border-gray-600">
 					<AvatarImage src={user?.name} alt={user?.name} />
 					<AvatarFallback className="text-4xl">
 						{user?.name.charAt(0).toUpperCase()}
@@ -70,7 +69,7 @@ export default function UserProfile() {
 					<div>
 						<span>Contact information</span>
 						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
-							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
 								<div className="flex items-center gap-x-2">
 									<Mail />
 									<div className="flex flex-col items-start">
@@ -80,9 +79,8 @@ export default function UserProfile() {
 										</span>
 									</div>
 								</div>
-								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
-							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
 								<div className="flex items-center gap-x-2">
 									<MessageCircle />
 									<div className="flex flex-col items-start">
@@ -92,7 +90,6 @@ export default function UserProfile() {
 										</span>
 									</div>
 								</div>
-								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
 						</div>
 					</div>
@@ -153,7 +150,7 @@ export default function UserProfile() {
 					<div>
 						<span>Contact information</span>
 						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
-							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
 								<div className="flex items-center gap-x-2">
 									<Mail />
 									<div className="flex flex-col items-start">
@@ -163,9 +160,8 @@ export default function UserProfile() {
 										</span>
 									</div>
 								</div>
-								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
-							<div className="group flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
+							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
 								<div className="flex items-center gap-x-2">
 									<MessageCircle />
 									<div className="flex flex-col items-start">
@@ -175,7 +171,6 @@ export default function UserProfile() {
 										</span>
 									</div>
 								</div>
-								<Copy className="hidden size-5 cursor-pointer group-hover:block" />
 							</div>
 						</div>
 					</div>

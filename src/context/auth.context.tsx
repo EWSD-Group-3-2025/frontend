@@ -16,7 +16,7 @@ import { AxiosResponse } from 'axios';
 interface AuthContextProps {
 	user?: User | null;
 	loading: boolean;
-	login: (accessToken: string, refreshToken: string, user: User) => void;
+	assignLoginToken: (accessToken: string, refreshToken: string) => void;
 	logout: () => Promise<void>;
 	userDataRefresh: (options?: RefetchOptions) => Promise<
 		QueryObserverResult<
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		},
 	});
 
-	const login = (accessToken: string, refreshToken: string, user: User) => {
+	const assignLoginToken = (accessToken: string, refreshToken: string) => {
 		Cookies.set(CONSTANTS.ACCESS_TOKEN_KEY, accessToken, {
 			expires: CONSTANTS.ACCESS_TOKEN_EXPIRE,
 		});
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 					? { ...userResponse.data.data.user }
 					: null,
 				loading: isLoading,
-				login,
+				assignLoginToken,
 				logout,
 				userDataRefresh,
 			}}

@@ -27,13 +27,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { forgotPassword, verifyOtp } from '../api';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const formSchema = z.object({
 	otpCode: z.string().trim().min(6, { message: 'OTP code required' }),
 });
 
 export default function VerifyOTPPage() {
+	// Ref to store interval ID
+	const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const [searchParams] = useSearchParams();
 	const forgotResetEmail = searchParams.get('forgot-reset-email');
 	const [countdown, setCountdown] = useState(60);
@@ -59,6 +61,22 @@ export default function VerifyOTPPage() {
 				await verifyOtp({ otp }),
 		});
 
+	// Handle countdown to resend OTP
+	const handleResendOTPCountdown = () => {
+		countdownTimerRef.current = setInterval(() => {
+			setCountdown((prev) => {
+				if (prev <= 1) {
+					if (countdownTimerRef.current) {
+						clearInterval(countdownTimerRef.current);
+					}
+					setCanResend(true);
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+	};
+
 	const handleResendOTP = async () => {
 		if (!forgotResetEmail) {
 			toast.error('Forgot password reset email is missing');
@@ -68,6 +86,20 @@ export default function VerifyOTPPage() {
 
 		setCanResend(false);
 		setCountdown(60); // Reset timer
+
+		// Restart countdown timer
+		countdownTimerRef.current = setInterval(() => {
+			setCountdown((prev) => {
+				if (prev <= 1) {
+					if (countdownTimerRef.current) {
+						clearInterval(countdownTimerRef.current);
+					}
+					setCanResend(true);
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
 
 		forgotPasswordMutation(
 			{ email: forgotResetEmail },
@@ -99,18 +131,13 @@ export default function VerifyOTPPage() {
 	};
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setCountdown((prev) => {
-				if (prev <= 1) {
-					clearInterval(interval);
-					setCanResend(true);
-					return 0;
-				}
-				return prev - 1;
-			});
-		}, 1000);
+		handleResendOTPCountdown();
 
-		return () => clearInterval(interval);
+		return () => {
+			if (countdownTimerRef.current) {
+				clearInterval(countdownTimerRef.current);
+			}
+		};
 	}, []);
 
 	return (

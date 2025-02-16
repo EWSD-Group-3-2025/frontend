@@ -80,10 +80,6 @@ export default function ForgotPasswordPage() {
 							className="space-y-1"
 						>
 							<FormField
-								disabled={
-									form.formState.isSubmitting ||
-									forgotPasswordPending
-								}
 								control={form.control}
 								name="email"
 								render={({ field }) => (
@@ -97,7 +93,9 @@ export default function ForgotPasswordPage() {
 										<FormControl>
 											<Input
 												disabled={
-													form.formState.isSubmitting
+													form.formState
+														.isSubmitting ||
+													forgotPasswordPending
 												}
 												id="email"
 												type="email"
