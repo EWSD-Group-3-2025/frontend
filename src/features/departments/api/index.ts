@@ -9,18 +9,18 @@ export const getAllDepartments = async () =>
 export const createDepartment = async (body: DepartmentCreateForm) =>
 	await api.post<HTTPResponse<boolean>>(routes.departments, body);
 
-export const updateDepartments = async (id: number, body: Department) =>
+export const updateDepartment = async (id: number, body: Department) =>
 	await api.put<HTTPResponse<boolean>>(
 		buildURL(routes.departmentId, { id }),
 		body
 	);
 
-export const showDepartments = async (id: number) =>
+export const showDepartment = async (id: number) =>
 	await api.get<HTTPResponse<Department>>(
 		buildURL(routes.departmentId, { id })
 	);
 
-export const deleteDepartments = async (id: number) =>
+export const deleteDepartment = async (id: number) =>
 	await api.delete<HTTPResponse<boolean>>(
 		buildURL(routes.departmentId, { id })
 	);
