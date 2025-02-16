@@ -84,7 +84,7 @@ const CustomPagination = ({
 			</Pagination>
 			<div className="ms-3 flex items-center space-x-2">
 				<Select
-					onValueChange={(value) => setPageSize(Number(value))}
+					onValueChange={(value: any) => setPageSize(Number(value))}
 					value={String(pageSize)}
 				>
 					<SelectTrigger className="w-16">
