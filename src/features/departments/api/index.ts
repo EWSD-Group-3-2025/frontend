@@ -1,5 +1,5 @@
 import routes from '@/features/departments/api/routes';
-import { DepartmentCreateForm } from '@/features/departments/pages/DepartmentList';
+import { DepartmentCreateForm } from '@/features/departments/components/DepartmentCreateModal';
 import { buildURL } from '@/utils';
 import api from '@/utils/axios';
 
@@ -10,7 +10,7 @@ export const createDepartment = async (body: DepartmentCreateForm) =>
 	await api.post<HTTPResponse<boolean>>(routes.departments, body);
 
 export const updateDepartment = async (id: number, body: Department) =>
-	await api.put<HTTPResponse<boolean>>(
+	await api.patch<HTTPResponse<boolean>>(
 		buildURL(routes.departmentId, { id }),
 		body
 	);
