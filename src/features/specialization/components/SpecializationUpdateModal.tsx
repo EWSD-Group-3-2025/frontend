@@ -16,60 +16,65 @@ import {
 import { Button } from '@/components/ui/button';
 import ResponsiveModal from '@/components/responsive-modal';
 import { Input } from '@/components/ui/input';
-import { showCourse, updateCourse } from '@/features/courses/api';
+import {
+	showSpecialization,
+	updateSpecialization,
+} from '@/features/specialization/api';
 
-type CourseUpdateModalProp = {
+type SpecializationUpdateModalProp = {
 	open: boolean;
 	setOpen: Dispatch<SetStateAction<boolean>>;
-	setCourseId: Dispatch<SetStateAction<number | null>>;
+	setSpecializationId: Dispatch<SetStateAction<number | null>>;
 	id: number;
 };
 
-const courseUpdateSchema = z.object({
+const specializationUpdateSchema = z.object({
 	name: z.string().min(1, 'Name Required'),
 });
 
-export type CourseUpdateForm = z.infer<typeof courseUpdateSchema>;
+export type SpecializationUpdateForm = z.infer<
+	typeof specializationUpdateSchema
+>;
 
-const CourseUpdateModal = ({
+const SpecializationUpdateModal = ({
 	open,
 	setOpen,
-	setCourseId,
+	setSpecializationId,
 	id,
-}: CourseUpdateModalProp) => {
+}: SpecializationUpdateModalProp) => {
 	const queryClient = useQueryClient();
 
-	useQuery<HTTPResponse<Course>>({
-		queryKey: ['get-course-by-id'],
-		queryFn: async (): Promise<HTTPResponse<Course>> =>
-			await showCourse(id).then((response) => {
+	useQuery<HTTPResponse<Specialization>>({
+		queryKey: ['get-specialization-by-id'],
+		queryFn: async (): Promise<HTTPResponse<Specialization>> =>
+			await showSpecialization(id).then((response) => {
 				if (response.data.code === 200) {
 					form.reset({ name: response.data.data.name });
 					return response.data;
 				}
 
-				throw new Error('Fetch Course Show Fail!');
+				throw new Error('Fetch Specialization Show Fail!');
 			}),
 		enabled: !!id,
 	});
 
 	const { mutateAsync } = useMutation({
-		mutationFn: async (body: CourseUpdateForm) =>
-			await updateCourse(id, {
+		mutationFn: async (body: SpecializationUpdateForm) =>
+			await updateSpecialization(id, {
 				id: id,
 				name: body.name,
 			})
 				.then((response) => {
-					if (response.status === 200) {
+					if (response.status === 204) {
 						queryClient.invalidateQueries({
-							queryKey: ['get-all-courses'],
+							queryKey: ['get-all-specializations'],
 						});
-						setCourseId(null);
+						setSpecializationId(null);
 						form.reset({
 							name: '',
 						});
 						setOpen(false);
-						toast.success('Course Updated Successfully');
+						toast.success('Specialization Updated Successfully');
 					}
 					return response.data;
 				})
@@ -79,14 +84,14 @@ const CourseUpdateModal = ({
 				}),
 	});
 
-	const form = useForm<CourseUpdateForm>({
-		resolver: zodResolver(courseUpdateSchema),
+	const form = useForm<SpecializationUpdateForm>({
+		resolver: zodResolver(specializationUpdateSchema),
 		defaultValues: {
 			name: '',
 		},
 	});
 
-	function onSubmit(values: CourseUpdateForm) {
+	function onSubmit(values: SpecializationUpdateForm) {
 		mutateAsync(values);
 	}
 
@@ -96,7 +101,7 @@ const CourseUpdateModal = ({
 			isOpen={open}
 			setIsOpen={() => {
 				setOpen(false);
-				setCourseId(null);
+				setSpecializationId(null);
 				form.reset({
 					name: '',
 				});
@@ -104,7 +109,7 @@ const CourseUpdateModal = ({
 		>
 			<div className="p-7">
 				<h2 className="mb-5 font-roboto-slab text-3xl">
-					Course Update
+					Specialization Update
 				</h2>
 
 				<Form {...form}>
@@ -137,4 +142,4 @@ const CourseUpdateModal = ({
 	);
 };
 
-export default CourseUpdateModal;
+export default SpecializationUpdateModal;
