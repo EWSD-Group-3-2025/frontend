@@ -1,7 +1,7 @@
-import { SpecializationCreateForm } from '@/features/specialization/pages/SpecializationList';
 import { buildURL } from '@/utils';
 import api from '@/utils/axios';
 import routes from '@/features/specialization/api/routes';
+import { SpecializationCreateForm } from '@/features/specialization/components/SpecializationCreateModal';
 
 export const getAllSpecializations = async () =>
 	await api.get<HTTPResponse<Specialization[]>>(routes.specializations);

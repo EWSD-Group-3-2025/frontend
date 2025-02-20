@@ -1,5 +1,5 @@
 import routes from '@/features/courses/api/routes';
-import { CourseCreateForm } from '@/features/courses/pages/CourseList';
+import { CourseCreateForm } from '@/features/courses/components/CourseCreateModal';
 import { buildURL } from '@/utils';
 import api from '@/utils/axios';
 
@@ -10,10 +10,7 @@ export const createCourse = async (body: CourseCreateForm) =>
 	await api.post<HTTPResponse<boolean>>(routes.courses, body);
 
 export const updateCourse = async (id: number, body: Course) =>
-	await api.put<HTTPResponse<boolean>>(
-		buildURL(routes.courseId, { id }),
-		body
-	);
+	await api.patch(buildURL(routes.courseId, { id }), body);
 
 export const showCourse = async (id: number) =>
 	await api.get<HTTPResponse<Course>>(buildURL(routes.courseId, { id }));
