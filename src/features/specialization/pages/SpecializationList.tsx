@@ -179,7 +179,7 @@ const SpecializationList = () => {
 			)}
 
 			<DeleteDialog
-				title="Delete User"
+				title="Delete Specialization"
 				description={`Are you sure to delete ${name}`}
 				handleDelete={handleMutationDelete}
 			/>
