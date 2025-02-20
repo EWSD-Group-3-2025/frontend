@@ -170,7 +170,7 @@ const CourseList = () => {
 			)}
 
 			<DeleteDialog
-				title="Delete User"
+				title="Delete Course"
 				description={`Are you sure to delete ${name}`}
 				handleDelete={handleMutationDelete}
 			/>

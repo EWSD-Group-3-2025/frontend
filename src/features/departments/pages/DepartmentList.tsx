@@ -160,7 +160,7 @@ const DepartmentList = () => {
 			)}
 
 			<DeleteDialog
-				title="Delete User"
+				title="Delete Department"
 				description={`Are you sure to delete ${name}`}
 				handleDelete={handleMutationDelete}
 			/>
