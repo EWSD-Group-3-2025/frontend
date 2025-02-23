@@ -1,5 +1,5 @@
 import ResponsiveModal from '@/components/responsive-modal';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +14,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
-import { createUser, usernameExistsCount } from '@/features/users/api';
+import {
+	createUser,
+	updateUser,
+	usernameExistsCount,
+} from '@/features/users/api';
 import { convertNameToSlug, transformObjects } from '@/utils';
 import { CheckCircle2, Loader } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
@@ -37,9 +41,11 @@ type UserFormModalProp = {
 	formData?: UserFormValue;
 	roleId: number;
 	roleName: string;
+	setSelectedUserId: Dispatch<SetStateAction<number | null>>;
 };
 const userFormSchema = z
 	.object({
+		id: z.number().optional(),
 		name: z.string().nonempty('Name Required'),
 		username: z.string(),
 		email: z.string().nonempty('Email Required'),
@@ -89,6 +95,7 @@ const UserFormModal = ({
 	formData,
 	roleId,
 	roleName,
+	setSelectedUserId,
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
 	const transform = transformObjects({ GENDER });
@@ -164,16 +171,60 @@ const UserFormModal = ({
 
 						await Promise.all([
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-admin-users'],
+								queryKey: ['get-all-users-admin'],
 							}),
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-staff-users'],
+								queryKey: ['get-all-users-staff'],
 							}),
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-students'],
+								queryKey: ['get-all-users-student'],
 							}),
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-teachers'],
+								queryKey: ['get-all-users-tutor'],
+							}),
+						]);
+						return response.data;
+					}
+					throw new Error('User Create Fail!');
+				})
+				.catch((e) => {
+					if (e.response.data.code === 400) {
+						toast.error(e.response.data.message);
+						e.response.data.data.forEach(
+							(err: { field: string; message: string }) => {
+								form.setError(
+									err.field as keyof UserFormValue,
+									{
+										type: 'server',
+										message: err.message,
+									}
+								);
+							}
+						);
+					}
+				}),
+	});
+
+	const { mutateAsync: userUpdate } = useMutation({
+		mutationFn: async (body: UserFormValue) =>
+			await updateUser(body.id!, body)
+				.then(async (response) => {
+					if (response.data.code === 201) {
+						toast.success(response.data.message);
+						setIsOpen(false);
+
+						await Promise.all([
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-users-admin'],
+							}),
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-users-staff'],
+							}),
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-users-student'],
+							}),
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-users-tutor'],
 							}),
 						]);
 						return response.data;
@@ -223,6 +274,7 @@ const UserFormModal = ({
 
 	function onSubmit(values: UserFormValue) {
 		if (formData) {
+			userUpdate(values);
 		} else {
 			userCreate(values);
 		}
@@ -254,15 +306,20 @@ const UserFormModal = ({
 			form.reset();
 			setSearchName('');
 			setIsLoadingSearchName(false);
+			setSelectedUserId(null);
 		}
 	}, [isOpen]);
+
+	useEffect(() => {
+		if (formData) {
+			form.reset({ ...formData });
+		}
+	}, [formData]);
 
 	const loadingSearchName =
 		isLoadingSearchName ||
 		isLoadingUsernameExistsCountData ||
 		isPendingUsernameExistsCountData;
-
-	console.log(form.getValues());
 
 	return (
 		<ResponsiveModal className="px-7" isOpen={isOpen} setIsOpen={setIsOpen}>
