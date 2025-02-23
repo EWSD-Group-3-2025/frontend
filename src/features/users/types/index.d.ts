@@ -6,6 +6,7 @@ export interface User {
 	username: string;
 	email: string;
 	status: boolean;
+	gender: 1 | 2 | 3;
 	roleId: 1 | 2 | 3 | 4;
 	roleName: keyof typeof USER_ROLE;
 	createdAt: string;
@@ -13,17 +14,18 @@ export interface User {
 
 export interface AdminStaffUser extends User {
 	departmentId: number | null;
-	department: string | null;
+	departmentName: string | null;
 }
 
 export interface StudentUser extends User {
 	courseId: number | null;
-	course: string | null;
+	courseName: string | null;
+	allocateTutorId: number | null;
 }
 
 export interface TutorUser extends User {
 	specializationId: number | null;
-	specialization: string | null;
+	specializationName: string | null;
 }
 export interface AuthUser {
 	id: number;

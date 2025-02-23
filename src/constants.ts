@@ -46,6 +46,11 @@ export const GENDER = Object.freeze({
 		key: 'FEMALE',
 		label: 'Female',
 	},
+	OTHER: {
+		value: 3,
+		key: 'OTHER',
+		label: 'Other',
+	},
 });
 
 export const itemsPerPage = Object.freeze([
