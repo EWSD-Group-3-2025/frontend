@@ -12,11 +12,13 @@ import {
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers } from '@/features/users/api';
+import { deleteUser, getAllUsers, showUser } from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
-import UserFormModal from '@/features/users/components/user-form-modal';
+import UserFormModal, {
+	UserFormValue,
+} from '@/features/users/components/user-form-modal';
 import DeleteDialog from '@/components/delete-dialog';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
@@ -33,6 +35,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { USER_ROLE } from '@/constants';
 import { useAuth } from '@/context/auth.context';
+import { useState } from 'react';
+import dayjs from 'dayjs';
 
 const StaffList = () => {
 	const queryClient = useQueryClient();
@@ -41,8 +45,10 @@ const StaffList = () => {
 	const { selectedId, name, setOpen, setSelectedId, setName } =
 		useDeleteModalStore();
 
+	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
-		queryKey: ['get-all-staff-users'],
+		queryKey: ['get-all-users-staff'],
 		queryFn: async (): Promise<HTTPResponse<User[]>> =>
 			await getAllUsers('role=staff').then((response) => {
 				if (response.data.code === 200) {
@@ -53,6 +59,19 @@ const StaffList = () => {
 			}),
 	});
 
+	const { data: userShow } = useQuery<HTTPResponse<UserFormValue>>({
+		queryKey: ['get-user-by-id'],
+		queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
+			await showUser(Number(selectedUserId)).then((response) => {
+				if (response.data.code === 200) {
+					return response.data;
+				}
+
+				throw new Error('Fetch User Show Fail!');
+			}),
+		enabled: !!selectedUserId,
+	});
+
 	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
 		{
 			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
@@ -60,7 +79,7 @@ const StaffList = () => {
 					.then((response) => {
 						if (response.data.code === 200) {
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-staff-users'],
+								queryKey: ['get-all-users-staff'],
 							});
 							toast.success(response.data.message);
 							setOpen(false);
@@ -119,7 +138,23 @@ const StaffList = () => {
 			header: ({ column }) => (
 				<HeaderSorting column={column} title="Department" />
 			),
-			accessorKey: 'department',
+			accessorKey: 'departmentName',
+		},
+		{
+			id: 'gender',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Gender" />
+			),
+			accessorKey: 'gender',
+			cell: (params) => (
+				<>
+					{params.row.original.gender === 1
+						? 'Male'
+						: params.row.original.gender === 2
+							? 'Female'
+							: 'Other'}
+				</>
+			),
 		},
 		{
 			id: 'status',
@@ -138,6 +173,15 @@ const StaffList = () => {
 					)}
 				</>
 			),
+		},
+		{
+			id: 'created_at',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Register At" />
+			),
+			accessorKey: 'created_at',
+			cell: (params) =>
+				dayjs(params.row.original.createdAt).format('YYYY-MM-DD'),
 		},
 		{
 			id: 'action',
@@ -212,8 +256,10 @@ const StaffList = () => {
 			<UserFormModal
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
+				formData={userShow?.data}
 				roleId={2}
 				roleName="Staff"
+				setSelectedUserId={setSelectedUserId}
 			/>
 
 			<DeleteDialog
