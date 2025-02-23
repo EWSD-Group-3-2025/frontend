@@ -5,6 +5,7 @@ import { ChangePasswordRequest, User } from '../types';
 import userRoutes from './routes';
 import { buildURL } from '@/utils';
 import { UserFormValue } from '@/features/users/components/user-form-modal';
+import { AllocateTutor } from '@/features/users/components/allocate-tutor';
 
 export const userChangePassword = async (body: ChangePasswordRequest) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
@@ -40,3 +41,6 @@ export const deleteUser = async (id: number) =>
 	await api.delete<HTTPResponse<boolean>>(
 		buildURL(userRoutes.userId, { id })
 	);
+
+export const allocation = async (body: AllocateTutor) =>
+	await api.post(userRoutes.allocation, body);
