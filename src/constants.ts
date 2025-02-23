@@ -35,6 +35,19 @@ export const USER_ROLES = Object.freeze({
 	},
 });
 
+export const GENDER = Object.freeze({
+	MALE: {
+		value: 1,
+		key: 'MALE',
+		label: 'Male',
+	},
+	FEMALE: {
+		value: 2,
+		key: 'FEMALE',
+		label: 'Female',
+	},
+});
+
 export const itemsPerPage = Object.freeze([
 	{
 		value: 10,

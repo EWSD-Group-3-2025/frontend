@@ -167,6 +167,16 @@ const Router = () => {
 			role: [USER_ROLE.ADMIN],
 		},
 		{
+			path: '/dashboard/admin/analysis',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/reports',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
 			name: 'Not Found',
 			path: '*',
 			element: NotFound,
@@ -182,17 +192,27 @@ const Router = () => {
 		{
 			path: '/dashboard/staff/departments',
 			element: DepartmentList,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			path: '/dashboard/staff/courses',
 			element: CourseList,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			path: '/dashboard/staff/specializations',
 			element: SpecializationList,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/analysis',
+			element: SpecializationList,
+			role: [USER_ROLE.STAFF],
+		},
+		{
+			path: '/dashboard/staff/reports',
+			element: SpecializationList,
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			path: '/dashboard/staff/users',

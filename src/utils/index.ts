@@ -1,5 +1,12 @@
 import api from '@/utils/axios';
-import { cn, buildURL } from '@/utils/stringUtils';
+import { cn, buildURL, convertNameToSlug } from '@/utils/stringUtils';
 import { transformObjects, objectToArray } from '@/utils/dataUtils';
 
-export { api, cn, buildURL, transformObjects, objectToArray };
+export {
+	api,
+	cn,
+	buildURL,
+	transformObjects,
+	objectToArray,
+	convertNameToSlug,
+};
