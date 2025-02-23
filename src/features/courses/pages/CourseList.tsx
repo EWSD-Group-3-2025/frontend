@@ -57,7 +57,7 @@ const CourseList = () => {
 		mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
 			await deleteCourse(id)
 				.then((response) => {
-					if (response.data.code === 200) {
+					if (response.status === 204) {
 						queryClient.invalidateQueries({
 							queryKey: ['get-all-courses'],
 						});

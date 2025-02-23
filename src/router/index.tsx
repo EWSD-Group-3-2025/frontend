@@ -8,10 +8,7 @@ import EndUserLayout from '@/layouts/EndUserLayout';
 import ManagementLayout from '@/layouts/ManagementLayout';
 import StandaloneLayout from '@/layouts/StandaloneLayout';
 import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
-import UserList from '@/features/users/pages/management/UserList';
 import AuthGuard from '@/features/auth/components/auth-guard';
-import UserCreate from '@/features/users/pages/management/UserCreate';
-import UserUpdate from '@/features/users/pages/management/UserUpdate';
 import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
 import AdminDashboard from '@/features/users/pages/admin/Dashboard';
 import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
@@ -132,21 +129,6 @@ const Router = () => {
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/users',
-			element: UserList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/admin/users/create',
-			element: UserCreate,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/admin/users/:id/update',
-			element: UserUpdate,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
 			path: '/dashboard/admin/staffs',
 			element: StaffList,
 			role: [USER_ROLE.ADMIN],
@@ -167,6 +149,16 @@ const Router = () => {
 			role: [USER_ROLE.ADMIN],
 		},
 		{
+			path: '/dashboard/admin/analysis',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
+			path: '/dashboard/admin/reports',
+			element: SpecializationList,
+			role: [USER_ROLE.ADMIN],
+		},
+		{
 			name: 'Not Found',
 			path: '*',
 			element: NotFound,
@@ -182,31 +174,26 @@ const Router = () => {
 		{
 			path: '/dashboard/staff/departments',
 			element: DepartmentList,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			path: '/dashboard/staff/courses',
 			element: CourseList,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.STAFF],
 		},
 		{
 			path: '/dashboard/staff/specializations',
 			element: SpecializationList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/staff/users',
-			element: UserList,
 			role: [USER_ROLE.STAFF],
 		},
 		{
-			path: '/dashboard/staff/users/create',
-			element: UserCreate,
+			path: '/dashboard/staff/analysis',
+			element: SpecializationList,
 			role: [USER_ROLE.STAFF],
 		},
 		{
-			path: '/dashboard/staff/users/:id/update',
-			element: UserUpdate,
+			path: '/dashboard/staff/reports',
+			element: SpecializationList,
 			role: [USER_ROLE.STAFF],
 		},
 		{

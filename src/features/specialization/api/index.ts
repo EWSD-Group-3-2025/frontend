@@ -10,7 +10,7 @@ export const createSpecialization = async (body: SpecializationCreateForm) =>
 	await api.post<HTTPResponse<boolean>>(routes.specializations, body);
 
 export const updateSpecialization = async (id: number, body: Department) =>
-	await api.put<HTTPResponse<boolean>>(
+	await api.patch<HTTPResponse<boolean>>(
 		buildURL(routes.specializationId, { id }),
 		body
 	);

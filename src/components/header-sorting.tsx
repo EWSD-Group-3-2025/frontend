@@ -14,7 +14,7 @@ export const HeaderSorting = <TData,>({
 	return (
 		<Button
 			variant="ghost"
-			className="hover:bg-transparent"
+			className="ps-0 hover:bg-transparent"
 			onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 		>
 			{title}

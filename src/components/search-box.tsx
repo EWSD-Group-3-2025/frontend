@@ -5,7 +5,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useSearch } from '@/store/useSearch';
 
-const SearchBox = () => {
+const SearchBox = ({ placeholder }: { placeholder?: string }) => {
 	const { setSearch } = useSearch();
 
 	const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,7 +34,7 @@ const SearchBox = () => {
 			<Input
 				className="w-full border-form-stroke pl-7 hover:border-form-stroke-hover"
 				type="search"
-				placeholder="Search . . ."
+				placeholder={placeholder ?? 'Search . . .'}
 				onChange={(e) => debouncedSearchText(e.target.value)}
 				onKeyDown={handleKeyDown}
 			/>
