@@ -118,6 +118,13 @@ const UserList = () => {
 			accessorKey: 'name',
 		},
 		{
+			id: 'username',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Username" />
+			),
+			accessorKey: 'username',
+		},
+		{
 			id: 'email',
 			header: ({ column }) => (
 				<HeaderSorting column={column} title="Email" />
@@ -209,7 +216,7 @@ const UserList = () => {
 		<>
 			<div className="mb-3 flex justify-between">
 				<h1 className="font-roboto-slab text-3xl font-semibold">
-					User List
+					User Management
 				</h1>
 				<Button onClick={() => navigate('create')}>
 					<Plus />

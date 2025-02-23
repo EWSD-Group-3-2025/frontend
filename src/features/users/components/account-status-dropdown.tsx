@@ -36,8 +36,8 @@ const AccountStatusDropDown = () => {
 
 			<SelectContent>
 				<SelectItem value="all">All</SelectItem>
-				<SelectItem value="1">Active</SelectItem>
-				<SelectItem value="0">In Active</SelectItem>
+				<SelectItem value="1">Available</SelectItem>
+				<SelectItem value="0">Unavailable</SelectItem>
 			</SelectContent>
 		</Select>
 	);
