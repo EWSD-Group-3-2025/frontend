@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { Cog, LayoutDashboard, Newspaper, UsersRound } from 'lucide-react';
+import {
+	Cog,
+	FileChartColumnIncreasing,
+	LayoutDashboard,
+	Newspaper,
+	UsersRound,
+} from 'lucide-react';
 
 import {
 	Sidebar,
@@ -23,7 +29,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			title: 'Dashboard',
 			url: baseURL,
 			icon: LayoutDashboard,
-			role: [USER_ROLE.ADMIN],
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+		},
+		{
+			title: 'Analysis',
+			url: `${baseURL}/analysis`,
+			icon: FileChartColumnIncreasing,
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+		},
+		{
+			title: 'Report',
+			url: `${baseURL}/report`,
+			icon: Newspaper,
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
 		{
 			title: 'User Management',
@@ -31,15 +49,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			icon: UsersRound,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 			items: [
-				{
-					title: 'Users',
-					url: `${baseURL}/users`,
-					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-				},
+				// {
+				// 	title: 'Users',
+				// 	url: `${baseURL}/users`,
+				// 	role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				// },
 				{
 					title: 'Admins',
 					url: `${baseURL}/admins`,
-					role: [USER_ROLE.ADMIN],
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Students',
@@ -59,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			],
 		},
 		{
-			title: 'Set up',
+			title: 'Resource Management',
 			url: '#',
 			icon: Cog,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
@@ -77,24 +95,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				{
 					title: 'Specializations',
 					url: `${baseURL}/specializations`,
-					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-				},
-			],
-		},
-		{
-			title: 'Report',
-			url: '#',
-			icon: Newspaper,
-			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-			items: [
-				{
-					title: 'Inactive Users',
-					url: '#',
-					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-				},
-				{
-					title: 'Student Without Tutor',
-					url: '#',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 			],
