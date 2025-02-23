@@ -49,14 +49,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			icon: UsersRound,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 			items: [
-				// {
-				// 	title: 'Users',
-				// 	url: `${baseURL}/users`,
-				// 	role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-				// },
 				{
 					title: 'Admins',
 					url: `${baseURL}/admins`,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Staffs',
+					url: `${baseURL}/staffs`,
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
@@ -67,11 +67,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				{
 					title: 'Tutors',
 					url: `${baseURL}/tutors`,
-					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-				},
-				{
-					title: 'Staffs',
-					url: `${baseURL}/staffs`,
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 			],

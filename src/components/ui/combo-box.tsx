@@ -26,6 +26,7 @@ interface ComboBoxProps<T> {
 	popoverClassName?: string;
 	valueKey?: keyof T;
 	labelKey?: keyof T;
+	extraLabelKey?: (keyof T)[];
 }
 
 export const ComboBox = <T extends Record<string, any>>({
@@ -37,6 +38,7 @@ export const ComboBox = <T extends Record<string, any>>({
 	popoverClassName,
 	valueKey = 'value',
 	labelKey = 'label',
+	extraLabelKey = [],
 }: ComboBoxProps<T>) => {
 	const [open, setOpen] = React.useState(false);
 	const [value, setValue] = React.useState<T[keyof T]>(
@@ -72,7 +74,7 @@ export const ComboBox = <T extends Record<string, any>>({
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className={cn('p-0', popoverClassName)}>
+			<PopoverContent className={cn('w-full p-0', popoverClassName)}>
 				<Command>
 					<CommandInput placeholder="Search..." className="h-9" />
 					<CommandList>
@@ -86,7 +88,10 @@ export const ComboBox = <T extends Record<string, any>>({
 										handleSelect(item[valueKey])
 									}
 								>
-									{String(item[labelKey])}
+									{`${item[labelKey]} - (${extraLabelKey
+										.map((key) => item[key])
+										.filter(Boolean)
+										.join(', ')})`}
 									<Check
 										className={cn(
 											'ml-auto',
