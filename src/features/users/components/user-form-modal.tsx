@@ -50,17 +50,14 @@ const userFormSchema = z
 		username: z.string(),
 		email: z.string().nonempty('Email Required'),
 		roleId: z.number(),
-		gender: z.string().nonempty('Gender Required'),
-		departmentId: z.string(),
-		specializationId: z.string(),
-		courseId: z.string(),
+		gender: z.number().optional(),
+		departmentId: z.number().nullable(),
+		specializationId: z.number().nullable(),
+		courseId: z.number().nullable(),
 	})
 	.superRefine((data, ctx) => {
 		// ✅ If roleId is 1 or 2, department is required
-		if (
-			(data.roleId === 1 || data.roleId === 2) &&
-			!data.departmentId.trim()
-		) {
+		if ((data.roleId === 1 || data.roleId === 2) && !data.departmentId) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ['departmentId'],
@@ -69,7 +66,7 @@ const userFormSchema = z
 		}
 
 		// ✅ If roleId is 3, course is required
-		if (data.roleId === 3 && !data.courseId.trim()) {
+		if (data.roleId === 3 && !data.courseId) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ['courseId'],
@@ -78,7 +75,7 @@ const userFormSchema = z
 		}
 
 		// ✅ If roleId is 4, specialization is required
-		if (data.roleId === 4 && !data.specializationId.trim()) {
+		if (data.roleId === 4 && !data.specializationId) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				path: ['specializationId'],
@@ -209,7 +206,7 @@ const UserFormModal = ({
 		mutationFn: async (body: UserFormValue) =>
 			await updateUser(body.id!, body)
 				.then(async (response) => {
-					if (response.data.code === 201) {
+					if (response.data.code === 200) {
 						toast.success(response.data.message);
 						setIsOpen(false);
 
@@ -260,15 +257,15 @@ const UserFormModal = ({
 
 	const form = useForm<UserFormValue>({
 		resolver: zodResolver(userFormSchema),
-		defaultValues: formData ?? {
+		defaultValues: {
 			name: '',
 			email: '',
 			username: '',
 			roleId: roleId,
-			gender: '',
-			departmentId: '',
-			specializationId: '',
-			courseId: '',
+			gender: undefined,
+			departmentId: null,
+			specializationId: null,
+			courseId: null,
 		},
 	});
 
@@ -281,7 +278,7 @@ const UserFormModal = ({
 	}
 
 	useEffect(() => {
-		if (!searchName) {
+		if (!searchName && !formData) {
 			setIsLoadingSearchName(false);
 			return;
 		}
@@ -312,14 +309,22 @@ const UserFormModal = ({
 
 	useEffect(() => {
 		if (formData) {
-			form.reset({ ...formData });
+			Object.entries(formData).forEach(([key, value]) => {
+				if (value !== null && value !== undefined) {
+					form.setValue(key as keyof typeof formData, value);
+				}
+			});
 		}
-	}, [formData]);
+	}, [formData, form]);
+
+	console.log(form.formState.errors);
 
 	const loadingSearchName =
 		isLoadingSearchName ||
 		isLoadingUsernameExistsCountData ||
 		isPendingUsernameExistsCountData;
+
+	console.log(form.getValues());
 
 	return (
 		<ResponsiveModal className="px-7" isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -351,6 +356,7 @@ const UserFormModal = ({
 								)}
 							/>
 							{searchName &&
+								!formData &&
 								(loadingSearchName ? (
 									<div className="flex items-center gap-x-2">
 										<Loader className="size-4 animate-spin text-emerald-500/60 duration-150" />
@@ -428,8 +434,10 @@ const UserFormModal = ({
 									<FormItem>
 										<FormLabel>Gender</FormLabel>
 										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
+											onValueChange={(value) =>
+												field.onChange(Number(value))
+											}
+											defaultValue={field.value?.toString()}
 										>
 											<FormControl>
 												<SelectTrigger>
@@ -474,8 +482,7 @@ const UserFormModal = ({
 													) => {
 														form.setValue(
 															'departmentId',
-															(value?.toString() as string) ??
-																''
+															value as number
 														);
 													}}
 													placeholder="Select Department"
@@ -513,8 +520,7 @@ const UserFormModal = ({
 													) => {
 														form.setValue(
 															'courseId',
-															(value?.toString() as string) ??
-																''
+															value as number
 														);
 													}}
 													placeholder="Select Course"
@@ -555,8 +561,7 @@ const UserFormModal = ({
 													) => {
 														form.setValue(
 															'specializationId',
-															(value?.toString() as string) ??
-																''
+															value as number
 														);
 													}}
 													placeholder="Select Specialization"
@@ -583,7 +588,7 @@ const UserFormModal = ({
 								Cancel
 							</Button>
 
-							<Button type="submit" disabled={loadingSearchName}>
+							<Button type="submit">
 								{formData ? 'Edit' : 'Add'} {roleName}
 							</Button>
 						</div>

@@ -88,10 +88,13 @@ export const ComboBox = <T extends Record<string, any>>({
 										handleSelect(item[valueKey])
 									}
 								>
-									{`${item[labelKey]} - (${extraLabelKey
-										.map((key) => item[key])
-										.filter(Boolean)
-										.join(', ')})`}
+									{extraLabelKey.length > 0
+										? `${item[labelKey]} - (${extraLabelKey
+												.map((key) => item[key])
+												.filter(Boolean)
+												.join(', ')})`
+										: `${item[labelKey]}`}
+
 									<Check
 										className={cn(
 											'ml-auto',

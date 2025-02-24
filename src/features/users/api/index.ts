@@ -30,7 +30,7 @@ export const createUser = async (body: UserFormValue) =>
 	await api.post(userRoutes.users, body);
 
 export const updateUser = async (id: number, body: UserFormValue) =>
-	await api.put(buildURL(userRoutes.userId, { id }), body);
+	await api.patch(buildURL(userRoutes.userId, { id }), body);
 
 export const showUser = async (id: number) =>
 	await api.get<HTTPResponse<UserFormValue>>(
