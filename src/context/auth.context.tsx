@@ -12,6 +12,8 @@ import { AuthUser } from '@/features/users/types';
 import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
 import { toast } from 'sonner';
 import { AxiosResponse } from 'axios';
+import { getBrowserName } from '@/utils';
+import { useLocation } from 'react-router-dom';
 
 interface AuthContextProps {
 	user?: AuthUser | null;
@@ -38,7 +40,12 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+	const location = useLocation();
 	const queryClient = useQueryClient();
+
+	const browser = getBrowserName();
+
+	console.log(location.pathname, browser);
 
 	// Fetch the user details if a refresh token is present
 	const {
@@ -47,7 +54,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		refetch: userDataRefresh,
 	} = useQuery({
 		queryKey: ['authUser'],
-		queryFn: async () => await getAuthAccount(),
+		queryFn: async () =>
+			await getAuthAccount(
+				`route=${location.pathname}&browser=${browser}`
+			),
 		retry: false,
 	});
 
