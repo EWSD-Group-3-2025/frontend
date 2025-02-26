@@ -1,5 +1,6 @@
 import { ModeToggle } from '@/components/mode-toggle';
 import { UserButton } from '@/features/auth/components/user-button';
+import WelcomeMessageDialog from '@/features/users/components/welcome-message-dialog';
 import { Link, Outlet } from 'react-router-dom';
 
 export default function EndUserLayout() {
@@ -18,6 +19,7 @@ export default function EndUserLayout() {
 			</div>
 			<div className="p-5">
 				<Outlet />
+				<WelcomeMessageDialog />
 			</div>
 		</div>
 	);

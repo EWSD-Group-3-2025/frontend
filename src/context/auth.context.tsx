@@ -77,6 +77,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const logout = async () => {
 		await logoutMutation.mutateAsync();
 	};
+	console.log(userResponse?.data.data.user);
 
 	return (
 		<AuthContext.Provider

@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { cn } from '@/utils/stringUtils';
+import { getRedirectRoute } from '@/utils/auth';
 
 const formSchema = z.object({
 	email: z
@@ -53,6 +54,7 @@ export default function LoginPage() {
 					);
 
 					form.reset();
+					// const redirectRoute = getRedirectRoute(auth.user.roleName);
 					// TODO Redirect based on user role and use function from RRD
 					window.location.href = '/dashboard/student';
 					toast.success('Log in successful');
@@ -68,8 +70,8 @@ export default function LoginPage() {
 	};
 
 	if (!auth.loading && auth.user) {
-		// TODO change redirect based on user role
-		const from = location.state?.from?.pathname || '/dashboard/student';
+		const redirectRoute = getRedirectRoute(auth.user.roleName);
+		const from = redirectRoute || location.state?.from?.pathname;
 		navigate(from);
 		return;
 	}

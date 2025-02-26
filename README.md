@@ -86,5 +86,4 @@ We'd love to hear from you! If you have any questions, suggestions, or feedback 
 
 ## TODO
 
-- Fix timer in resend OTP code
-- Forgot password is not work without login (show refresh token error)
+- Need to implement RBAC
