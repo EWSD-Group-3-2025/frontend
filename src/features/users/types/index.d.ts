@@ -28,11 +28,19 @@ export interface TutorUser extends User {
 	specializationName: string | null;
 }
 export interface AuthUser {
+	courseId: number | null;
+	courseName: string | null;
+	departmentId: number | null;
+	departmentName: string | null;
+	email: string;
 	id: number;
 	name: string;
+	roleId?: number | undefined;
+	roleName: USER_ROLE;
+	specializationId: number | null;
+	specializationName: string | null;
+	status: boolean;
 	username: string;
-	email: string;
-	roleName: keyof typeof USER_ROLE;
 }
 
 export interface ChangePasswordRequest {

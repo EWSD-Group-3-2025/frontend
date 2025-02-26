@@ -38,7 +38,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 				/>
 			);
 		} else {
-			// Protected routes, implement role-based authentication here
 			return <>{children}</>;
 		}
 	}

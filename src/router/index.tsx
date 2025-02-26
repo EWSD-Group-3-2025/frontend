@@ -1,6 +1,5 @@
 import { createElement, ElementType } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-
+import { Route, Routes } from 'react-router-dom';
 import { USER_ROLE } from '@/constants';
 import NotFound from '@/pages/notFound/NotFound';
 import LoginPage from '@/features/auth/pages/Login';
@@ -24,6 +23,8 @@ import AdminList from '@/features/users/pages/management/AdminList';
 import DepartmentList from '@/features/departments/pages/DepartmentList';
 import CourseList from '@/features/courses/pages/CourseList';
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
+import HomePage from '@/pages/HomePage';
+import RouteGuard from '@/features/auth/components/role-guard';
 
 type ChildRoute = {
 	path: string;
@@ -46,9 +47,10 @@ const Router = () => {
 		},
 	];
 
-	const studentRouteList = [
+	// endUserRoutes is for students and tutors
+	const endUserRouteList = [
 		{
-			path: '/dashboard/student',
+			path: '/dashboard/end-user',
 			element: StudentDashboard,
 			role: [USER_ROLE.STUDENT],
 		},
@@ -238,13 +240,15 @@ const Router = () => {
 
 			{/* Student Routes */}
 			<Route element={<EndUserLayout />}>
-				{studentRouteList.map((route, i) => (
+				{endUserRouteList.map((route, i) => (
 					<Route
 						key={i}
 						path={route.path}
 						element={
 							<AuthGuard>
-								{createElement(route.element)}
+								<RouteGuard>
+									{createElement(route.element)}
+								</RouteGuard>
 							</AuthGuard>
 						}
 					></Route>
@@ -259,7 +263,9 @@ const Router = () => {
 						path={route.path}
 						element={
 							<AuthGuard>
-								{createElement(route.element)}
+								<RouteGuard>
+									{createElement(route.element)}
+								</RouteGuard>
 							</AuthGuard>
 						}
 					></Route>
@@ -274,7 +280,9 @@ const Router = () => {
 						path={route.path}
 						element={
 							<AuthGuard>
-								{createElement(route.element)}
+								<RouteGuard>
+									{createElement(route.element)}
+								</RouteGuard>
 							</AuthGuard>
 						}
 					></Route>
@@ -292,7 +300,23 @@ const Router = () => {
 				))}
 			</Route>
 
-			<Route path="*" element={<Navigate to="/" replace />} />
+			{/* When user hit to Home and Dashboard routes, it will redirect automatically redirect to their specific route based on their role */}
+			<Route
+				path="/"
+				element={
+					<AuthGuard>
+						<RouteGuard>{createElement(HomePage)}</RouteGuard>
+					</AuthGuard>
+				}
+			/>
+			<Route
+				path="/dashboard"
+				element={
+					<AuthGuard>
+						<RouteGuard>{createElement(HomePage)}</RouteGuard>
+					</AuthGuard>
+				}
+			/>
 		</Routes>
 	);
 };
