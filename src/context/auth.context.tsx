@@ -45,8 +45,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const browser = getBrowserName();
 
-	console.log(location.pathname, browser);
-
 	// Fetch the user details if a refresh token is present
 	const {
 		isLoading,
@@ -56,7 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		queryKey: ['authUser'],
 		queryFn: async () =>
 			await getAuthAccount(
-				`route=${location.pathname}&browser=${browser}`
+				`routeName=${location.pathname}&browserName=${browser}`
 			),
 		retry: false,
 	});
