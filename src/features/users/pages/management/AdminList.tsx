@@ -7,15 +7,13 @@ import { Ellipsis, SquarePen, Trash2, UserPlus } from 'lucide-react';
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers, showUser } from '@/features/users/api';
+import { deleteUser, getAllUsers } from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
 import { Button } from '@/components/ui/button';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
-import UserFormModal, {
-	UserFormValue,
-} from '@/features/users/components/user-form-modal';
+import UserFormModal from '@/features/users/components/user-form-modal';
 import { Badge } from '@/components/ui/badge';
 import {
 	DropdownMenu,
@@ -49,19 +47,6 @@ const AdminList = () => {
 			}),
 	});
 
-	const { data: userShow } = useQuery<HTTPResponse<UserFormValue>>({
-		queryKey: ['get-user-by-id'],
-		queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
-			await showUser(Number(selectedUserId)).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
-
-				throw new Error('Fetch User Show Fail!');
-			}),
-		enabled: !!selectedUserId,
-	});
-
 	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
 		{
 			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
@@ -85,11 +70,14 @@ const AdminList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -103,11 +91,9 @@ const AdminList = () => {
 
 	const userListColumns: ColumnDef<User>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -194,7 +180,14 @@ const AdminList = () => {
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
-								<DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setIsOpen(true);
+										setSelectedUserId(
+											params.row.original.id
+										);
+									}}
+								>
 									<SquarePen /> Edit
 								</DropdownMenuItem>
 								<DropdownMenuItem
@@ -218,12 +211,12 @@ const AdminList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
+				<h1 className="font-roboto-slab text-2xl font-semibold transition-all duration-300 ease-linear sm:text-3xl">
 					Admin Management
 				</h1>
 				<Button onClick={() => setIsOpen(true)}>
 					<UserPlus className="font-bold" />
-					Create Admin
+					Add Admin
 				</Button>
 			</div>
 			<ContainerWrapper>
@@ -241,11 +234,11 @@ const AdminList = () => {
 			</ContainerWrapper>
 
 			<UserFormModal
+				roleId={1}
+				roleName="Admin"
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
-				roleId={1}
-				formData={userShow?.data}
-				roleName="Admin"
+				selectedUserId={selectedUserId}
 				setSelectedUserId={setSelectedUserId}
 			/>
 

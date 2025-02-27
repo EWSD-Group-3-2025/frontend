@@ -36,6 +36,7 @@ const CourseList = () => {
 	const [name, setName] = useState('');
 	const [openModal, setOpenModal] = useState(false);
 	const [courseId, setCourseId] = useState<number | null>(null);
+	const [courseName, setCourseName] = useState('');
 
 	const { data, isLoading } = useQuery<HTTPResponse<Course[]>>({
 		queryKey: ['get-all-courses'],
@@ -70,10 +71,10 @@ const CourseList = () => {
 				})
 				.catch((e) => {
 					setOpen(false);
-					toast.error(e.response.data.message ?? 'Request Fail', {
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
-							e.response?.data?.data ??
-							'Something went wrong. Please try again.',
+							e.response?.data?.message ??
+							'Something wrong plz try again',
 					});
 					throw e;
 				}),
@@ -87,11 +88,9 @@ const CourseList = () => {
 
 	const courseListColumns: ColumnDef<Course>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -99,6 +98,11 @@ const CourseList = () => {
 				<HeaderSorting column={column} title="Name" />
 			),
 			accessorKey: 'name',
+		},
+		{
+			id: 'staffName',
+			header: 'Created By',
+			accessorKey: 'staffName',
 		},
 		{
 			id: 'action',
@@ -111,6 +115,7 @@ const CourseList = () => {
 						onClick={() => {
 							setOpenModal(true);
 							setCourseId(params.row.original.id);
+							setCourseName(params.row.original.name);
 						}}
 					>
 						<SquarePen />
@@ -158,8 +163,10 @@ const CourseList = () => {
 				<CourseUpdateModal
 					open={openModal}
 					setOpen={setOpenModal}
+					courseName={courseName}
 					id={courseId}
 					setCourseId={setCourseId}
+					setCourseName={setCourseName}
 				/>
 			) : (
 				<CourseCreateModal

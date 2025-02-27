@@ -13,7 +13,7 @@ import {
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers, showUser } from '@/features/users/api';
+import { deleteUser, getAllUsers } from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
@@ -21,9 +21,7 @@ import { useAuth } from '@/context/auth.context';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import { toast } from 'sonner';
-import UserFormModal, {
-	UserFormValue,
-} from '@/features/users/components/user-form-modal';
+import UserFormModal from '@/features/users/components/user-form-modal';
 import DeleteDialog from '@/components/delete-dialog';
 import {
 	DropdownMenu,
@@ -63,19 +61,6 @@ const TutorList = () => {
 			}),
 	});
 
-	const { data: userShow } = useQuery<HTTPResponse<UserFormValue>>({
-		queryKey: ['get-user-by-id'],
-		queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
-			await showUser(Number(selectedUserId)).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
-
-				throw new Error('Fetch User Show Fail!');
-			}),
-		enabled: !!selectedUserId,
-	});
-
 	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
 		{
 			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
@@ -99,11 +84,14 @@ const TutorList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -117,11 +105,16 @@ const TutorList = () => {
 
 	const userListColumns: ColumnDef<User>[] = [
 		{
-			id: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
+		},
+		{
+			id: 'username',
 			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
+				<HeaderSorting column={column} title="UserName" />
 			),
-			accessorKey: 'id',
+			accessorKey: 'username',
 		},
 		{
 			id: 'name',
@@ -220,7 +213,14 @@ const TutorList = () => {
 								</>
 							)}
 							<DropdownMenuGroup>
-								<DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setIsOpen(true);
+										setSelectedUserId(
+											params.row.original.id
+										);
+									}}
+								>
 									<SquarePen /> Edit
 								</DropdownMenuItem>
 								<DropdownMenuItem
@@ -249,7 +249,7 @@ const TutorList = () => {
 				</h1>
 				<Button onClick={() => setIsOpen(true)}>
 					<UserPlus className="font-bold" />
-					Create Tutor
+					Add Tutor
 				</Button>
 			</div>
 			<ContainerWrapper>
@@ -269,7 +269,7 @@ const TutorList = () => {
 			<UserFormModal
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
-				formData={userShow?.data}
+				selectedUserId={selectedUserId}
 				roleId={4}
 				roleName="Tutor"
 				setSelectedUserId={setSelectedUserId}

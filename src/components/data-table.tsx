@@ -71,15 +71,17 @@ const DataTable = <TData, TValue>({
 				pages.push(i);
 			}
 		} else {
-			const start = Math.max(2, currentPage - 2);
-			const end = Math.min(totalPages - 1, currentPage + 2);
+			const start = Math.max(2, currentPage - 1);
+			const end = Math.min(totalPages - 1, currentPage + 1);
 
 			pages.push(1);
-			if (start > 2) pages.push('...');
+			if (start > 2) pages.push('prev');
+
 			for (let i = start; i <= end; i++) {
 				pages.push(i);
 			}
-			if (end < totalPages - 1) pages.push('...');
+
+			if (end < totalPages - 1) pages.push('next');
 			pages.push(totalPages);
 		}
 

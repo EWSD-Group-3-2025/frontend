@@ -12,13 +12,11 @@ import {
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers, showUser } from '@/features/users/api';
+import { deleteUser, getAllUsers } from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
-import UserFormModal, {
-	UserFormValue,
-} from '@/features/users/components/user-form-modal';
+import UserFormModal from '@/features/users/components/user-form-modal';
 import DeleteDialog from '@/components/delete-dialog';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
@@ -59,19 +57,6 @@ const StaffList = () => {
 			}),
 	});
 
-	const { data: userShow } = useQuery<HTTPResponse<UserFormValue>>({
-		queryKey: ['get-user-by-id'],
-		queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
-			await showUser(Number(selectedUserId)).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
-
-				throw new Error('Fetch User Show Fail!');
-			}),
-		enabled: !!selectedUserId,
-	});
-
 	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
 		{
 			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
@@ -95,11 +80,14 @@ const StaffList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -113,11 +101,9 @@ const StaffList = () => {
 
 	const userListColumns: ColumnDef<User>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -125,6 +111,13 @@ const StaffList = () => {
 				<HeaderSorting column={column} title="Name" />
 			),
 			accessorKey: 'name',
+		},
+		{
+			id: 'username',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="UserName" />
+			),
+			accessorKey: 'username',
 		},
 		{
 			id: 'email',
@@ -207,7 +200,14 @@ const StaffList = () => {
 								</>
 							)}
 							<DropdownMenuGroup>
-								<DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setIsOpen(true);
+										setSelectedUserId(
+											params.row.original.id
+										);
+									}}
+								>
 									<SquarePen /> Edit
 								</DropdownMenuItem>
 								<DropdownMenuItem
@@ -236,7 +236,7 @@ const StaffList = () => {
 				</h1>
 				<Button onClick={() => setIsOpen(true)}>
 					<UserPlus className="font-bold" />
-					Create Staff
+					Add Staff
 				</Button>
 			</div>
 			<ContainerWrapper>
@@ -254,11 +254,11 @@ const StaffList = () => {
 			</ContainerWrapper>
 
 			<UserFormModal
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				formData={userShow?.data}
 				roleId={2}
 				roleName="Staff"
+				isOpen={isOpen}
+				setIsOpen={setIsOpen}
+				selectedUserId={selectedUserId}
 				setSelectedUserId={setSelectedUserId}
 			/>
 

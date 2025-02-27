@@ -77,7 +77,8 @@ const AllocateTutor = ({
 			const response = await getAllUsers('role=student');
 			if (response.data.code === 200) {
 				const filterData = (response.data.data as StudentUser[]).filter(
-					(student: StudentUser) => student.allocateTutorId === null
+					(student: StudentUser) =>
+						student.allocateTutorId === null && student.status
 				);
 				return filterData as StudentUser[];
 			}
@@ -87,7 +88,7 @@ const AllocateTutor = ({
 		enabled: isOpen === true,
 	});
 
-	const { mutateAsync: allocateUser } = useMutation({
+	const { mutateAsync: allocateUser, isPending } = useMutation({
 		mutationFn: async (body: AllocateTutor) =>
 			await allocation(body).then(async (response) => {
 				if (response.data.code === 200) {
@@ -127,8 +128,10 @@ const AllocateTutor = ({
 	}
 
 	useEffect(() => {
+		console.log(selectedStudent);
 		if (selectedStudent) {
-			form.setValue('studentIds', [String(selectedStudent.id)]);
+			console.log('Enter');
+			form.setValue('studentIds', [selectedStudent.id?.toString() ?? '']);
 			form.setValue(
 				'tutorId',
 				selectedStudent.allocateTutorId?.toString() ?? ''
@@ -161,28 +164,34 @@ const AllocateTutor = ({
 	});
 
 	useEffect(() => {
-		if (selectedStudentUsername.length > 0) {
+		console.log('ABCC');
+		if (selectedStudentUsername.length > 0 && !selectedStudent) {
 			const selectedStudents = studentData?.filter((student) =>
 				selectedStudentUsername.includes(student.username)
 			);
+			console.log(selectedStudents, 'SELECT');
 			const studentIds =
 				selectedStudents?.map((student) => student.id.toString()) || [];
+
+			console.log(selectedStudentUsername.length);
+			console.log(studentIds);
 			form.setValue('studentIds', studentIds);
 		}
 	}, [selectedStudentUsername, studentData]);
 
+	console.log(studentData);
 	useEffect(() => {
 		if (selectedTutorId) {
 			form.setValue('tutorId', selectedTutorId.toString());
 		}
 	}, [selectedTutorId]);
 
-	console.log(form.getValues());
 	return (
 		<ResponsiveModal
 			className={cn(
 				'px-7 sm:min-h-[50vh] md:min-h-[50vh]',
-				selectedStudent && 'md:min-h-[30vh]'
+				selectedStudent && 'md:min-h-[30vh]',
+				selectedTutorId && 'md:min-h-[40vh]'
 			)}
 			isOpen={isOpen}
 			setIsOpen={setIsOpen}
@@ -343,7 +352,9 @@ const AllocateTutor = ({
 								Cancel
 							</Button>
 
-							<Button type="submit">Assign</Button>
+							<Button type="submit" disabled={isPending}>
+								{isPending ? 'Loading' : 'Assign'}
+							</Button>
 						</div>
 					</form>
 				</Form>
