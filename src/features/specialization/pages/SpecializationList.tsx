@@ -45,6 +45,7 @@ const SpecializationList = () => {
 	const [specializationId, setSpecializationId] = useState<number | null>(
 		null
 	);
+	const [specializationName, setSpecializationName] = useState('');
 
 	const { data, isLoading } = useQuery<HTTPResponse<Specialization[]>>({
 		queryKey: ['get-all-specializations'],
@@ -171,6 +172,8 @@ const SpecializationList = () => {
 					open={openModal}
 					setOpen={setOpenModal}
 					id={specializationId}
+					specializationName={specializationName}
+					setSpecializationName={setSpecializationName}
 					setSpecializationId={setSpecializationId}
 				/>
 			) : (

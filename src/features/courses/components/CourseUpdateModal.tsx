@@ -1,9 +1,9 @@
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
 	Form,
@@ -16,12 +16,14 @@ import {
 import { Button } from '@/components/ui/button';
 import ResponsiveModal from '@/components/responsive-modal';
 import { Input } from '@/components/ui/input';
-import { showCourse, updateCourse } from '@/features/courses/api';
+import { updateCourse } from '@/features/courses/api';
 
 type CourseUpdateModalProp = {
 	open: boolean;
+	courseName: string;
 	setOpen: Dispatch<SetStateAction<boolean>>;
 	setCourseId: Dispatch<SetStateAction<number | null>>;
+	setCourseName: Dispatch<SetStateAction<string>>;
 	id: number;
 };
 
@@ -34,24 +36,12 @@ export type CourseUpdateForm = z.infer<typeof courseUpdateSchema>;
 const CourseUpdateModal = ({
 	open,
 	setOpen,
+	courseName,
 	setCourseId,
+	setCourseName,
 	id,
 }: CourseUpdateModalProp) => {
 	const queryClient = useQueryClient();
-
-	useQuery<HTTPResponse<Course>>({
-		queryKey: ['get-course-by-id'],
-		queryFn: async (): Promise<HTTPResponse<Course>> =>
-			await showCourse(id).then((response) => {
-				if (response.data.code === 200) {
-					form.reset({ name: response.data.data.name });
-					return response.data;
-				}
-
-				throw new Error('Fetch Course Show Fail!');
-			}),
-		enabled: !!id,
-	});
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: CourseUpdateForm) =>
@@ -60,7 +50,7 @@ const CourseUpdateModal = ({
 				name: body.name,
 			})
 				.then((response) => {
-					if (response.status === 200) {
+					if (response.status === 204) {
 						queryClient.invalidateQueries({
 							queryKey: ['get-all-courses'],
 						});
@@ -82,7 +72,7 @@ const CourseUpdateModal = ({
 	const form = useForm<CourseUpdateForm>({
 		resolver: zodResolver(courseUpdateSchema),
 		defaultValues: {
-			name: '',
+			name: courseName,
 		},
 	});
 
@@ -90,17 +80,22 @@ const CourseUpdateModal = ({
 		mutateAsync(values);
 	}
 
+	useEffect(() => {
+		if (!open) {
+			setOpen(false);
+			setCourseId(null);
+			setCourseName('');
+			form.reset({
+				name: '',
+			});
+		}
+	}, [open]);
+
 	return (
 		<ResponsiveModal
 			className="sm:min-h-[50vh] md:min-h-[30vh]"
 			isOpen={open}
-			setIsOpen={() => {
-				setOpen(false);
-				setCourseId(null);
-				form.reset({
-					name: '',
-				});
-			}}
+			setIsOpen={setOpen}
 		>
 			<div className="p-7">
 				<h2 className="mb-5 font-roboto-slab text-3xl">

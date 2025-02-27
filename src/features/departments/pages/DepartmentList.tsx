@@ -26,6 +26,7 @@ const DepartmentList = () => {
 	const [name, setName] = useState('');
 	const [openModal, setOpenModal] = useState(false);
 	const [departmentId, setDepartmentId] = useState<number | null>(null);
+	const [departmentName, setDepartmentName] = useState('');
 
 	const { data, isLoading } = useQuery<HTTPResponse<Department[]>>({
 		queryKey: ['get-all-departments'],
@@ -101,6 +102,7 @@ const DepartmentList = () => {
 						onClick={() => {
 							setOpenModal(true);
 							setDepartmentId(params.row.original.id);
+							setDepartmentName(params.row.original.name);
 						}}
 					>
 						<SquarePen />
@@ -148,6 +150,8 @@ const DepartmentList = () => {
 				<DepartmentUpdateModal
 					open={openModal}
 					setOpen={setOpenModal}
+					departmentName={departmentName}
+					setDepartmentName={setDepartmentName}
 					id={departmentId}
 					setDepartmentId={setDepartmentId}
 				/>

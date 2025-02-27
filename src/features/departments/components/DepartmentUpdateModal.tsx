@@ -1,9 +1,9 @@
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
 	Form,
@@ -15,13 +15,15 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import ResponsiveModal from '@/components/responsive-modal';
-import { showDepartment, updateDepartment } from '@/features/departments/api';
+import { updateDepartment } from '@/features/departments/api';
 import { Input } from '@/components/ui/input';
 
 type DepartmentCreateModalProp = {
 	open: boolean;
 	setOpen: Dispatch<SetStateAction<boolean>>;
+	departmentName: string;
 	setDepartmentId: Dispatch<SetStateAction<number | null>>;
+	setDepartmentName: Dispatch<SetStateAction<string>>;
 	id: number;
 };
 
@@ -34,24 +36,12 @@ export type DepartmentUpdateForm = z.infer<typeof departmentUpdateSchema>;
 const DepartmentUpdateModal = ({
 	open,
 	setOpen,
+	departmentName,
 	setDepartmentId,
+	setDepartmentName,
 	id,
 }: DepartmentCreateModalProp) => {
 	const queryClient = useQueryClient();
-
-	useQuery<HTTPResponse<Department>>({
-		queryKey: ['get-department-by-id'],
-		queryFn: async (): Promise<HTTPResponse<Department>> =>
-			await showDepartment(id).then((response) => {
-				if (response.data.code === 200) {
-					form.reset({ name: response.data.data.name });
-					return response.data;
-				}
-
-				throw new Error('Fetch Department Show Fail!');
-			}),
-		enabled: !!id,
-	});
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: DepartmentUpdateForm) =>
@@ -65,6 +55,7 @@ const DepartmentUpdateModal = ({
 							queryKey: ['get-all-departments'],
 						});
 						setDepartmentId(null);
+						setDepartmentName('');
 						form.reset({
 							name: '',
 						});
@@ -82,7 +73,7 @@ const DepartmentUpdateModal = ({
 	const form = useForm<DepartmentUpdateForm>({
 		resolver: zodResolver(departmentUpdateSchema),
 		defaultValues: {
-			name: '',
+			name: departmentName,
 		},
 	});
 
@@ -90,17 +81,22 @@ const DepartmentUpdateModal = ({
 		mutateAsync(values);
 	}
 
+	useEffect(() => {
+		if (!open) {
+			setOpen(false);
+			setDepartmentId(null);
+			setDepartmentName('');
+			form.reset({
+				name: '',
+			});
+		}
+	}, [open]);
+
 	return (
 		<ResponsiveModal
 			className="sm:min-h-[50vh] md:min-h-[30vh]"
 			isOpen={open}
-			setIsOpen={() => {
-				setOpen(false);
-				setDepartmentId(null);
-				form.reset({
-					name: '',
-				});
-			}}
+			setIsOpen={setOpen}
 		>
 			<div className="p-7">
 				<h2 className="mb-5 font-roboto-slab text-3xl">

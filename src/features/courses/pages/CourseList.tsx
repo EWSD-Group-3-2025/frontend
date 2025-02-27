@@ -36,6 +36,7 @@ const CourseList = () => {
 	const [name, setName] = useState('');
 	const [openModal, setOpenModal] = useState(false);
 	const [courseId, setCourseId] = useState<number | null>(null);
+	const [courseName, setCourseName] = useState('');
 
 	const { data, isLoading } = useQuery<HTTPResponse<Course[]>>({
 		queryKey: ['get-all-courses'],
@@ -111,6 +112,7 @@ const CourseList = () => {
 						onClick={() => {
 							setOpenModal(true);
 							setCourseId(params.row.original.id);
+							setCourseName(params.row.original.name);
 						}}
 					>
 						<SquarePen />
@@ -158,8 +160,10 @@ const CourseList = () => {
 				<CourseUpdateModal
 					open={openModal}
 					setOpen={setOpenModal}
+					courseName={courseName}
 					id={courseId}
 					setCourseId={setCourseId}
+					setCourseName={setCourseName}
 				/>
 			) : (
 				<CourseCreateModal
