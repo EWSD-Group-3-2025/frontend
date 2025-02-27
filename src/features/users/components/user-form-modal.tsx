@@ -210,7 +210,14 @@ const UserFormModal = ({
 				})
 				.catch((e) => {
 					if (e.response.data.code === 422) {
-						toast.error(e.response.data.message);
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						e.response.data.data.forEach(
 							(err: { field: string; message: string }) => {
 								form.setError(
@@ -222,10 +229,15 @@ const UserFormModal = ({
 								);
 							}
 						);
-					} else if (e.response.data.code === 409) {
-						toast.error(e.response.data.data, {
-							description: e.response.data.message,
-						});
+					} else {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 					}
 				}),
 	});
@@ -257,8 +269,15 @@ const UserFormModal = ({
 					throw new Error('User Create Fail!');
 				})
 				.catch((e) => {
-					if (e.response.data.code === 400) {
-						toast.error(e.response.data.message);
+					if (e.response.data.code === 422) {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						e.response.data.data.forEach(
 							(err: { field: string; message: string }) => {
 								form.setError(
@@ -268,6 +287,15 @@ const UserFormModal = ({
 										message: err.message,
 									}
 								);
+							}
+						);
+					} else {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
 							}
 						);
 					}

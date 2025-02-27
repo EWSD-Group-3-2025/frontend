@@ -80,11 +80,14 @@ const StaffList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -98,11 +101,9 @@ const StaffList = () => {
 
 	const userListColumns: ColumnDef<User>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -235,7 +236,7 @@ const StaffList = () => {
 				</h1>
 				<Button onClick={() => setIsOpen(true)}>
 					<UserPlus className="font-bold" />
-					Create Staff
+					Add Staff
 				</Button>
 			</div>
 			<ContainerWrapper>

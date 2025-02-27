@@ -70,11 +70,14 @@ const AdminList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -88,11 +91,9 @@ const AdminList = () => {
 
 	const userListColumns: ColumnDef<User>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -210,12 +211,12 @@ const AdminList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
+				<h1 className="font-roboto-slab text-2xl font-semibold transition-all duration-300 ease-linear sm:text-3xl">
 					Admin Management
 				</h1>
 				<Button onClick={() => setIsOpen(true)}>
 					<UserPlus className="font-bold" />
-					Create Admin
+					Add Admin
 				</Button>
 			</div>
 			<ContainerWrapper>
