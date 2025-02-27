@@ -5,6 +5,7 @@ import {
 	Cog,
 	FileChartColumnIncreasing,
 	LayoutDashboard,
+	Logs,
 	Newspaper,
 	UsersRound,
 } from 'lucide-react';
@@ -39,6 +40,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			title: 'Report',
 			url: '/dashboard/management/reports',
 			icon: Newspaper,
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+		},
+		{
+			title: 'Activity Logs',
+			url: '/dashboard/management/activity-logs',
+			icon: Logs,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
 		{

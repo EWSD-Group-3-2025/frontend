@@ -26,6 +26,7 @@ import SpecializationList from '@/features/specialization/pages/SpecializationLi
 import HomePage from '@/pages/HomePage';
 import RouteGuard from '@/features/auth/components/role-guard';
 import { useAuth } from '@/context/auth.context';
+import ActivityLogs from '@/features/activity-logs/page/ActivityLogs';
 
 type ChildRoute = {
 	path: string;
@@ -167,7 +168,7 @@ const Router = () => {
 		},
 		{
 			path: '/dashboard/management/activity-logs',
-			element: SpecializationList,
+			element: ActivityLogs,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
