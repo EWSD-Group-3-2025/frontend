@@ -64,13 +64,18 @@ export function UserButton() {
 									{user?.name.charAt(0).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
-							<div className="flex flex-col space-y-1">
+							<div className="flex w-40 flex-col space-y-1">
 								<p className="text-sm font-medium leading-none">
 									{user?.name}
 								</p>
-								<p className="text-xs leading-none text-muted-foreground">
-									{user?.email}
-								</p>
+								<abbr
+									title={user?.email}
+									className="no-underline"
+								>
+									<p className="overflow-hidden text-ellipsis text-xs leading-none text-muted-foreground">
+										{user?.email}
+									</p>
+								</abbr>
 							</div>
 						</div>
 					</DropdownMenuLabel>
