@@ -317,14 +317,10 @@ const UserFormModal = ({
 		}
 	}, [formData, form]);
 
-	console.log(form.formState.errors);
-
 	const loadingSearchName =
 		isLoadingSearchName ||
 		isLoadingUsernameExistsCountData ||
 		isPendingUsernameExistsCountData;
-
-	console.log(form.getValues());
 
 	return (
 		<ResponsiveModal className="px-7" isOpen={isOpen} setIsOpen={setIsOpen}>

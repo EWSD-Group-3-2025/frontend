@@ -177,7 +177,6 @@ const AllocateTutor = ({
 		}
 	}, [selectedTutorId]);
 
-	console.log(form.getValues());
 	return (
 		<ResponsiveModal
 			className={cn(

@@ -3,6 +3,14 @@ import CONSTANTS from '@/constants';
 import authRoutes from './routes';
 import { AuthUser } from '@/features/users/types';
 import api from '@/utils/axios';
+import {
+	ForgotPasswordRequest,
+	LoginRequest,
+	LoginResponse,
+	ResetPasswordRequest,
+	UpdateUserProfileRequest,
+	VerifyOtpRequest,
+} from '../types';
 
 export const login = async (body: LoginRequest) =>
 	await api.post<HTTPResponse<LoginResponse>>(authRoutes.login, body);

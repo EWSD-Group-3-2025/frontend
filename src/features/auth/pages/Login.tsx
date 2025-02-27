@@ -54,10 +54,12 @@ export default function LoginPage() {
 					);
 
 					form.reset();
-					// const redirectRoute = getRedirectRoute(auth.user.roleName);
-					// TODO Redirect based on user role and use function from RRD
-					window.location.href = '/dashboard/student';
-					toast.success('Log in successful');
+					const redirectRoute = getRedirectRoute(
+						response.data.data.user.roleName
+					);
+
+					window.location.href = redirectRoute;
+					toast.success(response.data.message);
 				}
 			})
 			.catch((e) => {
