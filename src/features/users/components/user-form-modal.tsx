@@ -20,20 +20,20 @@ import {
 	updateUser,
 	usernameExistsCount,
 } from '@/features/users/api';
-import { convertNameToSlug, transformObjects } from '@/utils';
+import { convertNameToSlug } from '@/utils';
 import { CheckCircle2, Loader } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
 import { getAllCourses } from '@/features/courses/api';
 import { getAllSpecializations } from '@/features/specialization/api';
-import { GENDER } from '@/constants';
+// import { GENDER } from '@/constants';
 import { ComboBox } from '@/components/ui/combo-box';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+// import {
+// 	Select,
+// 	SelectContent,
+// 	SelectItem,
+// 	SelectTrigger,
+// 	SelectValue,
+// } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 type UserFormModalProp = {
@@ -96,7 +96,7 @@ const UserFormModal = ({
 	setSelectedUserId,
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
-	const transform = transformObjects({ GENDER });
+	// const transform = transformObjects({ GENDER });
 	const [searchName, setSearchName] = useState('');
 	const [username, setUsername] = useState('');
 	const [isLoadingSearchName, setIsLoadingSearchName] = useState(false);
