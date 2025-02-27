@@ -13,6 +13,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from '@/components/ui/pagination';
+import { Ellipsis } from 'lucide-react';
 
 type CustomPaginationProps = {
 	currentPage: number;
@@ -53,8 +54,10 @@ const CustomPagination = ({
 
 					{pageNumbers.map((page, index) => (
 						<PaginationItem key={index}>
-							{page === '...' ? (
-								<span className="px-2">...</span>
+							{page === 'prev' || page === 'next' ? (
+								<span className="px-2">
+									<Ellipsis className="h-4 w-4" />
+								</span>
 							) : (
 								<PaginationLink
 									href="#"
