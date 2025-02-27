@@ -25,6 +25,7 @@ import CourseList from '@/features/courses/pages/CourseList';
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
 import HomePage from '@/pages/HomePage';
 import RouteGuard from '@/features/auth/components/role-guard';
+import { useAuth } from '@/context/auth.context';
 
 type ChildRoute = {
 	path: string;
@@ -40,6 +41,7 @@ type Route = {
 };
 
 const Router = () => {
+	const { user } = useAuth();
 	const authRouteList = [
 		{
 			path: '/login',
@@ -96,127 +98,77 @@ const Router = () => {
 
 	const adminRouteList = [
 		{
-			path: '/dashboard/admin',
-			element: AdminDashboard,
+			path: '/dashboard/management',
+			element:
+				user?.roleName === USER_ROLE.ADMIN
+					? AdminDashboard
+					: StaffDashboard,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/departments',
+			path: '/dashboard/management/departments',
 			element: DepartmentList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/courses',
+			path: '/dashboard/management/courses',
 			element: CourseList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/specializations',
+			path: '/dashboard/management/specializations',
 			element: SpecializationList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/student/:username',
+			path: '/dashboard/management/student/:username',
 			element: OtherUserDashboard,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/tutor/:username',
+			path: '/dashboard/management/tutor/:username',
 			element: OtherUserDashboard,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/staff/:username',
+			path: '/dashboard/management/staff/:username',
 			element: OtherUserDashboard,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/staffs',
+			path: '/dashboard/management/staffs',
 			element: StaffList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/students',
+			path: '/dashboard/management/students',
 			element: StudentList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/tutors',
+			path: '/dashboard/management/tutors',
 			element: TutorList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/admins',
+			path: '/dashboard/management/admins',
 			element: AdminList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/analysis',
+			path: '/dashboard/management/analysis',
 			element: SpecializationList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			path: '/dashboard/admin/reports',
+			path: '/dashboard/management/reports',
 			element: SpecializationList,
 			role: [USER_ROLE.ADMIN],
 		},
 		{
-			name: 'Not Found',
-			path: '*',
-			element: NotFound,
-		},
-	];
-
-	const staffRouteList = [
-		{
-			path: '/dashboard/staff',
-			element: StaffDashboard,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/departments',
-			element: DepartmentList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/courses',
-			element: CourseList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/specializations',
+			path: '/dashboard/management/activity-logs',
 			element: SpecializationList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/analysis',
-			element: SpecializationList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/reports',
-			element: SpecializationList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/staffs',
-			element: StaffList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/students',
-			element: StudentList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/tutors',
-			element: TutorList,
-			role: [USER_ROLE.STAFF],
-		},
-		{
-			path: '/dashboard/staff/admins',
-			element: AdminList,
-			role: [USER_ROLE.STAFF],
+			role: [USER_ROLE.ADMIN],
 		},
 		{
 			name: 'Not Found',
@@ -258,23 +210,6 @@ const Router = () => {
 			{/* Admin Routes */}
 			<Route element={<ManagementLayout />}>
 				{adminRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={
-							<AuthGuard>
-								<RouteGuard>
-									{createElement(route.element)}
-								</RouteGuard>
-							</AuthGuard>
-						}
-					></Route>
-				))}
-			</Route>
-
-			{/* Staff Routes */}
-			<Route element={<ManagementLayout />}>
-				{staffRouteList.map((route, i) => (
 					<Route
 						key={i}
 						path={route.path}

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
+
 import {
 	Cog,
 	FileChartColumnIncreasing,
@@ -16,30 +18,26 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from '@/components/ui/sidebar';
-import { Link } from 'react-router-dom';
-import { SidebarItem } from '@/components/sidebar-item';
 import { USER_ROLE } from '@/constants';
-import { useUserBasePath } from '@/hooks/useUserBasePath';
+import { SidebarItem } from '@/components/sidebar-item';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const baseURL = useUserBasePath();
-
 	const sidebarList = [
 		{
 			title: 'Dashboard',
-			url: baseURL,
+			url: '/dashboard/management',
 			icon: LayoutDashboard,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
 		{
 			title: 'Analysis',
-			url: `${baseURL}/analysis`,
+			url: '/dashboard/management/analysis',
 			icon: FileChartColumnIncreasing,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
 		{
 			title: 'Report',
-			url: `${baseURL}/report`,
+			url: '/dashboard/management/reports',
 			icon: Newspaper,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
@@ -51,22 +49,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			items: [
 				{
 					title: 'Admins',
-					url: `${baseURL}/admins`,
+					url: '/dashboard/management/admins',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Staffs',
-					url: `${baseURL}/staffs`,
+					url: '/dashboard/management/staffs',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Students',
-					url: `${baseURL}/students`,
+					url: '/dashboard/management/students',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Tutors',
-					url: `${baseURL}/tutors`,
+					url: '/dashboard/management/tutors',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 			],
@@ -79,17 +77,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			items: [
 				{
 					title: 'Departments',
-					url: `${baseURL}/departments`,
+					url: '/dashboard/management/departments',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Courses',
-					url: `${baseURL}/courses`,
+					url: '/dashboard/management/courses',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 				{
 					title: 'Specializations',
-					url: `${baseURL}/specializations`,
+					url: '/dashboard/management/specializations',
 					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 				},
 			],
@@ -102,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
-							<Link to={baseURL}>
+							<Link to="/dashboard/management">
 								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
 									<img
 										src="/vite.svg"
