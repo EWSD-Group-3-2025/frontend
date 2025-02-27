@@ -64,7 +64,12 @@ const CourseUpdateModal = ({
 					return response.data;
 				})
 				.catch((e) => {
-					toast.error(e.response?.data?.message ?? 'Request Failed');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+
 					return e.response.data;
 				}),
 	});

@@ -61,10 +61,10 @@ const DepartmentList = () => {
 				})
 				.catch((e) => {
 					setOpen(false);
-					toast.error(e.response.data.message ?? 'Request Fail', {
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
-							e.response?.data?.data ??
-							'Something went wrong. Please try again.',
+							e.response?.data?.message ??
+							'Something wrong plz try again',
 					});
 					throw e;
 				}),
@@ -78,11 +78,9 @@ const DepartmentList = () => {
 
 	const departmentListColumns: ColumnDef<Department>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -90,6 +88,11 @@ const DepartmentList = () => {
 				<HeaderSorting column={column} title="Name" />
 			),
 			accessorKey: 'name',
+		},
+		{
+			id: 'staffName',
+			header: 'Created By',
+			accessorKey: 'staffName',
 		},
 		{
 			id: 'action',
