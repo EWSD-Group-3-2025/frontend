@@ -6,7 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function convertNameToSlug(name: string): string {
-	return name.toLowerCase().replace(/\s+/g, '-');
+	return name
+		.normalize('NFD') // Normalize to decomposed Unicode
+		.replace(/[\u0300-\u036f]/g, '') // Remove diacritics (accents)
+		.replace(/[^a-zA-Z0-9\s-]/g, '') // Remove non-ASCII characters except spaces and hyphens
+		.trim() // Trim spaces from start and end
+		.replace(/\s+/g, '-') // Replace spaces with hyphens
+		.toLowerCase(); // Convert to lowercase
 }
 
 export const buildURL = <T extends Record<string, string | number>>(

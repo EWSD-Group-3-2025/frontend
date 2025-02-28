@@ -58,6 +58,7 @@ export default function UserProfileEditForm({
 		queryFn: async () => {
 			return await usernameExistsCount({ name: searchName });
 		},
+		retry: 3,
 	});
 
 	const { mutate: updateProfileMutation, isPending: updateProfilePending } =
@@ -90,6 +91,8 @@ export default function UserProfileEditForm({
 		setDebounceTimeout(newTimeout);
 	};
 
+	console.log(searchName);
+
 	useEffect(() => {
 		if (!searchName || !isChangedFiled) {
 			setIsLoadingSearchName(false);
@@ -101,11 +104,11 @@ export default function UserProfileEditForm({
 			usernameExistsCountData?.data?.code === 200 &&
 			usernameExistsCountData?.data?.success === 1
 		) {
-			const count =
-				usernameExistsCountData?.data?.data?.count === 0
-					? usernameExistsCountData?.data?.data?.count + 1
-					: usernameExistsCountData?.data?.data?.count;
-			const newUsername = `${convertNameToSlug(form.getValues('name'))}-${count}`;
+			const count = usernameExistsCountData?.data?.data?.count || 0;
+			const baseUsername = convertNameToSlug(form.getValues('name'));
+			const newUsername =
+				count > 0 ? `${baseUsername}-${count}` : baseUsername;
+
 			form.setValue('username', newUsername);
 		}
 		setIsLoadingSearchName(false);
@@ -170,7 +173,7 @@ export default function UserProfileEditForm({
 								<div className="text-sm">
 									<p className="text-emerald-500">
 										Your username will be created as{' '}
-										<span className="font-bold">
+										<span className="break-all font-bold">
 											{form.getValues('username')}
 										</span>
 									</p>

@@ -120,6 +120,7 @@ const UserFormModal = ({
 					return await usernameExistsCount({ name: searchName });
 				},
 				enabled: !!searchName,
+				retry: 3,
 			},
 			{
 				queryKey: ['get-all-departments'],
@@ -304,7 +305,7 @@ const UserFormModal = ({
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newName = e.target.value;
-		form.setValue('name', newName);
+		form.setValue('name', newName.trim());
 		setIsLoadingSearchName(true);
 		if (debounceTimeout) clearTimeout(debounceTimeout);
 		const newTimeout = setTimeout(() => setSearchName(newName), 1500);
@@ -344,12 +345,11 @@ const UserFormModal = ({
 			usernameExistsCountData?.data?.code === 200 &&
 			usernameExistsCountData?.data?.success === 1
 		) {
-			console.log(usernameExistsCountData?.data?.data?.count);
-			const count =
-				usernameExistsCountData?.data?.data?.count !== 0
-					? usernameExistsCountData?.data?.data?.count + 1
-					: usernameExistsCountData?.data?.data?.count;
-			const newUsername = `${convertNameToSlug(form.getValues('name'))}-${count}`;
+			const count = usernameExistsCountData?.data?.data?.count || 0;
+			const baseUsername = convertNameToSlug(form.getValues('name'));
+			const newUsername =
+				count > 0 ? `${baseUsername}-${count}` : baseUsername;
+
 			form.setValue('username', newUsername);
 			setUsername(newUsername);
 		}
@@ -415,7 +415,7 @@ const UserFormModal = ({
 										<div className="text-sm">
 											<p className="text-emerald-500">
 												Your username will be created as{' '}
-												<span className="font-bold">
+												<span className="break-all font-bold">
 													{username}
 												</span>
 											</p>
