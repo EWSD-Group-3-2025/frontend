@@ -10,6 +10,23 @@ body {
 	@apply font-roboto;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 8px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+	@apply bg-gray-100 dark:bg-gray-800; /* Background color */
+}
+
+::-webkit-scrollbar-thumb {
+	@apply rounded-lg bg-gray-400 dark:bg-gray-600; /* Thumb color and rounded edges */
+}
+
+::-webkit-scrollbar-thumb:hover {
+	@apply bg-gray-500 dark:bg-gray-500; /* Change color on hover */
+}
+
 @layer base {
 	:root {
 		--background: 0 0% 100%;
@@ -108,13 +125,11 @@ body {
 	}
 }
 
-
-
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
 }

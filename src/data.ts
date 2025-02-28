@@ -6,6 +6,13 @@ export const tutors = [
 		department: 'Computer Science',
 		avatar: '/placeholder.svg?height=32&width=32',
 	},
+	{
+		id: 't2',
+		name: 'Dr. Michael Jack',
+		email: 'michael.jack@university.edu',
+		department: 'Computer Science',
+		avatar: '/placeholder.svg?height=32&width=32',
+	},
 ];
 
 export const students = [
