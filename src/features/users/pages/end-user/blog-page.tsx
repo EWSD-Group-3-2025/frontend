@@ -1,3 +1,5 @@
+import { BlogView } from '../../components/blogs-view';
+
 export default function BlogPage() {
-	return <div>Blog page</div>;
+	return <BlogView />;
 }
