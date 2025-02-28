@@ -1,3 +1,5 @@
+import { DocumentsView } from '../../components/documents-view';
+
 export default function DocumentsPage() {
-	return <div>document page</div>;
+	return <DocumentsView />;
 }
