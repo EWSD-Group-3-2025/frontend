@@ -83,7 +83,7 @@ export const ComboBox = <T extends Record<string, any>>({
 							{data.map((item) => (
 								<CommandItem
 									key={String(item[valueKey])}
-									value={String(item[valueKey])}
+									value={`${item[labelKey]} ${item[valueKey]}`}
 									onSelect={() =>
 										handleSelect(item[valueKey])
 									}

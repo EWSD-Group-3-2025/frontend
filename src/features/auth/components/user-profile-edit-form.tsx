@@ -18,11 +18,18 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/auth.context';
 import { usernameExistsCount } from '@/features/users/api';
 import { convertNameToSlug } from '@/utils/stringUtils';
-import { CheckCircle2, Loader } from 'lucide-react';
 import { UpdateUserProfileRequest } from '../types';
+import { CheckCircle2, Loader, XCircle } from 'lucide-react';
 
 const formSchema = z.object({
-	name: z.string().trim().min(1, { message: 'Name required' }),
+	name: z
+		.string()
+		.trim()
+		.min(1, { message: 'Name required' })
+		.regex(
+			/^[a-zA-Z0-9-\s]+$/,
+			"Name can only contain ASCII letters, digits, spaces, and '-'"
+		),
 	username: z.string().trim().min(1, { message: 'Username required' }),
 });
 
@@ -54,11 +61,13 @@ export default function UserProfileEditForm({
 		data: usernameExistsCountData,
 		isLoading: isLoadingUsernameExistsCountData,
 		isPending: isPendingUsernameExistsCountData,
+		isError: isErrorUsernameExistsCountData,
 	} = useQuery({
 		queryKey: ['username-exists-counts', searchName],
 		queryFn: async () => {
 			return await usernameExistsCount({ name: searchName });
 		},
+		retry: 3,
 	});
 
 	const { mutate: updateProfileMutation, isPending: updateProfilePending } =
@@ -84,15 +93,38 @@ export default function UserProfileEditForm({
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newName = e.target.value;
+
 		form.setValue('name', newName);
+
 		setIsLoadingSearchName(true);
+
+		if (!/^[a-zA-Z0-9-\s]*$/.test(newName)) {
+			form.setError('name', {
+				type: 'manual',
+				message:
+					"Name can only contain ASCII letters, digits, spaces, and '-'",
+			});
+			return;
+		} else {
+			form.clearErrors('name');
+		}
+
 		if (debounceTimeout) clearTimeout(debounceTimeout);
+
 		const newTimeout = setTimeout(() => setSearchName(newName), 1500);
+
 		setDebounceTimeout(newTimeout);
 	};
 
+	console.log(searchName);
+
 	useEffect(() => {
 		if (!searchName || !isChangedFiled) {
+			setIsLoadingSearchName(false);
+			return;
+		}
+
+		if (isErrorUsernameExistsCountData) {
 			setIsLoadingSearchName(false);
 			return;
 		}
@@ -102,11 +134,11 @@ export default function UserProfileEditForm({
 			usernameExistsCountData?.data?.code === 200 &&
 			usernameExistsCountData?.data?.success === 1
 		) {
-			const count =
-				usernameExistsCountData?.data?.data?.count === 0
-					? usernameExistsCountData?.data?.data?.count + 1
-					: usernameExistsCountData?.data?.data?.count;
-			const newUsername = `${convertNameToSlug(form.getValues('name'))}-${count}`;
+			const count = usernameExistsCountData?.data?.data?.count ?? 0;
+			const baseUsername = convertNameToSlug(form.getValues('name'));
+			const newUsername =
+				count > 0 ? `${baseUsername}-${count}` : baseUsername;
+
 			form.setValue('username', newUsername);
 		}
 		setIsLoadingSearchName(false);
@@ -115,10 +147,6 @@ export default function UserProfileEditForm({
 	// Watch the form
 	const watchedValues = form.watch(['name', 'username']);
 	useEffect(() => {
-		//! TODO Handle for username when username is actually change in backend
-		// setIsChangedFiled(
-		// 	watchedValues[0] !== name || watchedValues[1] !== username
-		// );
 		setIsChangedFiled(watchedValues[0] !== name);
 	}, [watchedValues, name, username]);
 
@@ -158,11 +186,19 @@ export default function UserProfileEditForm({
 						)}
 					/>
 					{isChangedFiled &&
-						(loadingSearchName ? (
+						(loadingSearchName && !form.formState.errors.name ? (
 							<div className="flex items-center gap-x-2">
 								<Loader className="size-4 animate-spin text-emerald-500/60 duration-150" />
 								<p className="text-sm text-muted-foreground">
 									Checking availability...
+								</p>
+							</div>
+						) : isErrorUsernameExistsCountData ||
+						  form.formState.errors.name ? (
+							<div className="flex items-center gap-x-2 text-red-500">
+								<XCircle className="size-4" />
+								<p className="text-sm">
+									Failed to check username availability.
 								</p>
 							</div>
 						) : (
@@ -171,7 +207,7 @@ export default function UserProfileEditForm({
 								<div className="text-sm">
 									<p className="text-emerald-500">
 										Your username will be created as{' '}
-										<span className="font-bold">
+										<span className="break-all font-bold">
 											{form.getValues('username')}
 										</span>
 									</p>
