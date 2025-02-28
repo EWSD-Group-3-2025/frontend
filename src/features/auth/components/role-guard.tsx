@@ -4,7 +4,7 @@ import {
 	getRedirectRoute,
 	isAuthDashboardPath,
 } from '@/utils/auth';
-import { Navigate, useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 
 interface RouteGuardProps {
 	children: React.ReactNode;

@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/auth.context';
 import { Loader } from 'lucide-react';
-import { Navigate, useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 
 interface AuthGuardProps {
 	children: React.ReactNode;
