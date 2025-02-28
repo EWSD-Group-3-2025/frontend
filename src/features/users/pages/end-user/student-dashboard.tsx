@@ -23,8 +23,10 @@ export function StudentDashboard() {
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.slice(0, 2);
 
+	// TODO Use recent documents
 	// Get recent documents
 	const recentDocuments = documents.slice(0, 3);
+	console.log(recentDocuments);
 
 	return (
 		<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

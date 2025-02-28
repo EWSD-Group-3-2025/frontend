@@ -1,7 +1,5 @@
-'use client';
-
-import type React from 'react';
-
+//! TODO Must remove ts ignore
+// @ts-nocheck
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

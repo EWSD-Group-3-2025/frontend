@@ -4,14 +4,9 @@ import { Link } from 'react-router-dom';
 import {
 	BookOpen,
 	Calendar,
-	Cog,
-	FileChartColumnIncreasing,
 	FileText,
 	LayoutDashboard,
-	Logs,
 	MessageSquare,
-	Newspaper,
-	UsersRound,
 	Video,
 } from 'lucide-react';
 

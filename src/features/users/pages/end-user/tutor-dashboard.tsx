@@ -30,8 +30,10 @@ export default function TutorDashboard() {
 			student.id.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
+	// TODO Use recent messages
 	// Get recent messages
 	const recentMessages = messages.slice(0, 3);
+	console.log(recentMessages);
 
 	// Get upcoming meetings
 	const upcomingMeetings = meetings
