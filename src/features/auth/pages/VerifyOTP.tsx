@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { forgotPassword, verifyOtp } from '../api';
 import { useEffect, useRef, useState } from 'react';
+import { ForgotPasswordRequest, VerifyOtpRequest } from '../types';
 
 const formSchema = z.object({
 	otpCode: z.string().trim().min(6, { message: 'OTP code required' }),

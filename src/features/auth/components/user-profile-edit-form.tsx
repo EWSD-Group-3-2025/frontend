@@ -19,6 +19,7 @@ import { useAuth } from '@/context/auth.context';
 import { usernameExistsCount } from '@/features/users/api';
 import { convertNameToSlug } from '@/utils/stringUtils';
 import { CheckCircle2, Loader } from 'lucide-react';
+import { UpdateUserProfileRequest } from '../types';
 
 const formSchema = z.object({
 	name: z.string().trim().min(1, { message: 'Name required' }),
