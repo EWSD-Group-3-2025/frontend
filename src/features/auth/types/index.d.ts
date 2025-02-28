@@ -1,3 +1,5 @@
+import { AuthUser } from '@/features/users/types';
+
 interface UpdateUserProfileRequest {
 	username: string;
 	name: string;
@@ -24,6 +26,7 @@ interface LoginRequest {
 interface LoginResponse {
 	accessToken: string;
 	refreshToken: string;
+	user: AuthUser;
 }
 
 interface RegisterRequest {

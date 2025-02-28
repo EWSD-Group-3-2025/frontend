@@ -366,6 +366,18 @@ const UserFormModal = ({
 		}
 	}, [isOpen]);
 
+
+	useEffect(() => {
+		if (formData) {
+			Object.entries(formData).forEach(([key, value]) => {
+				if (value !== null && value !== undefined) {
+					form.setValue(key as keyof typeof formData, value);
+				}
+			});
+		}
+	}, [formData, form]);
+
+
 	const loadingSearchName =
 		isLoadingSearchName ||
 		isLoadingUsernameExistsCountData ||
