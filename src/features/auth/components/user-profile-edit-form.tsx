@@ -116,8 +116,6 @@ export default function UserProfileEditForm({
 		setDebounceTimeout(newTimeout);
 	};
 
-	console.log(searchName);
-
 	useEffect(() => {
 		if (!searchName || !isChangedFiled) {
 			setIsLoadingSearchName(false);

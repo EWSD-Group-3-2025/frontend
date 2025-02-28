@@ -24,6 +24,7 @@ import {
 	FileUp,
 } from 'lucide-react';
 import { documents as initialDocuments } from '@/data';
+import { useAuth } from '@/context/auth.context';
 
 export function DocumentsView() {
 	const { user } = useAuth();
