@@ -1,8 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
+import { writeToString } from 'fast-csv';
+import { saveAs } from 'file-saver';
 
-import { Ellipsis, SquarePen, Trash2, UserPlus } from 'lucide-react';
+import {
+	ChevronDown,
+	Ellipsis,
+	Plus,
+	SquarePen,
+	Trash2,
+	UserPlus,
+} from 'lucide-react';
 
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
@@ -34,6 +43,25 @@ const AdminList = () => {
 		useDeleteModalStore();
 
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+	const exportToCSV = <T extends Record<string, unknown>>(
+		data: T[],
+		fileName: string
+	) => {
+		if (!data.length) {
+			console.error('No data available to export.');
+			return;
+		}
+
+		writeToString(data, { headers: true })
+			.then((csvData) => {
+				const blob = new Blob([csvData], {
+					type: 'text/csv;charset=utf-8;',
+				});
+				saveAs(blob, `${fileName}.csv`);
+			})
+			.catch((error) => console.error('CSV Export Error:', error));
+	};
 
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-admin'],
@@ -220,11 +248,47 @@ const AdminList = () => {
 				</Button>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
-					<SearchBox placeholder="Search admin" />
-					<div className="block min-w-32">
-						<AccountStatusDropDown />
+				<div className="mb-3 flex justify-between">
+					<div className="flex gap-5">
+						<SearchBox placeholder="Search admin" />
+						<div className="block min-w-32">
+							<AccountStatusDropDown />
+						</div>
 					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button className="relative flex items-center justify-between gap-2 rounded-md p-3 text-white shadow-lg">
+								<Plus size={18} />
+								<span>New</span>
+								<ChevronDown className="ms-3" size={18} />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="rounded-lg shadow-lg">
+							<DropdownMenuItem
+								onClick={() =>
+									exportToCSV(
+										(data?.data as unknown as Record<
+											string,
+											unknown
+										>[]) ?? [],
+										`admin_list${new Date().getTime()}`
+									)
+								}
+							>
+								Export as CSV
+							</DropdownMenuItem>
+							{/* <DropdownMenuItem
+								onClick={() => handleExport('XLSX')}
+							>
+								Export as XLSX
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => handleExport('PDF')}
+							>
+								Export as PDF
+							</DropdownMenuItem> */}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 				<DataTable
 					columns={userListColumns}
