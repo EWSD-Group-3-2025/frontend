@@ -16,29 +16,30 @@ import { Button } from '@/components/ui/button';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import {
 	createUser,
+	showUser,
 	updateUser,
 	usernameExistsCount,
 } from '@/features/users/api';
-import { convertNameToSlug, transformObjects } from '@/utils';
+import { convertNameToSlug } from '@/utils';
 import { CheckCircle2, Loader } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
 import { getAllCourses } from '@/features/courses/api';
 import { getAllSpecializations } from '@/features/specialization/api';
-import { GENDER } from '@/constants';
+// import { GENDER } from '@/constants';
 import { ComboBox } from '@/components/ui/combo-box';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+// import {
+// 	Select,
+// 	SelectContent,
+// 	SelectItem,
+// 	SelectTrigger,
+// 	SelectValue,
+// } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 type UserFormModalProp = {
 	isOpen: boolean;
 	setIsOpen: (isOpen: boolean) => void;
-	formData?: UserFormValue;
+	selectedUserId: number | null;
 	roleId: number;
 	roleName: string;
 	setSelectedUserId: Dispatch<SetStateAction<number | null>>;
@@ -88,15 +89,16 @@ export type UserFormValue = z.infer<typeof userFormSchema>;
 
 const UserFormModal = ({
 	isOpen,
-	setIsOpen,
-	formData,
+	selectedUserId,
 	roleId,
 	roleName,
+	setIsOpen,
 	setSelectedUserId,
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
-	const transform = transformObjects({ GENDER });
+	// const transform = transformObjects({ GENDER });
 	const [searchName, setSearchName] = useState('');
+	const [username, setUsername] = useState('');
 	const [isLoadingSearchName, setIsLoadingSearchName] = useState(false);
 	const [debounceTimeout, setDebounceTimeout] =
 		useState<NodeJS.Timeout | null>(null);
@@ -155,10 +157,32 @@ const UserFormModal = ({
 					}),
 				enabled: roleId === 4,
 			},
+			{
+				queryKey: ['get-user-by-id'],
+				queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
+					await showUser(Number(selectedUserId)).then((response) => {
+						if (response.data.code === 200) {
+							Object.entries(response.data.data).forEach(
+								([key, value]) => {
+									if (value !== null && value !== undefined) {
+										form.setValue(
+											key as keyof UserFormValue,
+											value
+										);
+									}
+								}
+							);
+							return response.data;
+						}
+
+						throw new Error('Fetch User Show Fail!');
+					}),
+				enabled: !!selectedUserId,
+			},
 		],
 	});
 
-	const { mutateAsync: userCreate } = useMutation({
+	const { mutateAsync: userCreate, isPending: createLoading } = useMutation({
 		mutationFn: async (body: UserFormValue) =>
 			await createUser(body)
 				.then(async (response) => {
@@ -185,8 +209,15 @@ const UserFormModal = ({
 					throw new Error('User Create Fail!');
 				})
 				.catch((e) => {
-					if (e.response.data.code === 400) {
-						toast.error(e.response.data.message);
+					if (e.response.data.code === 422) {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						e.response.data.data.forEach(
 							(err: { field: string; message: string }) => {
 								form.setError(
@@ -198,11 +229,20 @@ const UserFormModal = ({
 								);
 							}
 						);
+					} else {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 					}
 				}),
 	});
 
-	const { mutateAsync: userUpdate } = useMutation({
+	const { mutateAsync: userUpdate, isPending: updateLoading } = useMutation({
 		mutationFn: async (body: UserFormValue) =>
 			await updateUser(body.id!, body)
 				.then(async (response) => {
@@ -229,8 +269,15 @@ const UserFormModal = ({
 					throw new Error('User Create Fail!');
 				})
 				.catch((e) => {
-					if (e.response.data.code === 400) {
-						toast.error(e.response.data.message);
+					if (e.response.data.code === 422) {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						e.response.data.data.forEach(
 							(err: { field: string; message: string }) => {
 								form.setError(
@@ -240,6 +287,15 @@ const UserFormModal = ({
 										message: err.message,
 									}
 								);
+							}
+						);
+					} else {
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
 							}
 						);
 					}
@@ -270,7 +326,7 @@ const UserFormModal = ({
 	});
 
 	function onSubmit(values: UserFormValue) {
-		if (formData) {
+		if (selectedUserId) {
 			userUpdate(values);
 		} else {
 			userCreate(values);
@@ -278,7 +334,7 @@ const UserFormModal = ({
 	}
 
 	useEffect(() => {
-		if (!searchName && !formData) {
+		if (!searchName && !selectedUserId) {
 			setIsLoadingSearchName(false);
 			return;
 		}
@@ -288,12 +344,14 @@ const UserFormModal = ({
 			usernameExistsCountData?.data?.code === 200 &&
 			usernameExistsCountData?.data?.success === 1
 		) {
+			console.log(usernameExistsCountData?.data?.data?.count);
 			const count =
-				usernameExistsCountData?.data?.data?.count === 0
-					? usernameExistsCountData?.data?.data?.count
-					: usernameExistsCountData?.data?.data?.count + 1;
+				usernameExistsCountData?.data?.data?.count !== 0
+					? usernameExistsCountData?.data?.data?.count + 1
+					: usernameExistsCountData?.data?.data?.count;
 			const newUsername = `${convertNameToSlug(form.getValues('name'))}-${count}`;
 			form.setValue('username', newUsername);
+			setUsername(newUsername);
 		}
 		setIsLoadingSearchName(false);
 	}, [usernameExistsCountData, searchName]);
@@ -304,8 +362,10 @@ const UserFormModal = ({
 			setSearchName('');
 			setIsLoadingSearchName(false);
 			setSelectedUserId(null);
+			setUsername('');
 		}
 	}, [isOpen]);
+
 
 	useEffect(() => {
 		if (formData) {
@@ -317,6 +377,7 @@ const UserFormModal = ({
 		}
 	}, [formData, form]);
 
+
 	const loadingSearchName =
 		isLoadingSearchName ||
 		isLoadingUsernameExistsCountData ||
@@ -326,7 +387,7 @@ const UserFormModal = ({
 		<ResponsiveModal className="px-7" isOpen={isOpen} setIsOpen={setIsOpen}>
 			<div className="flex flex-col justify-center">
 				<h1 className="mb-5 font-roboto-slab text-3xl font-semibold">
-					{formData ? 'Edit' : 'Add'} {roleName}
+					{selectedUserId ? 'Edit' : 'Add'} {roleName}
 				</h1>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -352,7 +413,7 @@ const UserFormModal = ({
 								)}
 							/>
 							{searchName &&
-								!formData &&
+								!selectedUserId &&
 								(loadingSearchName ? (
 									<div className="flex items-center gap-x-2">
 										<Loader className="size-4 animate-spin text-emerald-500/60 duration-150" />
@@ -367,7 +428,7 @@ const UserFormModal = ({
 											<p className="text-emerald-500">
 												Your username will be created as{' '}
 												<span className="font-bold">
-													{form.getValues('username')}
+													{username}
 												</span>
 											</p>
 											<p className="text-muted-foreground">
@@ -404,6 +465,7 @@ const UserFormModal = ({
 									</FormItem>
 								)}
 							/>
+
 							<FormField
 								control={form.control}
 								name="email"
@@ -423,7 +485,7 @@ const UserFormModal = ({
 								)}
 							/>
 
-							<FormField
+							{/* <FormField
 								control={form.control}
 								name="gender"
 								render={({ field }) => (
@@ -456,7 +518,8 @@ const UserFormModal = ({
 										<FormMessage />
 									</FormItem>
 								)}
-							/>
+							/> */}
+
 							{(roleId === 1 || roleId === 2) && (
 								<FormField
 									control={form.control}
@@ -584,8 +647,15 @@ const UserFormModal = ({
 								Cancel
 							</Button>
 
-							<Button type="submit">
-								{formData ? 'Edit' : 'Add'} {roleName}
+							<Button
+								type="submit"
+								disabled={createLoading || updateLoading}
+							>
+								{createLoading || updateLoading
+									? 'Loading'
+									: selectedUserId
+										? 'Edit '
+										: 'Add ' + roleName}
 							</Button>
 						</div>
 					</form>

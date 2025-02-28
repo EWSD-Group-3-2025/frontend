@@ -1,9 +1,9 @@
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
 	Form,
@@ -16,15 +16,14 @@ import {
 import { Button } from '@/components/ui/button';
 import ResponsiveModal from '@/components/responsive-modal';
 import { Input } from '@/components/ui/input';
-import {
-	showSpecialization,
-	updateSpecialization,
-} from '@/features/specialization/api';
+import { updateSpecialization } from '@/features/specialization/api';
 
 type SpecializationUpdateModalProp = {
 	open: boolean;
 	setOpen: Dispatch<SetStateAction<boolean>>;
+	specializationName: string;
 	setSpecializationId: Dispatch<SetStateAction<number | null>>;
+	setSpecializationName: Dispatch<SetStateAction<string>>;
 	id: number;
 };
 
@@ -39,24 +38,12 @@ export type SpecializationUpdateForm = z.infer<
 const SpecializationUpdateModal = ({
 	open,
 	setOpen,
+	specializationName,
 	setSpecializationId,
+	setSpecializationName,
 	id,
 }: SpecializationUpdateModalProp) => {
 	const queryClient = useQueryClient();
-
-	useQuery<HTTPResponse<Specialization>>({
-		queryKey: ['get-specialization-by-id'],
-		queryFn: async (): Promise<HTTPResponse<Specialization>> =>
-			await showSpecialization(id).then((response) => {
-				if (response.data.code === 200) {
-					form.reset({ name: response.data.data.name });
-					return response.data;
-				}
-
-				throw new Error('Fetch Specialization Show Fail!');
-			}),
-		enabled: !!id,
-	});
 
 	const { mutateAsync } = useMutation({
 		mutationFn: async (body: SpecializationUpdateForm) =>
@@ -79,7 +66,12 @@ const SpecializationUpdateModal = ({
 					return response.data;
 				})
 				.catch((e) => {
-					toast.error(e.response?.data?.message ?? 'Request Failed');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+
 					return e.response.data;
 				}),
 	});
@@ -87,7 +79,7 @@ const SpecializationUpdateModal = ({
 	const form = useForm<SpecializationUpdateForm>({
 		resolver: zodResolver(specializationUpdateSchema),
 		defaultValues: {
-			name: '',
+			name: specializationName,
 		},
 	});
 
@@ -95,17 +87,22 @@ const SpecializationUpdateModal = ({
 		mutateAsync(values);
 	}
 
+	useEffect(() => {
+		if (!open) {
+			setOpen(false);
+			setSpecializationId(null);
+			setSpecializationName('');
+			form.reset({
+				name: '',
+			});
+		}
+	}, [open]);
+
 	return (
 		<ResponsiveModal
 			className="sm:min-h-[50vh] md:min-h-[30vh]"
 			isOpen={open}
-			setIsOpen={() => {
-				setOpen(false);
-				setSpecializationId(null);
-				form.reset({
-					name: '',
-				});
-			}}
+			setIsOpen={setOpen}
 		>
 			<div className="p-7">
 				<h2 className="mb-5 font-roboto-slab text-3xl">

@@ -14,14 +14,12 @@ import {
 import { StudentUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers, showUser } from '@/features/users/api';
+import { deleteUser, getAllUsers } from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
 import { Button } from '@/components/ui/button';
-import UserFormModal, {
-	UserFormValue,
-} from '@/features/users/components/user-form-modal';
+import UserFormModal from '@/features/users/components/user-form-modal';
 import DeleteDialog from '@/components/delete-dialog';
 import { useAuth } from '@/context/auth.context';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
@@ -66,19 +64,6 @@ const StudentList = () => {
 		},
 	});
 
-	const { data: userShow } = useQuery<HTTPResponse<UserFormValue>>({
-		queryKey: ['get-user-by-id'],
-		queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
-			await showUser(Number(selectedUserId)).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
-
-				throw new Error('Fetch User Show Fail!');
-			}),
-		enabled: !!selectedUserId,
-	});
-
 	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
 		{
 			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
@@ -102,11 +87,14 @@ const StudentList = () => {
 						setOpen(false);
 						setSelectedId(null);
 						setName(null);
-						toast.error(e.response.data.message ?? 'Request Fail', {
-							description:
-								e.response?.data?.data ??
-								'Something went wrong. Please try again.',
-						});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
 						throw e;
 					}),
 		}
@@ -120,11 +108,9 @@ const StudentList = () => {
 
 	const userListColumns: ColumnDef<StudentUser>[] = [
 		{
-			id: 'id',
-			header: ({ column }) => (
-				<HeaderSorting column={column} title="ID" />
-			),
-			accessorKey: 'id',
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
 		},
 		{
 			id: 'name',
@@ -132,6 +118,13 @@ const StudentList = () => {
 				<HeaderSorting column={column} title="Name" />
 			),
 			accessorKey: 'name',
+		},
+		{
+			id: 'username',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="UserName" />
+			),
+			accessorKey: 'username',
 		},
 		{
 			id: 'email',
@@ -183,7 +176,6 @@ const StudentList = () => {
 				</>
 			),
 		},
-
 		{
 			id: 'status',
 			header: 'Status',
@@ -295,7 +287,7 @@ const StudentList = () => {
 					</Button>
 					<Button onClick={() => setIsOpen(true)}>
 						<UserPlus className="font-bold" />
-						Create Student
+						Add Student
 					</Button>
 				</div>
 			</div>
@@ -317,8 +309,8 @@ const StudentList = () => {
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
 				roleId={3}
-				formData={userShow?.data}
 				roleName="Student"
+				selectedUserId={selectedUserId}
 				setSelectedUserId={setSelectedUserId}
 			/>
 

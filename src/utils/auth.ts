@@ -14,9 +14,8 @@ export const hasAccess = ({
 export const getRedirectRoute = (role: USER_ROLE) => {
 	switch (role) {
 		case USER_ROLE.ADMIN:
-			return '/dashboard/admin';
 		case USER_ROLE.STAFF:
-			return '/dashboard/staff';
+			return '/dashboard/management';
 		case USER_ROLE.STUDENT:
 		case USER_ROLE.TUTOR:
 			return '/dashboard/end-user';
@@ -28,9 +27,8 @@ export const getRedirectRoute = (role: USER_ROLE) => {
 export const getAuthPathname = (role: USER_ROLE) => {
 	switch (role) {
 		case USER_ROLE.ADMIN:
-			return 'admin';
 		case USER_ROLE.STAFF:
-			return 'staff';
+			return 'management';
 		case USER_ROLE.STUDENT:
 		case USER_ROLE.TUTOR:
 			return 'end-user';

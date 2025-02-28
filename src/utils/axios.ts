@@ -42,7 +42,7 @@ api.interceptors.response.use(
 
 		// If the error is not 400 and request auth user, that mean cause error by other api and directly reject error
 
-		if (originalRequest.url !== '/v1/auth/me') {
+		if (error.response.data.code !== 410) {
 			return Promise.reject(error);
 		}
 		try {

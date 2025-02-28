@@ -81,6 +81,9 @@ export default {
 				'form-stroke': 'hsl(var(--form-stroke))',
 				'form-stroke-hover': 'hsl(var(--form-stroke-hover))',
 			},
+			screens: {
+				xs: 450,
+			},
 		},
 	},
 	plugins: [require('tailwindcss-animate')],
