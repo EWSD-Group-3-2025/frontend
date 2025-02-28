@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { forgotPassword } from '../api';
+import { ForgotPasswordRequest } from '../types';
 
 const formSchema = z.object({
 	email: z

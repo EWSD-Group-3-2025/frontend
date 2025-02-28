@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { resetPassword } from '../api';
 import { useMutation } from '@tanstack/react-query';
+import { ResetPasswordRequest } from '../types';
 
 const formSchema = z.object({
 	newPassword: z.string().trim().min(6, { message: 'New Password required' }),
