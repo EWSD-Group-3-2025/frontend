@@ -112,7 +112,7 @@ export function SidebarItem({
 								asChild
 								className={cn(
 									isActive &&
-										'bg-neutral-200 dark:bg-neutral-700'
+										'bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700'
 								)}
 							>
 								<a

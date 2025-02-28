@@ -79,7 +79,7 @@ export function EndUserAppSidebar({
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
 							<Link to="/dashboard/end-user">
-								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-300 text-sidebar-primary-foreground dark:bg-gray-700">
 									<img
 										src="/vite.svg"
 										alt="Anima Logo"
