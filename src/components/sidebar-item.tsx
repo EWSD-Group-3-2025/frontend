@@ -1,5 +1,3 @@
-'use client';
-
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 
 import {
@@ -20,6 +18,7 @@ import { useLocation } from 'react-router-dom';
 import { USER_ROLE } from '@/constants';
 import { useAuth } from '@/context/auth.context';
 import { useState } from 'react';
+import { cn } from '@/utils';
 
 export function SidebarItem({
 	items,
@@ -62,9 +61,9 @@ export function SidebarItem({
 			<SidebarMenu>
 				{filteredItems.map((item) => {
 					const isActive =
-						location.pathname.startsWith(item.url) ||
-						(item.items?.some((subItem) =>
-							location.pathname.startsWith(subItem.url)
+						location.pathname === item.url || // Exact match for the main item
+						(item.items?.some(
+							(subItem) => location.pathname === subItem.url
 						) ??
 							false);
 
@@ -109,7 +108,13 @@ export function SidebarItem({
 						</Collapsible>
 					) : (
 						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton asChild>
+							<SidebarMenuButton
+								asChild
+								className={cn(
+									isActive &&
+										'bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700'
+								)}
+							>
 								<a
 									href={item.url}
 									className="flex items-center gap-2"

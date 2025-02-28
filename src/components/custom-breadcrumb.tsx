@@ -6,8 +6,10 @@ import {
 	BreadcrumbList,
 	BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { useAuth } from '@/context/auth.context';
 
 const CustomBreadcrumbs = () => {
+	const { user } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const currentPath = location.pathname;
@@ -47,7 +49,17 @@ const CustomBreadcrumbs = () => {
 											})}
 								>
 									{crumb.charAt(0).toUpperCase() +
-										crumb.slice(1)}
+										crumb.slice(1) ===
+									'End-user'
+										? `${
+												user &&
+												user?.username
+													?.charAt(0)
+													?.toUpperCase() +
+													user?.username?.slice(1)
+											}`
+										: crumb.charAt(0).toUpperCase() +
+											crumb.slice(1)}
 								</BreadcrumbLink>
 							</BreadcrumbItem>
 							{index < breadcrumbs.length - 1 && (

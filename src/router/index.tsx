@@ -12,7 +12,7 @@ import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
 import AdminDashboard from '@/features/users/pages/admin/Dashboard';
 import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
 import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
-import StudentDashboard from '@/features/users/pages/student/Dashboard';
+import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
 import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 import StaffDashboard from '@/features/users/pages/staff/Dashboard';
@@ -27,6 +27,11 @@ import HomePage from '@/pages/HomePage';
 import RouteGuard from '@/features/auth/components/role-guard';
 import { useAuth } from '@/context/auth.context';
 import ActivityLogs from '@/features/activity-logs/page/ActivityLogs';
+import MessagesPage from '@/features/users/pages/end-user/messages-page';
+import BlogPage from '@/features/users/pages/end-user/blog-page';
+import DocumentsPage from '@/features/users/pages/end-user/documents-page';
+import CalendarPage from '@/features/users/pages/end-user/calendar-page';
+import MeetingsPage from '@/features/users/pages/end-user/meetings-page';
 
 type ChildRoute = {
 	path: string;
@@ -54,8 +59,33 @@ const Router = () => {
 	const endUserRouteList = [
 		{
 			path: '/dashboard/end-user',
-			element: StudentDashboard,
-			role: [USER_ROLE.STUDENT],
+			element: EndUserDashboard,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
+		},
+		{
+			path: '/dashboard/end-user/messages',
+			element: MessagesPage,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
+		},
+		{
+			path: '/dashboard/end-user/meetings',
+			element: MeetingsPage,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
+		},
+		{
+			path: '/dashboard/end-user/calendar',
+			element: CalendarPage,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
+		},
+		{
+			path: '/dashboard/end-user/documents',
+			element: DocumentsPage,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
+		},
+		{
+			path: '/dashboard/end-user/blog',
+			element: BlogPage,
+			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
 		},
 		{
 			name: 'Not Found',
