@@ -9,7 +9,8 @@
         - [Navigate to the project directory](#navigate-to-the-project-directory)
     - [Step 2 - Install dependencies](#step-2---install-dependencies)
     - [Step 3 - Set up environment variables](#step-3---set-up-environment-variables)
-    - [Step 4 - Start the development](#step-4---start-the-development)
+    - [Step 4 - Install necessary packages](#step-4---install-necessary-packages)
+    - [Step 5 - Start the development](#step-5---start-the-development)
 - [Usage](#usage)
 - [Folder Structure](#folder-structure)
 - [License](#license)
@@ -46,10 +47,13 @@ cd frontend
 
 ## Step 2 - Install dependencies
 
-You can use npm or another package manager
+Please use Pnpm as package manager to solve peer dependency issues
 
 ```bash
-npm install
+npm install -g pnpm
+
+# For linux for mac os, sudo permission will need
+# sudo npm install -g pnpm
 ```
 
 ## Step 3 - Set up environment variables
@@ -64,10 +68,16 @@ VITE_BASE_URL=
 VITE_JWT_SECRET_KEY=
 ```
 
-## Step 4 - Start the development
+## Step 4 - Install necessary packages
 
 ```bash
-npm run dev
+pnpm install
+```
+
+## Step 5 - Start the development
+
+```bash
+pnpm run dev
 ```
 
 # Usage

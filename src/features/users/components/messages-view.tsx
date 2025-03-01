@@ -1,64 +1,105 @@
-//! TODO Must remove ts ignore
-// @ts-nocheck
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Paperclip, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
-import { students, tutors, messages as initialMessages } from '@/data';
-import { USER_ROLE } from '@/constants';
+import {
+	chatRoomListsByUserId,
+	messagesForChatRoom,
+} from '@/features/chats/api';
+import { ChatRoom, ChatRoomMessage } from '@/features/chats/types';
+import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/utils';
 
 export function MessagesView() {
 	const { user } = useAuth();
-	const [activeChat, setActiveChat] = useState(
-		user?.roleName === USER_ROLE.STUDENT ? tutors[0].id : students[0].id
-	);
-	const [messages, setMessages] = useState(initialMessages);
+	const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+	const [activeChatRoom, setActiveChatRoom] = useState<number | null>(null);
+	const [messages, setMessages] = useState<ChatRoomMessage[]>([]);
 	const [newMessage, setNewMessage] = useState('');
-	const messagesEndRef = useRef<HTMLDivElement>(null); // Reference for the last message
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
+	const socketRef = useRef<WebSocket | null>(null);
 
-	const contacts = user?.roleName === USER_ROLE.STUDENT ? tutors : students;
-	const activeContact = contacts.find((contact) => contact.id === activeChat);
+	useEffect(() => {
+		if (!user) return;
 
-	const chatMessages = messages.filter(
-		(message) =>
-			(message.sender.id === user?.id &&
-				message.recipient.id === activeChat) ||
-			(message.sender.id === activeChat &&
-				message.recipient.id === user?.id)
-	);
+		(async () => {
+			const res = await chatRoomListsByUserId(user.id);
 
-	const handleSendMessage = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!newMessage.trim() || !user) return;
+			setChatRooms(res.data.data);
+			if (res.data.data.length > 0) {
+				setActiveChatRoom(res.data.data[0].chatRoomId);
+			}
+		})();
+	}, [user]);
 
-		const newMsg = {
-			id: `msg-${Date.now()}`,
-			sender: {
-				id: user.id,
-				name: user.name,
-				avatar: user?.name || '',
-			},
-			recipient: {
-				id: activeChat,
-				name: activeContact?.name || '',
-				avatar: activeContact?.avatar || '',
-			},
-			content: newMessage,
-			timestamp: new Date().toISOString(),
-			read: false,
+	useEffect(() => {
+		if (!activeChatRoom) return;
+
+		(async () => {
+			const res = await messagesForChatRoom(activeChatRoom);
+			setMessages(res.data.data);
+		})();
+	}, [activeChatRoom]);
+
+	useEffect(() => {
+		if (!user) return;
+
+		const socket = new WebSocket('ws://localhost:3000/ws-chat');
+		socketRef.current = socket;
+
+		socket.onopen = () => console.log('Connected to WebSocket');
+
+		socket.onmessage = (event) => {
+			const receivedMessage = JSON.parse(event.data) as ChatRoomMessage;
+			if (
+				receivedMessage.chatRoomId === activeChatRoom &&
+				receivedMessage.senderId !== user.id
+			) {
+				setMessages((prev) => [...prev, receivedMessage]);
+			}
 		};
 
-		setMessages([...messages, newMsg]);
+		socket.onerror = (error) => console.error('WebSocket error:', error);
+		socket.onclose = () => console.log('WebSocket disconnected');
+
+		return () => socket.close();
+	}, [activeChatRoom, user]);
+
+	const handleSendMessage = (e: FormEvent) => {
+		e.preventDefault();
+		if (
+			!newMessage.trim() ||
+			!user ||
+			!socketRef.current ||
+			!activeChatRoom
+		)
+			return;
+
+		const newMsg = {
+			chatRoomId: activeChatRoom,
+			senderId: user.id,
+			content: newMessage,
+		};
+
+		socketRef?.current?.send(JSON.stringify(newMsg));
+		setMessages([
+			...messages,
+			{
+				...newMsg,
+				id: messages.length + 1,
+				senderUsername: user?.name,
+				timestamp: new Date(),
+			},
+		]);
 		setNewMessage('');
 	};
 
-	// Scroll to the last message smoothly whenever messages change
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-	}, [messages, activeContact]);
+	}, [messages]);
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -66,139 +107,84 @@ export function MessagesView() {
 				<Card className="h-full">
 					<CardContent className="flex h-full gap-x-4 p-4">
 						<div className="min-w-[250px] space-y-1">
-							{contacts.map((contact) => (
+							{chatRooms.map((room) => (
 								<div
-									key={contact.id}
-									className={`flex cursor-pointer items-center gap-3 rounded-lg p-1 hover:bg-muted hover:outline hover:outline-neutral-300 dark:hover:outline-neutral-700 ${
-										activeChat === contact.id
-											? 'bg-muted outline outline-neutral-300 dark:outline-neutral-700'
-											: ''
-									}`}
-									onClick={() => setActiveChat(contact.id)}
+									key={room.chatRoomId}
+									className={`flex cursor-pointer items-center gap-3 rounded-lg p-1 hover:bg-muted ${activeChatRoom === room.chatRoomId ? 'bg-muted' : ''}`}
+									onClick={() =>
+										setActiveChatRoom(room.chatRoomId)
+									}
 								>
 									<Avatar className="h-10 w-10">
-										<AvatarImage
-											src={contact.avatar}
-											alt={contact.name}
-										/>
-										<AvatarFallback>
-											{contact.name.charAt(0)}
+										<AvatarFallback className="bg-gray-700 text-xl">
+											{room.receiverName
+												.charAt(1)
+												.toUpperCase()}
 										</AvatarFallback>
 									</Avatar>
-									<div className="flex-1 overflow-hidden">
-										<p className="font-medium">
-											{contact.name}
-										</p>
-										<p className="truncate text-sm text-muted-foreground">
-											{messages.find(
-												(m) =>
-													(m.sender.id ===
-														contact.id &&
-														m.recipient.id ===
-															user?.id) ||
-													(m.sender.id === user?.id &&
-														m.recipient.id ===
-															contact.id)
-											)?.content || 'No messages yet'}
-										</p>
-									</div>
+									<p className="font-medium">
+										{room.receiverName}
+									</p>
 								</div>
 							))}
 						</div>
 						<div className="h-full w-[1.5px] bg-neutral-200 dark:bg-neutral-800" />
 						<div className="flex-1">
-							{activeContact ? (
-								<div className="flex h-full flex-col items-center justify-center">
-									{/* Chat header */}
-									<div className="flex w-full items-center gap-3 border-b p-2">
-										<Avatar className="h-10 w-10">
-											<AvatarImage
-												src={activeContact.avatar}
-												alt={activeContact.name}
-											/>
-											<AvatarFallback>
-												{activeContact.name.charAt(0)}
-											</AvatarFallback>
-										</Avatar>
-										<div>
-											<p className="font-medium">
-												{activeContact.name}
-											</p>
-											<p className="text-sm text-muted-foreground">
-												{user?.roleName ===
-												USER_ROLE.STUDENT
-													? 'Personal Tutor'
-													: 'Student'}
-											</p>
-										</div>
-									</div>
-
-									{/* Chat body */}
-									<div className="h-full w-full flex-1 overflow-y-auto p-4">
-										<div className="h-full space-y-4">
-											{chatMessages.length > 0 ? (
-												chatMessages.map((message) => (
+							{activeChatRoom ? (
+								<div className="flex h-full flex-col">
+									<div className="h-full w-full flex-1 space-y-1 overflow-y-auto p-4">
+										{messages.length > 0 ? (
+											messages.map((message) => (
+												<div
+													key={message.id}
+													className={`flex ${message.senderId === user?.id ? 'justify-end' : 'justify-start'}`}
+												>
 													<div
-														key={message.id}
-														className={`flex ${message.sender.id === user?.id ? 'justify-end' : 'justify-start'}`}
-													>
-														<div
-															className={`max-w-[80%] rounded-lg p-3 ${
-																message.sender
-																	.id ===
+														className={cn(
+															`max-w-[80%] rounded-lg p-3`,
+															message.senderId ===
 																user?.id
-																	? 'bg-primary text-primary-foreground'
-																	: 'bg-muted'
-															}`}
+																? 'bg-primary text-primary-foreground'
+																: 'bg-muted'
+														)}
+													>
+														<p className="text-sm">
+															{message.content}
+														</p>
+														<span
+															className={cn(
+																'mt-2 text-xs',
+																message.senderId ===
+																	user?.id
+																	? 'text-muted'
+																	: 'text-muted-foreground'
+															)}
 														>
-															<p className="text-sm">
+															{formatDistanceToNow(
+																message.timestamp,
 																{
-																	message.content
+																	addSuffix:
+																		true,
 																}
-															</p>
-															<p className="mt-1 text-xs opacity-70">
-																{new Date(
-																	message.timestamp
-																).toLocaleTimeString(
-																	[],
-																	{
-																		hour: '2-digit',
-																		minute: '2-digit',
-																	}
-																)}
-															</p>
-														</div>
+															)}
+														</span>
 													</div>
-												))
-											) : (
-												<div className="flex h-full flex-1 flex-col items-center justify-center">
-													<p className="text-center text-muted-foreground">
-														No messages yet. Start a
-														conversation!
-													</p>
 												</div>
-											)}
-											{/* Scroll-to-bottom reference */}
-											<div ref={messagesEndRef} />
-										</div>
+											))
+										) : (
+											<div className="flex h-full items-center justify-center">
+												<p>
+													No messages yet. Start a
+													conversation!
+												</p>
+											</div>
+										)}
+										<div ref={messagesEndRef} />
 									</div>
-
-									{/* Chat submit input form */}
 									<form
 										onSubmit={handleSendMessage}
 										className="flex w-full items-center gap-2 border-t p-4"
 									>
-										<Button
-											type="button"
-											size="icon"
-											variant="ghost"
-											className="h-8 w-8 shrink-0 rounded-full"
-										>
-											<Paperclip className="h-4 w-4" />
-											<span className="sr-only">
-												Attach file
-											</span>
-										</Button>
 										<Input
 											placeholder="Type a message..."
 											className="flex-1"
@@ -210,20 +196,15 @@ export function MessagesView() {
 										<Button
 											type="submit"
 											size="icon"
-											className="h-8 w-8 shrink-0 rounded-full"
+											className="h-8 w-8"
 										>
 											<Send className="h-4 w-4" />
-											<span className="sr-only">
-												Send message
-											</span>
 										</Button>
 									</form>
 								</div>
 							) : (
 								<div className="flex h-full items-center justify-center">
-									<p className="text-center text-muted-foreground">
-										Select a contact to start messaging
-									</p>
+									<p>Select a chat room to start messaging</p>
 								</div>
 							)}
 						</div>
