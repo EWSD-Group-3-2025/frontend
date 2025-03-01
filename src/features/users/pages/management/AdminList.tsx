@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
-import { writeToString } from 'fast-csv';
+import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
 
 import {
@@ -53,14 +53,9 @@ const AdminList = () => {
 			return;
 		}
 
-		writeToString(data, { headers: true })
-			.then((csvData) => {
-				const blob = new Blob([csvData], {
-					type: 'text/csv;charset=utf-8;',
-				});
-				saveAs(blob, `${fileName}.csv`);
-			})
-			.catch((error) => console.error('CSV Export Error:', error));
+		const csvData = Papa.unparse(data);
+		const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+		saveAs(blob, `${fileName}.csv`);
 	};
 
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
@@ -118,11 +113,7 @@ const AdminList = () => {
 	};
 
 	const userListColumns: ColumnDef<User>[] = [
-		{
-			id: 'no',
-			header: 'No.',
-			cell: (params) => params.row.index + 1,
-		},
+		{ id: 'no', header: 'No.', cell: (params) => params.row.index + 1 },
 		{
 			id: 'name',
 			header: ({ column }) => (
@@ -255,40 +246,42 @@ const AdminList = () => {
 							<AccountStatusDropDown />
 						</div>
 					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button className="relative flex items-center justify-between gap-2 rounded-md p-3 text-white shadow-lg">
-								<Plus size={18} />
-								<span>New</span>
-								<ChevronDown className="ms-3" size={18} />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent className="rounded-lg shadow-lg">
-							<DropdownMenuItem
-								onClick={() =>
-									exportToCSV(
-										(data?.data as unknown as Record<
-											string,
-											unknown
-										>[]) ?? [],
-										`admin_list${new Date().getTime()}`
-									)
-								}
-							>
-								Export as CSV
-							</DropdownMenuItem>
-							{/* <DropdownMenuItem
-								onClick={() => handleExport('XLSX')}
-							>
-								Export as XLSX
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => handleExport('PDF')}
-							>
-								Export as PDF
-							</DropdownMenuItem> */}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					{data && data.data.length > 0 && !isLoading && (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button className="relative flex items-center justify-between gap-2 rounded-md p-3 text-white shadow-lg">
+									<Plus size={18} />
+									<span>New</span>
+									<ChevronDown className="ms-3" size={18} />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent className="rounded-lg shadow-lg">
+								<DropdownMenuItem
+									onClick={() =>
+										exportToCSV(
+											data.data as unknown as Record<
+												string,
+												unknown
+											>[],
+											`admin_list_${new Date().getTime()}`
+										)
+									}
+								>
+									Export as CSV
+								</DropdownMenuItem>
+								{/* <DropdownMenuItem
+									onClick={() => handleExport('XLSX')}
+								>
+									Export as XLSX
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => handleExport('PDF')}
+								>
+									Export as PDF
+								</DropdownMenuItem> */}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
 				</div>
 				<DataTable
 					columns={userListColumns}
