@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				`routeName=${location.pathname}&browserName=${browser}`
 			),
 		retry: false,
+		enabled: location.pathname !== '/login', // Will not call getAuthAccount for /login page
 	});
 
 	const logoutMutation = useMutation({

@@ -20,20 +20,20 @@ import {
 	updateUser,
 	usernameExistsCount,
 } from '@/features/users/api';
-import { convertNameToSlug } from '@/utils';
-import { CheckCircle2, Loader } from 'lucide-react';
+import { convertNameToSlug, transformObjects } from '@/utils';
+import { CheckCircle2, Loader, XCircle } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
 import { getAllCourses } from '@/features/courses/api';
 import { getAllSpecializations } from '@/features/specialization/api';
-// import { GENDER } from '@/constants';
+import { GENDER } from '@/constants';
 import { ComboBox } from '@/components/ui/combo-box';
-// import {
-// 	Select,
-// 	SelectContent,
-// 	SelectItem,
-// 	SelectTrigger,
-// 	SelectValue,
-// } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 
 type UserFormModalProp = {
@@ -47,7 +47,13 @@ type UserFormModalProp = {
 const userFormSchema = z
 	.object({
 		id: z.number().optional(),
-		name: z.string().nonempty('Name Required'),
+		name: z
+			.string()
+			.nonempty('Name Required')
+			.regex(
+				/^[a-zA-Z0-9-\s]+$/,
+				"Name can only contain ASCII letters, digits, spaces, and '-'"
+			),
 		username: z.string(),
 		email: z.string().nonempty('Email Required'),
 		roleId: z.number(),
@@ -96,7 +102,7 @@ const UserFormModal = ({
 	setSelectedUserId,
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
-	// const transform = transformObjects({ GENDER });
+	const transform = transformObjects({ GENDER });
 	const [searchName, setSearchName] = useState('');
 	const [username, setUsername] = useState('');
 	const [isLoadingSearchName, setIsLoadingSearchName] = useState(false);
@@ -108,6 +114,7 @@ const UserFormModal = ({
 			data: usernameExistsCountData,
 			isLoading: isLoadingUsernameExistsCountData,
 			isPending: isPendingUsernameExistsCountData,
+			isError: isErrorUsernameExistsCountData,
 		},
 		{ data: departmentData },
 		{ data: courseData },
@@ -117,9 +124,16 @@ const UserFormModal = ({
 			{
 				queryKey: ['username-exists-counts', searchName],
 				queryFn: async () => {
-					return await usernameExistsCount({ name: searchName });
+					try {
+						return await usernameExistsCount({ name: searchName });
+					} catch (error) {
+						throw new Error(
+							'Failed to fetch username availability'
+						);
+					}
 				},
 				enabled: !!searchName,
+				retry: 3,
 			},
 			{
 				queryKey: ['get-all-departments'],
@@ -222,10 +236,7 @@ const UserFormModal = ({
 							(err: { field: string; message: string }) => {
 								form.setError(
 									err.field as keyof UserFormValue,
-									{
-										type: 'server',
-										message: err.message,
-									}
+									{ type: 'server', message: err.message }
 								);
 							}
 						);
@@ -282,10 +293,7 @@ const UserFormModal = ({
 							(err: { field: string; message: string }) => {
 								form.setError(
 									err.field as keyof UserFormValue,
-									{
-										type: 'server',
-										message: err.message,
-									}
+									{ type: 'server', message: err.message }
 								);
 							}
 						);
@@ -304,10 +312,26 @@ const UserFormModal = ({
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newName = e.target.value;
+
 		form.setValue('name', newName);
+
 		setIsLoadingSearchName(true);
+
+		if (!/^[a-zA-Z0-9-\s]*$/.test(newName)) {
+			form.setError('name', {
+				type: 'manual',
+				message:
+					"Name can only contain ASCII letters, digits, spaces, and '-'",
+			});
+			return;
+		} else {
+			form.clearErrors('name');
+		}
+
 		if (debounceTimeout) clearTimeout(debounceTimeout);
+
 		const newTimeout = setTimeout(() => setSearchName(newName), 1500);
+
 		setDebounceTimeout(newTimeout);
 	};
 
@@ -339,17 +363,21 @@ const UserFormModal = ({
 			return;
 		}
 
+		if (isErrorUsernameExistsCountData) {
+			setIsLoadingSearchName(false);
+			return;
+		}
+
 		if (
 			!isLoadingUsernameExistsCountData &&
 			usernameExistsCountData?.data?.code === 200 &&
 			usernameExistsCountData?.data?.success === 1
 		) {
-			console.log(usernameExistsCountData?.data?.data?.count);
-			const count =
-				usernameExistsCountData?.data?.data?.count !== 0
-					? usernameExistsCountData?.data?.data?.count + 1
-					: usernameExistsCountData?.data?.data?.count;
-			const newUsername = `${convertNameToSlug(form.getValues('name'))}-${count}`;
+			const count = usernameExistsCountData?.data?.data?.count ?? 0;
+			const baseUsername = convertNameToSlug(form.getValues('name'));
+			const newUsername =
+				count > 0 ? `${baseUsername}-${count}` : baseUsername;
+
 			form.setValue('username', newUsername);
 			setUsername(newUsername);
 		}
@@ -385,7 +413,7 @@ const UserFormModal = ({
 								name="name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Name</FormLabel>
+										<FormLabel>Name </FormLabel>
 										<FormControl>
 											<Input
 												placeholder="Please enter your name"
@@ -402,11 +430,21 @@ const UserFormModal = ({
 							/>
 							{searchName &&
 								!selectedUserId &&
-								(loadingSearchName ? (
+								(loadingSearchName &&
+								!form.formState.errors.name ? (
 									<div className="flex items-center gap-x-2">
 										<Loader className="size-4 animate-spin text-emerald-500/60 duration-150" />
 										<p className="text-sm text-muted-foreground">
 											Checking availability...
+										</p>
+									</div>
+								) : isErrorUsernameExistsCountData ||
+								  form.formState.errors.name ? (
+									<div className="flex items-center gap-x-2 text-red-500">
+										<XCircle className="size-4" />
+										<p className="text-sm">
+											Failed to check username
+											availability. Please try again.
 										</p>
 									</div>
 								) : (
@@ -473,7 +511,7 @@ const UserFormModal = ({
 								)}
 							/>
 
-							{/* <FormField
+							<FormField
 								control={form.control}
 								name="gender"
 								render={({ field }) => (
@@ -506,7 +544,7 @@ const UserFormModal = ({
 										<FormMessage />
 									</FormItem>
 								)}
-							/> */}
+							/>
 
 							{(roleId === 1 || roleId === 2) && (
 								<FormField

@@ -128,9 +128,7 @@ const AllocateTutor = ({
 	}
 
 	useEffect(() => {
-		console.log(selectedStudent);
 		if (selectedStudent) {
-			console.log('Enter');
 			form.setValue('studentIds', [selectedStudent.id?.toString() ?? '']);
 			form.setValue(
 				'tutorId',
@@ -164,22 +162,17 @@ const AllocateTutor = ({
 	});
 
 	useEffect(() => {
-		console.log('ABCC');
 		if (selectedStudentUsername.length > 0 && !selectedStudent) {
 			const selectedStudents = studentData?.filter((student) =>
 				selectedStudentUsername.includes(student.username)
 			);
-			console.log(selectedStudents, 'SELECT');
 			const studentIds =
 				selectedStudents?.map((student) => student.id.toString()) || [];
 
-			console.log(selectedStudentUsername.length);
-			console.log(studentIds);
 			form.setValue('studentIds', studentIds);
 		}
 	}, [selectedStudentUsername, studentData]);
 
-	console.log(studentData);
 	useEffect(() => {
 		if (selectedTutorId) {
 			form.setValue('tutorId', selectedTutorId.toString());
