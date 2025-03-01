@@ -8,8 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/context/auth.context';
 import { useForm } from 'react-hook-form';
 import { login } from '@/features/auth/api';
-import Cookies from 'js-cookie';
-import CONSTANTS from '@/constants';
 import { toast } from 'sonner';
 import {
 	Form,
@@ -20,6 +18,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { cn } from '@/utils/stringUtils';
+import { getRedirectRoute } from '@/utils/auth';
 
 const formSchema = z.object({
 	email: z
@@ -49,18 +48,18 @@ export default function LoginPage() {
 		await login(data)
 			.then((response) => {
 				if (response.data.code === 200) {
-					Cookies.set(
-						CONSTANTS.ACCESS_TOKEN_KEY,
-						response.data.data.accessToken
-					);
-					Cookies.set(
-						CONSTANTS.REFRESH_TOKEN_KEY,
+					auth.assignLoginToken(
+						response.data.data.accessToken,
 						response.data.data.refreshToken
 					);
-					// TODO Redirect based on user role and use function from RRD
-					// navigate('/dashboard/student');
-					window.location.href = '/dashboard/student';
-					toast.success('Log in successful');
+
+					form.reset();
+					const redirectRoute = getRedirectRoute(
+						response.data.data.user.roleName
+					);
+
+					window.location.href = redirectRoute;
+					toast.success(response.data.message);
 				}
 			})
 			.catch((e) => {
@@ -73,8 +72,8 @@ export default function LoginPage() {
 	};
 
 	if (!auth.loading && auth.user) {
-		// TODO change redirect based on user role
-		const from = location.state?.from?.pathname || '/dashboard/student';
+		const redirectRoute = getRedirectRoute(auth.user.roleName);
+		const from = redirectRoute || location.state?.from?.pathname;
 		navigate(from);
 		return;
 	}

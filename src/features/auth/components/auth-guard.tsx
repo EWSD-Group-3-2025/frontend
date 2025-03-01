@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/auth.context';
 import { Loader } from 'lucide-react';
-import { Navigate, useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 
 interface AuthGuardProps {
 	children: React.ReactNode;
@@ -38,7 +38,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 				/>
 			);
 		} else {
-			// Protected routes, implement role-based authentication here
 			return <>{children}</>;
 		}
 	}

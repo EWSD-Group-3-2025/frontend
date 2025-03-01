@@ -14,14 +14,19 @@ import { useAuth } from '@/context/auth.context';
 import ResponsiveModal from '@/components/responsive-modal';
 import UserProfile from './user-profile';
 import { useOpenProfileStore } from '../store/use-open-profile-store';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function UserButton() {
-	const { user, logout } = useAuth();
+	const { user, logout, loading } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
 	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
 		useOpenProfileStore();
 
-	if (!user) {
+	if (!user && loading) {
+		return <Skeleton className="size-10 rounded-full" />;
+	}
+
+	if (!user && !loading) {
 		return null;
 	}
 
@@ -39,9 +44,9 @@ export function UserButton() {
 						variant="ghost"
 						className="relative size-10 rounded-full"
 					>
-						<Avatar className="size-10">
+						<Avatar className="size-10 border border-gray-300 dark:border-gray-600">
 							<AvatarImage src={user?.name} alt={user?.name} />
-							<AvatarFallback>
+							<AvatarFallback className="text-xl">
 								{user?.name.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
@@ -50,7 +55,7 @@ export function UserButton() {
 				<DropdownMenuContent className="w-56" align="end" forceMount>
 					<DropdownMenuLabel className="font-normal">
 						<div className="flex items-center gap-x-2">
-							<Avatar className="size-8">
+							<Avatar className="size-8 border border-gray-300 dark:border-gray-600">
 								<AvatarImage
 									src={user?.name}
 									alt={user?.name}
@@ -59,13 +64,18 @@ export function UserButton() {
 									{user?.name.charAt(0).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
-							<div className="flex flex-col space-y-1">
+							<div className="flex w-40 flex-col space-y-1">
 								<p className="text-sm font-medium leading-none">
 									{user?.name}
 								</p>
-								<p className="text-xs leading-none text-muted-foreground">
-									{user?.email}
-								</p>
+								<abbr
+									title={user?.email}
+									className="no-underline"
+								>
+									<p className="overflow-hidden text-ellipsis text-xs leading-none text-muted-foreground">
+										{user?.email}
+									</p>
+								</abbr>
 							</div>
 						</div>
 					</DropdownMenuLabel>
