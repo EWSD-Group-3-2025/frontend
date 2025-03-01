@@ -47,7 +47,9 @@ export function MessagesView() {
 	useEffect(() => {
 		if (!user) return;
 
-		const socket = new WebSocket('ws://localhost:3000/ws-chat');
+		const socket = new WebSocket(
+			import.meta.env.VITE_BACKEND_WEB_SOCKET_BASE_URL
+		);
 		socketRef.current = socket;
 
 		socket.onopen = () => console.log('Connected to WebSocket');

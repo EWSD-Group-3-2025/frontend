@@ -62,10 +62,12 @@ copy `.env.example` to `.env`
 
 `VITE_BASE_URL` is your backend container URL
 `VITE_JWT_SECRET_KEY` is backend JWT secret key
+`VITE_BACKEND_WEB_SOCKET_BASE_URL` is backend Web Socket Connection URL
 
 ```bash
 VITE_BASE_URL=
 VITE_JWT_SECRET_KEY=
+VITE_BACKEND_WEB_SOCKET_BASE_URL=
 ```
 
 ## Step 4 - Install necessary packages
