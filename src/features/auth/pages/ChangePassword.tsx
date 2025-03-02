@@ -1,11 +1,13 @@
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { EyeIcon, EyeOffIcon, Keyboard } from 'lucide-react';
+
 import {
 	Form,
 	FormControl,
@@ -14,32 +16,55 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth.context';
 import { userChangePassword } from '@/features/users/api';
 import { ChangePasswordRequest } from '@/features/users/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { EyeIcon, EyeOffIcon, Keyboard } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { z } from 'zod';
+import { getRedirectRoute, isNewUser, removeNewUserFlag } from '@/utils';
 
-const formSchema = z.object({
-	oldPassword: z.string().trim().min(6, { message: 'Old Password required' }),
-	newPassword: z.string().trim().min(6, { message: 'New Password required' }),
-	confirmPassword: z
-		.string()
-		.trim()
-		.min(6, { message: 'Confirm Password required' }),
-});
+const passwordValidation = z
+	.string()
+	.trim()
+	.min(8, { message: 'Password must be at least 8 characters long' })
+	.regex(/[A-Z]/, {
+		message: 'Password must include at least one uppercase letter',
+	})
+	.regex(/[a-z]/, {
+		message: 'Password must include at least one lowercase letter',
+	})
+	.regex(/[0-9]/, { message: 'Password must include at least one number' })
+	.regex(/[\W_]/, {
+		message: 'Password must include at least one special character',
+	});
+
+const formSchema = z
+	.object({
+		oldPassword: z
+			.string()
+			.trim()
+			.min(6, { message: 'Old Password required' }),
+		newPassword: passwordValidation,
+		confirmPassword: passwordValidation,
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: 'New Password and Confirm Password must match',
+		path: ['confirmPassword'],
+	});
 
 export default function ChangePasswordPage() {
 	const [showOldPassword, setShowOldPassword] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const navigate = useNavigate();
+	const { user } = useAuth();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -72,8 +97,14 @@ export default function ChangePasswordPage() {
 
 		changePasswordMutation(finalValue, {
 			onSuccess: ({ data }) => {
-				toast.success(data.message);
-				navigate('/dashboard/student');
+				if (user) {
+					toast.success(data.message);
+					const redirectRoute = getRedirectRoute(user?.roleName);
+					if (isNewUser()) {
+						removeNewUserFlag();
+					}
+					navigate(redirectRoute);
+				}
 			},
 			onError: (data: any) => {
 				toast.error(data?.response?.data?.message);
@@ -90,8 +121,8 @@ export default function ChangePasswordPage() {
 						Change new password
 					</CardTitle>
 					<CardDescription className="mt-1 text-center">
-						Must be at least 6 character and use strong combination
-						of characters, number, uppercase and lowercase
+						Must be at least 8 character and use strong combination
+						of special characters, number, uppercase and lowercase
 					</CardDescription>
 				</CardHeader>
 				<CardContent>

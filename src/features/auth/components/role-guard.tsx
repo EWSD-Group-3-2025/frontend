@@ -1,10 +1,11 @@
-import { useAuth } from '@/context/auth.context';
+import { Navigate, useLocation } from 'react-router-dom';
+
 import {
 	getAuthPathname,
 	getRedirectRoute,
 	isAuthDashboardPath,
-} from '@/utils/auth';
-import { Navigate, useLocation } from 'react-router-dom';
+} from '@/utils';
+import { useAuth } from '@/context/auth.context';
 
 interface RouteGuardProps {
 	children: React.ReactNode;

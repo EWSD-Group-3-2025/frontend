@@ -1,6 +1,9 @@
-import { useAuth } from '@/context/auth.context';
-import { Loader } from 'lucide-react';
 import { Navigate, useLocation } from 'react-router-dom';
+
+import { Loader } from 'lucide-react';
+
+import { isNewUser } from '@/utils';
+import { useAuth } from '@/context/auth.context';
 
 interface AuthGuardProps {
 	children: React.ReactNode;
@@ -19,6 +22,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 				<Loader className="size-10 animate-spin text-muted-foreground" />
 			</div>
 		);
+	}
+
+	if (isNewUser() && location.pathname !== '/change-password') {
+		return <Navigate to={'/change-password'} replace />;
 	}
 
 	if (!user) {
