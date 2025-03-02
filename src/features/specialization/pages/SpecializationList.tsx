@@ -20,6 +20,7 @@ import {
 } from '@/features/specialization/api';
 import SpecializationUpdateModal from '@/features/specialization/components/SpecializationUpdateModal';
 import SpecializationCreateModal from '@/features/specialization/components/SpecializationCreateModal';
+import ExportButton from '@/components/export-button';
 
 const specializationCreateSchema = z.object({
 	name: z.array(z.string()).nonempty('Please at least one item'),
@@ -160,8 +161,19 @@ const SpecializationList = () => {
 				</Button>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
+				<div className="mb-3 flex justify-between gap-5">
 					<SearchBox />
+					{data && data.data.length > 0 && !isLoading && (
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
+					)}
 				</div>
 				<DataTable
 					columns={specializationListColumns}

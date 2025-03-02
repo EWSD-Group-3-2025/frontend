@@ -38,6 +38,7 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import dayjs from 'dayjs';
+import ExportButton from '@/components/export-button';
 
 const StudentList = () => {
 	const { user } = useAuth();
@@ -292,11 +293,24 @@ const StudentList = () => {
 				</div>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
-					<SearchBox />
-					<div className="block min-w-32">
-						<AccountStatusDropDown />
+				<div className="mb-3 flex justify-between">
+					<div className="flex gap-5">
+						<SearchBox placeholder="Search admin" />
+						<div className="block min-w-32">
+							<AccountStatusDropDown />
+						</div>
 					</div>
+					{data && data.data.length > 0 && !isLoading && (
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
+					)}
 				</div>
 				<DataTable
 					columns={userListColumns}

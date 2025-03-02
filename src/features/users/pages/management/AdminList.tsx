@@ -1,29 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
-import Papa from 'papaparse';
-import { saveAs } from 'file-saver';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import {
-	ChevronDown,
-	Ellipsis,
-	Plus,
-	SquarePen,
-	Trash2,
-	UserPlus,
-} from 'lucide-react';
+import { Ellipsis, SquarePen, Trash2, UserPlus } from 'lucide-react';
 
-import { User } from '@/features/users/types';
-import DataTable from '@/components/data-table';
-import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers } from '@/features/users/api';
-import { HeaderSorting } from '@/components/header-sorting';
-import ContainerWrapper from '@/components/container-wrapper';
-import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
-import { Button } from '@/components/ui/button';
-import { useUserFormModal } from '@/features/users/store/user-form-modal';
-import UserFormModal from '@/features/users/components/user-form-modal';
-import { Badge } from '@/components/ui/badge';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -31,10 +13,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
+import { User } from '@/features/users/types';
+import { Badge } from '@/components/ui/badge';
+import DataTable from '@/components/data-table';
+import SearchBox from '@/components/search-box';
+import { Button } from '@/components/ui/button';
 import DeleteDialog from '@/components/delete-dialog';
-import { toast } from 'sonner';
-import { useState } from 'react';
+import ExportButton from '@/components/export-button';
+import { HeaderSorting } from '@/components/header-sorting';
+import ContainerWrapper from '@/components/container-wrapper';
+import { deleteUser, getAllUsers } from '@/features/users/api';
+import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
+import UserFormModal from '@/features/users/components/user-form-modal';
+import { useUserFormModal } from '@/features/users/store/user-form-modal';
+import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
 
 const AdminList = () => {
 	const queryClient = useQueryClient();
@@ -43,20 +35,6 @@ const AdminList = () => {
 		useDeleteModalStore();
 
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-
-	const exportToCSV = <T extends Record<string, unknown>>(
-		data: T[],
-		fileName: string
-	) => {
-		if (!data.length) {
-			console.error('No data available to export.');
-			return;
-		}
-
-		const csvData = Papa.unparse(data);
-		const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-		saveAs(blob, `${fileName}.csv`);
-	};
 
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-admin'],
@@ -247,40 +225,15 @@ const AdminList = () => {
 						</div>
 					</div>
 					{data && data.data.length > 0 && !isLoading && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button className="relative flex items-center justify-between gap-2 rounded-md p-3 text-white shadow-lg">
-									<Plus size={18} />
-									<span>New</span>
-									<ChevronDown className="ms-3" size={18} />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className="rounded-lg shadow-lg">
-								<DropdownMenuItem
-									onClick={() =>
-										exportToCSV(
-											data.data as unknown as Record<
-												string,
-												unknown
-											>[],
-											`admin_list_${new Date().getTime()}`
-										)
-									}
-								>
-									Export as CSV
-								</DropdownMenuItem>
-								{/* <DropdownMenuItem
-									onClick={() => handleExport('XLSX')}
-								>
-									Export as XLSX
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => handleExport('PDF')}
-								>
-									Export as PDF
-								</DropdownMenuItem> */}
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
 					)}
 				</div>
 				<DataTable
