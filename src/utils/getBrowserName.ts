@@ -27,6 +27,5 @@ export const getBrowserName = (): string => {
 	} else if (userAgent.includes('msie') || userAgent.includes('trident')) {
 		return 'Internet Explorer';
 	}
-
 	return 'Unknown';
 };
