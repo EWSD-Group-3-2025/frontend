@@ -26,6 +26,7 @@ import {
 	MultiSelectorTrigger,
 } from '@/components/ui/multi-select';
 import { cn } from '@/utils';
+import RequiredStar from '@/components/ui/required-star';
 
 type AllocateTutorProp = {
 	isOpen: boolean;
@@ -204,7 +205,8 @@ const AllocateTutor = ({
 										return (
 											<FormItem className="mt-1 flex flex-col space-y-3">
 												<FormLabel>
-													Personal Tutor
+													Personal Tutor{' '}
+													<RequiredStar />
 												</FormLabel>
 												<FormControl>
 													<ComboBox
@@ -244,7 +246,8 @@ const AllocateTutor = ({
 										return (
 											<FormItem>
 												<FormLabel>
-													Select Student
+													Select Student{' '}
+													<RequiredStar />
 												</FormLabel>
 												<FormControl>
 													<MultiSelector

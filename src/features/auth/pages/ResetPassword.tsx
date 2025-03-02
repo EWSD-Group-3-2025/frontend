@@ -1,4 +1,13 @@
-import { Button } from '@/components/ui/button';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { EyeIcon, EyeOffIcon, Keyboard } from 'lucide-react';
+
 import {
 	Card,
 	CardContent,
@@ -14,16 +23,9 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EyeIcon, EyeOffIcon, Keyboard } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { z } from 'zod';
 import { resetPassword } from '../api';
-import { useMutation } from '@tanstack/react-query';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { ResetPasswordRequest } from '../types';
 
 const formSchema = z.object({
@@ -35,10 +37,11 @@ const formSchema = z.object({
 });
 
 export default function ResetPasswordPage() {
+	const navigate = useNavigate();
+
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-	const navigate = useNavigate();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {

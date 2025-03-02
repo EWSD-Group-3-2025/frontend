@@ -13,9 +13,10 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import ResponsiveModal from '@/components/responsive-modal';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import RequiredStar from '@/components/ui/required-star';
+import ResponsiveModal from '@/components/responsive-modal';
 import { updateSpecialization } from '@/features/specialization/api';
 
 type SpecializationUpdateModalProp = {
@@ -116,7 +117,9 @@ const SpecializationUpdateModal = ({
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
+									<FormLabel>
+										Name <RequiredStar />
+									</FormLabel>
 									<FormControl>
 										<Input
 											placeholder="Please enter Name"

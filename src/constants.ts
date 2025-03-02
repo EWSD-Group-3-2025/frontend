@@ -3,6 +3,7 @@ const CONSTANTS = {
 	ACCESS_TOKEN_EXPIRE: 15 / (24 * 60), // 15 minutes in days
 	REFRESH_TOKEN_KEY: 'EWSD_refreshToken',
 	REFRESH_TOKEN_EXPIRE: 7, // 7 days
+	NEW_USER: 'EWSD_NEW_USER',
 };
 
 export enum USER_ROLE {

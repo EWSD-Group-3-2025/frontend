@@ -1,8 +1,8 @@
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { Dispatch, SetStateAction, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -13,10 +13,11 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import ResponsiveModal from '@/components/responsive-modal';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { updateCourse } from '@/features/courses/api';
+import RequiredStar from '@/components/ui/required-star';
+import ResponsiveModal from '@/components/responsive-modal';
 
 type CourseUpdateModalProp = {
 	open: boolean;
@@ -114,7 +115,9 @@ const CourseUpdateModal = ({
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
+									<FormLabel>
+										Name <RequiredStar />
+									</FormLabel>
 									<FormControl>
 										<Input
 											placeholder="Please enter Name"

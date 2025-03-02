@@ -18,6 +18,7 @@ import ContainerWrapper from '@/components/container-wrapper';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import DepartmentCreateModal from '@/features/departments/components/DepartmentCreateModal';
 import DepartmentUpdateModal from '@/features/departments/components/DepartmentUpdateModal';
+import ExportButton from '@/components/export-button';
 
 const DepartmentList = () => {
 	const queryClient = useQueryClient();
@@ -139,8 +140,19 @@ const DepartmentList = () => {
 				</Button>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
+				<div className="mb-3 flex justify-between gap-5">
 					<SearchBox />
+					{data && data.data.length > 0 && !isLoading && (
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
+					)}
 				</div>
 				<DataTable
 					columns={departmentListColumns}

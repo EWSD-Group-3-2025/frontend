@@ -1,4 +1,7 @@
-import { Button } from '@/components/ui/button';
+import { CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import {
 	Card,
 	CardContent,
@@ -6,12 +9,13 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { getRedirectRoute } from '@/utils';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth.context';
 
 export default function ResetPasswordSuccessPage() {
 	const navigate = useNavigate();
+	const { user } = useAuth();
 	const [countdown, setCountdown] = useState(60); // Start from 60 seconds
 
 	useEffect(() => {
@@ -21,7 +25,10 @@ export default function ResetPasswordSuccessPage() {
 
 		const timeout = setTimeout(() => {
 			// TODO Make redirect logic based on user role and user previous route like accessing from login screen or from profile page
-			navigate('/dashboard/student');
+			if (user) {
+				const redirectRoute = getRedirectRoute(user?.roleName);
+				navigate(redirectRoute);
+			}
 		}, 60000); // 1 minute
 
 		return () => {
@@ -45,7 +52,7 @@ export default function ResetPasswordSuccessPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Link to={'/dashboard/student'} className="w-full">
+					<Link to={'/dashboard/end-user'} className="w-full">
 						<Button className="w-full">Back to Home</Button>
 					</Link>
 				</CardContent>

@@ -1,4 +1,11 @@
-import { Button } from '@/components/ui/button';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckCircle2, Loader, XCircle } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import {
 	Form,
 	FormControl,
@@ -7,19 +14,14 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { updateAuthAccount } from '../api';
-import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+import { convertNameToSlug } from '@/utils';
 import { useAuth } from '@/context/auth.context';
-import { usernameExistsCount } from '@/features/users/api';
-import { convertNameToSlug } from '@/utils/stringUtils';
 import { UpdateUserProfileRequest } from '../types';
-import { CheckCircle2, Loader, XCircle } from 'lucide-react';
+import { usernameExistsCount } from '@/features/users/api';
 
 const formSchema = z.object({
 	name: z
