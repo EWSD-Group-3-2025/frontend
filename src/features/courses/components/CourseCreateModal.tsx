@@ -15,9 +15,10 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth.context';
-import { TagsInput } from '@/components/ui/tags-input';
-import ResponsiveModal from '@/components/responsive-modal';
 import { createCourse } from '@/features/courses/api';
+import { TagsInput } from '@/components/ui/tags-input';
+import RequiredStar from '@/components/ui/required-star';
+import ResponsiveModal from '@/components/responsive-modal';
 
 type CourseCreateModalProp = {
 	open: boolean;
@@ -105,7 +106,9 @@ const CourseCreateModal = ({
 							name="names"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
+									<FormLabel>
+										Name <RequiredStar />
+									</FormLabel>
 									<FormControl>
 										<TagsInput
 											value={field.value ?? []}

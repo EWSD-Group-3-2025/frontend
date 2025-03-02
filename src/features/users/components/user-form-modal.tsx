@@ -35,6 +35,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import RequiredStar from '@/components/ui/required-star';
 
 type UserFormModalProp = {
 	isOpen: boolean;
@@ -57,7 +58,7 @@ const userFormSchema = z
 		username: z.string(),
 		email: z.string().nonempty('Email Required'),
 		roleId: z.number(),
-		gender: z.number().optional(),
+		gender: z.number(),
 		departmentId: z.number().nullable(),
 		specializationId: z.number().nullable(),
 		courseId: z.number().nullable(),
@@ -310,6 +311,12 @@ const UserFormModal = ({
 				}),
 	});
 
+	const handleNameBlur = () => {
+		const currentValue = form.getValues('name');
+		const formattedName = currentValue.trim().replace(/\s+/g, ' ');
+		form.setValue('name', formattedName);
+	};
+
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newName = e.target.value;
 
@@ -413,15 +420,16 @@ const UserFormModal = ({
 								name="name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Name </FormLabel>
+										<FormLabel>
+											Name <RequiredStar />
+										</FormLabel>
 										<FormControl>
 											<Input
 												placeholder="Please enter your name"
 												type="text"
 												{...field}
-												onChange={(e) => {
-													handleNameChange(e);
-												}}
+												onChange={handleNameChange}
+												onBlur={handleNameBlur}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -497,7 +505,9 @@ const UserFormModal = ({
 								name="email"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Email</FormLabel>
+										<FormLabel>
+											Email <RequiredStar />
+										</FormLabel>
 										<FormControl>
 											<Input
 												placeholder="Please enter your email"
@@ -516,7 +526,9 @@ const UserFormModal = ({
 								name="gender"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Gender</FormLabel>
+										<FormLabel>
+											Gender <RequiredStar />
+										</FormLabel>
 										<Select
 											onValueChange={(value) =>
 												field.onChange(Number(value))
@@ -552,7 +564,9 @@ const UserFormModal = ({
 									name="departmentId"
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
-											<FormLabel>Department</FormLabel>
+											<FormLabel>
+												Department <RequiredStar />
+											</FormLabel>
 											<FormControl>
 												<ComboBox
 													data={
@@ -591,7 +605,9 @@ const UserFormModal = ({
 									name="courseId"
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
-											<FormLabel>Course</FormLabel>
+											<FormLabel>
+												Course <RequiredStar />
+											</FormLabel>
 											<FormControl>
 												<ComboBox
 													data={
@@ -630,7 +646,7 @@ const UserFormModal = ({
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
 											<FormLabel>
-												Specialization
+												Specialization <RequiredStar />
 											</FormLabel>
 											<FormControl>
 												<ComboBox
