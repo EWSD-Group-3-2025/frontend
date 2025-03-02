@@ -1,37 +1,39 @@
+import Cookies from 'js-cookie';
 import { createElement, ElementType } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { USER_ROLE } from '@/constants';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import CONSTANTS, { USER_ROLE } from '@/constants';
+import HomePage from '@/pages/HomePage';
+import { useAuth } from '@/context/auth.context';
 import NotFound from '@/pages/notFound/NotFound';
 import LoginPage from '@/features/auth/pages/Login';
 import EndUserLayout from '@/layouts/EndUserLayout';
 import ManagementLayout from '@/layouts/ManagementLayout';
 import StandaloneLayout from '@/layouts/StandaloneLayout';
 import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
+import CourseList from '@/features/courses/pages/CourseList';
 import AuthGuard from '@/features/auth/components/auth-guard';
-import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
-import AdminDashboard from '@/features/users/pages/admin/Dashboard';
-import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
-import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
-import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
-import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
-import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
-import StaffDashboard from '@/features/users/pages/staff/Dashboard';
+import RouteGuard from '@/features/auth/components/role-guard';
+import BlogPage from '@/features/users/pages/end-user/blog-page';
 import StaffList from '@/features/users/pages/management/StaffList';
-import StudentList from '@/features/users/pages/management/StudentList';
 import TutorList from '@/features/users/pages/management/TutorList';
 import AdminList from '@/features/users/pages/management/AdminList';
-import DepartmentList from '@/features/departments/pages/DepartmentList';
-import CourseList from '@/features/courses/pages/CourseList';
-import SpecializationList from '@/features/specialization/pages/SpecializationList';
-import HomePage from '@/pages/HomePage';
-import RouteGuard from '@/features/auth/components/role-guard';
-import { useAuth } from '@/context/auth.context';
+import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
+import AdminDashboard from '@/features/users/pages/admin/Dashboard';
+import StaffDashboard from '@/features/users/pages/staff/Dashboard';
+import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
 import ActivityLogs from '@/features/activity-logs/page/ActivityLogs';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
+import StudentList from '@/features/users/pages/management/StudentList';
+import DepartmentList from '@/features/departments/pages/DepartmentList';
 import MessagesPage from '@/features/users/pages/end-user/messages-page';
-import BlogPage from '@/features/users/pages/end-user/blog-page';
-import DocumentsPage from '@/features/users/pages/end-user/documents-page';
 import CalendarPage from '@/features/users/pages/end-user/calendar-page';
 import MeetingsPage from '@/features/users/pages/end-user/meetings-page';
+import DocumentsPage from '@/features/users/pages/end-user/documents-page';
+import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
+import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
+import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
+import SpecializationList from '@/features/specialization/pages/SpecializationList';
 
 type ChildRoute = {
 	path: string;
@@ -48,6 +50,10 @@ type Route = {
 
 const Router = () => {
 	const { user } = useAuth();
+	const isLogin =
+		Cookies.get(CONSTANTS.ACCESS_TOKEN_KEY) &&
+		Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+
 	const authRouteList = [
 		{
 			path: '/login',
@@ -208,7 +214,7 @@ const Router = () => {
 		},
 	];
 
-	return (
+	return isLogin ? (
 		<Routes>
 			{/* Forget Password Routes */}
 			<Route element={<StandaloneLayout />}>
@@ -216,7 +222,11 @@ const Router = () => {
 					<Route
 						key={i}
 						path={route.path}
-						element={createElement(route.element)}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
 					></Route>
 				))}
 			</Route>
@@ -255,17 +265,6 @@ const Router = () => {
 				))}
 			</Route>
 
-			{/* Auth Routes */}
-			<Route element={<StandaloneLayout />}>
-				{authRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={createElement(route.element)}
-					/>
-				))}
-			</Route>
-
 			{/* When user hit to Home and Dashboard routes, it will redirect automatically redirect to their specific route based on their role */}
 			<Route
 				path="/"
@@ -283,6 +282,20 @@ const Router = () => {
 					</AuthGuard>
 				}
 			/>
+		</Routes>
+	) : (
+		<Routes>
+			{/* Auth Routes */}
+			<Route element={<StandaloneLayout />}>
+				{authRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={createElement(route.element)}
+					/>
+				))}
+			</Route>
+			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
 };
