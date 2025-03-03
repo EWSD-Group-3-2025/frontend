@@ -1,16 +1,23 @@
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { Ellipsis, SquarePen, Trash2, UserPlus } from 'lucide-react';
+import {
+	Ellipsis,
+	SquareAsterisk,
+	SquarePen,
+	Trash2,
+	UserPlus,
+} from 'lucide-react';
 
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { User } from '@/features/users/types';
@@ -22,19 +29,32 @@ import DeleteDialog from '@/components/delete-dialog';
 import ExportButton from '@/components/export-button';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
-import { deleteUser, getAllUsers } from '@/features/users/api';
+import {
+	deleteUser,
+	getAllUsers,
+	resetPasswordByAdmin,
+} from '@/features/users/api';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import UserFormModal from '@/features/users/components/user-form-modal';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
+import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 
 const AdminList = () => {
 	const queryClient = useQueryClient();
 	const { isOpen, setIsOpen } = useUserFormModal();
-	const { selectedId, name, setOpen, setSelectedId, setName } =
-		useDeleteModalStore();
+	const {
+		selectedId,
+		name: deletedName,
+		setOpen,
+		setSelectedId,
+		setName: setDeletedName,
+	} = useDeleteModalStore();
 
+	const [name, setName] = useState('');
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
+		useState(false);
 
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-admin'],
@@ -48,45 +68,70 @@ const AdminList = () => {
 			}),
 	});
 
-	const { mutateAsync } = useMutation<HTTPResponse<boolean>, unknown, number>(
-		{
-			mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
-				await deleteUser(id)
-					.then((response) => {
-						if (response.data.code === 200) {
-							queryClient.invalidateQueries({
-								queryKey: ['get-all-users-admin'],
-							});
-							toast.success(response.data.message);
-							setOpen(false);
-							setSelectedId(null);
-							setName(null);
-
-							return response.data;
-						}
-
-						throw new Error('User Delete Fail!');
-					})
-					.catch((e) => {
+	const { mutateAsync: handleUserDelete } = useMutation<
+		HTTPResponse<boolean>,
+		unknown,
+		number
+	>({
+		mutationFn: async (id: number): Promise<HTTPResponse<boolean>> =>
+			await deleteUser(id)
+				.then((response) => {
+					if (response.data.code === 200) {
+						queryClient.invalidateQueries({
+							queryKey: ['get-all-users-admin'],
+						});
+						toast.success(response.data.message);
 						setOpen(false);
 						setSelectedId(null);
-						setName(null);
-						toast.error(
-							e.response?.data?.data ?? 'Request Failed',
-							{
-								description:
-									e.response?.data?.message ??
-									'Something wrong plz try again',
-							}
-						);
-						throw e;
-					}),
-		}
-	);
+						setDeletedName(null);
+
+						return response.data;
+					}
+
+					throw new Error('User Delete Fail!');
+				})
+				.catch((e) => {
+					setOpen(false);
+					setSelectedId(null);
+					setDeletedName(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const { mutateAsync: handleResetPassword } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await resetPasswordByAdmin()
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setResetPasswordConfirmation(false);
+						setName('');
+
+						return response.data;
+					}
+
+					throw new Error('Reset Password Fail!');
+				})
+				.catch((e) => {
+					setResetPasswordConfirmation(false);
+					setName('');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
-			mutateAsync(selectedId);
+			handleUserDelete(selectedId);
 		}
 	};
 
@@ -178,6 +223,18 @@ const AdminList = () => {
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
 								<DropdownMenuItem
+									disabled={!params.row.original.status}
+									onClick={() => {
+										setResetPasswordConfirmation(true);
+										setName(params.row.original.name);
+									}}
+								>
+									<SquareAsterisk /> Reset Password
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+							</DropdownMenuGroup>
+							<DropdownMenuGroup>
+								<DropdownMenuItem
 									onClick={() => {
 										setIsOpen(true);
 										setSelectedUserId(
@@ -190,7 +247,9 @@ const AdminList = () => {
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
 									onClick={() => {
-										setName(params.row.original.name);
+										setDeletedName(
+											params.row.original.name
+										);
 										setSelectedId(params.row.original.id);
 										setOpen(true);
 									}}
@@ -204,6 +263,12 @@ const AdminList = () => {
 			),
 		},
 	];
+
+	useEffect(() => {
+		if (!resetPasswordConfirmation) {
+			setName('');
+		}
+	}, [resetPasswordConfirmation]);
 
 	return (
 		<>
@@ -252,9 +317,16 @@ const AdminList = () => {
 				setSelectedUserId={setSelectedUserId}
 			/>
 
+			<ResetPasswordConfirmationModal
+				name={name}
+				isOpen={resetPasswordConfirmation}
+				setIsOpen={setResetPasswordConfirmation}
+				handleReset={() => handleResetPassword()}
+			/>
+
 			<DeleteDialog
 				title="Delete User"
-				description={`Are you sure to delete ${name}`}
+				description={`Are you sure to delete ${deletedName}`}
 				handleDelete={handleMutationDelete}
 			/>
 		</>
