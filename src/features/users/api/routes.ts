@@ -4,6 +4,7 @@ const userRoutes = {
 	users: '/v1/users',
 	userId: '/v1/users/${id}',
 	allocation: '/v1/allocate',
+	resetPasswordByAdmin: '/v1/users/reset-password',
 };
 
 export default userRoutes;
