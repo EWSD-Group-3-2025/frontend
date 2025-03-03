@@ -22,11 +22,7 @@ import { useAuth } from '@/context/auth.context';
 import { cn, getRedirectRoute, setNewUserFlag } from '@/utils';
 
 const formSchema = z.object({
-	email: z
-		.string()
-		.trim()
-		.email({ message: 'Email required' })
-		.min(1, { message: 'Email required' }),
+	email: z.string().trim().nonempty('Email or username required'),
 	password: z.string().trim().min(1, { message: 'Password required' }),
 });
 
@@ -104,7 +100,7 @@ export default function LoginPage() {
 								render={({ field }) => (
 									<FormItem className="mb-3">
 										<FormLabel htmlFor="email">
-											Email
+											Email or Username
 											<span className="ml-1 text-red-500">
 												*
 											</span>
@@ -115,8 +111,7 @@ export default function LoginPage() {
 													form.formState.isSubmitting
 												}
 												id="email"
-												type="email"
-												placeholder="name@work-email.com"
+												placeholder="Email or username"
 												{...field}
 											/>
 										</FormControl>
