@@ -74,6 +74,7 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))',
 				},
 				'container-bg': 'hsl(var(--wrapper-bg))',
+				warning: 'hsl(var(--warning))',
 			},
 			screens: {
 				xs: '450px',
