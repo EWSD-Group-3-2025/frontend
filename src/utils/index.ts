@@ -1,7 +1,3 @@
-import api from '@/utils/axios';
-import { transformObjects, objectToArray } from '@/utils/dataUtils';
-import { cn, buildURL, convertNameToSlug } from '@/utils/stringUtils';
-import { getBrowserName } from '@/utils/getBrowserName';
 import {
 	isNewUser,
 	hasAccess,
@@ -11,6 +7,15 @@ import {
 	removeNewUserFlag,
 	isAuthDashboardPath,
 } from '@/utils/auth';
+import {
+	cn,
+	buildURL,
+	convertNameToSlug,
+	getPageName,
+} from '@/utils/stringUtils';
+import api from '@/utils/axios';
+import { getBrowserName } from '@/utils/getBrowserName';
+import { transformObjects, objectToArray } from '@/utils/dataUtils';
 
 export {
 	api,
@@ -18,6 +23,7 @@ export {
 	buildURL,
 	hasAccess,
 	isNewUser,
+	getPageName,
 	objectToArray,
 	getBrowserName,
 	setNewUserFlag,
