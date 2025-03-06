@@ -5,21 +5,21 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import { OctagonAlert } from 'lucide-react';
+import { CircleAlert } from 'lucide-react';
 
-type ResetPasswordConfirmationModalProps = {
+type DeallocationStudentProps = {
 	name: string;
 	isOpen: boolean;
 	setIsOpen: (isOpen: boolean) => void;
 	handleReset: () => void;
 };
 
-const ResetPasswordConfirmationModal = ({
+const DeallocationStudent = ({
 	name,
 	isOpen,
 	setIsOpen,
 	handleReset,
-}: ResetPasswordConfirmationModalProps) => {
+}: DeallocationStudentProps) => {
 	return (
 		<ModalBox
 			className="min-h-[25vh] p-6"
@@ -27,26 +27,23 @@ const ResetPasswordConfirmationModal = ({
 			setIsOpen={setIsOpen}
 		>
 			<div className="flex gap-3 [&_svg]:size-10">
-				<OctagonAlert className="text-warning" />
+				<CircleAlert className="mt-2 text-destructive" />
 				<DialogHeader>
 					<DialogTitle className="font-roboto-slab text-3xl">
-						Reset Password
+						Deallocate Student
 					</DialogTitle>
 					<DialogDescription className="text-sm">
-						Are you sure you want to reset{' '}
-						<span className="font-bold text-white">{name}'s</span>{' '}
-						password? A reset email will be sent random password to
-						their registered email address.
+						Are you sure you want to deallocate {name}'s students?
 					</DialogDescription>
 				</DialogHeader>
 			</div>
 			<div className="flex justify-end gap-3">
 				<Button
-					className="w-24 bg-warning hover:bg-warning/90"
-					variant="default"
+					className="w-24"
+					variant="destructive"
 					onClick={handleReset}
 				>
-					Reset
+					Confirm
 				</Button>
 				<Button className="w-24" onClick={() => setIsOpen(false)}>
 					Cancel
@@ -56,4 +53,4 @@ const ResetPasswordConfirmationModal = ({
 	);
 };
 
-export default ResetPasswordConfirmationModal;
+export default DeallocationStudent;

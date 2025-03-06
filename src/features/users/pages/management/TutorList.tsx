@@ -17,6 +17,7 @@ import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
+	deallocationStudents,
 	deleteUser,
 	getAllUsers,
 	resetPasswordByAdmin,
@@ -46,6 +47,7 @@ import dayjs from 'dayjs';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
+import DeallocationStudent from '@/features/users/components/deallocation-student';
 
 const TutorList = () => {
 	const { user } = useAuth();
@@ -61,6 +63,10 @@ const TutorList = () => {
 
 	const [name, setName] = useState('');
 	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
+	const [
+		deallocationStudentConfirmation,
+		setDeallocationStudentConfirmation,
+	] = useState(false);
 	const [selectedTutorId, setSelectedTutorId] = useState<number | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
@@ -130,6 +136,32 @@ const TutorList = () => {
 				})
 				.catch((e) => {
 					setResetPasswordConfirmation(false);
+					setName('');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const { mutateAsync: handleDeallocationStudents } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await deallocationStudents(`tutorId=${selectedTutorId}`)
+				.then((response) => {
+					if (response.status === 204) {
+						toast.success(response.data.message);
+						setDeallocationStudentConfirmation(false);
+						setName('');
+
+						return response.data;
+					}
+
+					throw new Error('Deallocation Fail!');
+				})
+				.catch((e) => {
+					setDeallocationStudentConfirmation(false);
 					setName('');
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
@@ -270,6 +302,15 @@ const TutorList = () => {
 
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
+									onClick={() => {
+										setDeallocationStudentConfirmation(
+											true
+										);
+										setSelectedTutorId(
+											params.row.original.id
+										);
+										setName(params.row.original.name);
+									}}
 								>
 									<UserRoundX /> Deallocate Students
 								</DropdownMenuItem>
@@ -319,6 +360,13 @@ const TutorList = () => {
 			setName('');
 		}
 	}, [resetPasswordConfirmation]);
+
+	useEffect(() => {
+		if (!deallocationStudentConfirmation) {
+			setName('');
+			setSelectedTutorId(null);
+		}
+	}, [deallocationStudentConfirmation]);
 
 	return (
 		<>
@@ -372,6 +420,13 @@ const TutorList = () => {
 				isOpen={resetPasswordConfirmation}
 				setIsOpen={setResetPasswordConfirmation}
 				handleReset={() => handleResetPassword()}
+			/>
+
+			<DeallocationStudent
+				name={name}
+				isOpen={deallocationStudentConfirmation}
+				setIsOpen={setDeallocationStudentConfirmation}
+				handleReset={() => handleDeallocationStudents()}
 			/>
 
 			<DeleteDialog

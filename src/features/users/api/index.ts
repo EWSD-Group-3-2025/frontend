@@ -45,5 +45,8 @@ export const deleteUser = async (id: number) =>
 export const allocation = async (body: AllocateTutor) =>
 	await api.post(userRoutes.allocation, body);
 
+export const deallocationStudents = async (params: string = '') =>
+	await api.delete(userRoutes.deallocationStudents.concat(`?${params}`));
+
 export const resetPasswordByAdmin = async () =>
 	await api.post(userRoutes.resetPasswordByAdmin);
