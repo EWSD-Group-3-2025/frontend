@@ -37,9 +37,6 @@ const chartData = [
 	{ browser: 'Safari', value: 200 },
 	{ browser: 'Edge', value: 173 },
 	{ browser: 'Opera', value: 160 },
-	{ browser: 'Vivaldi', value: 130 },
-	{ browser: 'Samsung Internet', value: 190 },
-	{ browser: 'Yandex', value: 120 },
 	{ browser: 'Brave', value: 145 },
 	{ browser: 'Internet Explorer', value: 110 },
 	{ browser: 'Unknown', value: 90 },
@@ -70,21 +67,6 @@ const chartConfig: CustomConfig = {
 		label: 'Opera',
 		color: 'hsl(var(--opera))',
 		fill: 'hsl(var(--opera))',
-	},
-	vivaldi: {
-		label: 'Vivaldi',
-		color: 'hsl(var(--vivaldi))',
-		fill: 'hsl(var(--vivaldi))',
-	},
-	'samsung internet': {
-		label: 'Samsung Internet',
-		color: 'hsl(var(--samsung-internet))',
-		fill: 'hsl(var(--samsung-internet))',
-	},
-	yandex: {
-		label: 'Yandex',
-		color: 'hsl(var(--yandex))',
-		fill: 'hsl(var(--yandex))',
 	},
 	brave: {
 		label: 'Brave',
@@ -141,45 +123,24 @@ const AdminDashboard = () => {
 			<ContainerWrapper>
 				<Card className="flex flex-col">
 					<CardHeader className="items-center pb-0">
-						<CardTitle>Pie Chart - Label List</CardTitle>
+						<CardTitle>Pie Chart - Label</CardTitle>
 						<CardDescription>January - June 2024</CardDescription>
 					</CardHeader>
 					<CardContent className="flex-1 pb-0">
 						<ChartContainer
 							config={chartConfig}
-							className="mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"
+							className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
 						>
 							<PieChart>
 								<ChartTooltip
-									content={({
-										payload,
-									}: {
-										payload?: any[];
-									}) => {
-										if (!payload || payload.length === 0)
-											return null;
-										const data = payload[0].payload;
-										return (
-											<div className="rounded-md bg-white p-2 shadow-md dark:bg-gray-800">
-												<p className="font-semibold">
-													{data.browser}
-												</p>
-												<p>Visitors: {data.value}</p>
-											</div>
-										);
-									}}
+									content={<ChartTooltipContent hideLabel />}
 								/>
 								<Pie
 									data={formattedChartData}
 									dataKey="value"
+									label
 									nameKey="browser"
-								>
-									<LabelList
-										dataKey="browser"
-										position="inside"
-										className="fill-white text-xs"
-									/>
-								</Pie>
+								/>
 							</PieChart>
 						</ChartContainer>
 					</CardContent>
