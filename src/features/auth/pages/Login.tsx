@@ -22,11 +22,7 @@ import { useAuth } from '@/context/auth.context';
 import { cn, getRedirectRoute, setNewUserFlag } from '@/utils';
 
 const formSchema = z.object({
-	email: z
-		.string()
-		.trim()
-		.email({ message: 'Email required' })
-		.min(1, { message: 'Email required' }),
+	email: z.string().trim().nonempty('Email or username required'),
 	password: z.string().trim().min(1, { message: 'Password required' }),
 });
 
@@ -60,10 +56,11 @@ export default function LoginPage() {
 					);
 
 					if (response.data.data.user.firstTimeLogin) {
-						navigate('/change-password');
+						window.location.href = '/change-password';
+
 						setNewUserFlag();
 					} else {
-						navigate(redirectRoute);
+						window.location.href = redirectRoute;
 					}
 
 					toast.success(response.data.message);
@@ -104,7 +101,7 @@ export default function LoginPage() {
 								render={({ field }) => (
 									<FormItem className="mb-3">
 										<FormLabel htmlFor="email">
-											Email
+											Email or Username
 											<span className="ml-1 text-red-500">
 												*
 											</span>
@@ -115,8 +112,7 @@ export default function LoginPage() {
 													form.formState.isSubmitting
 												}
 												id="email"
-												type="email"
-												placeholder="name@work-email.com"
+												placeholder="Email or username"
 												{...field}
 											/>
 										</FormControl>

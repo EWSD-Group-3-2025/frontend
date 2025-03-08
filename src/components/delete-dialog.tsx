@@ -28,7 +28,7 @@ const DeleteDialog = ({
 				<div className="flex gap-3">
 					<CircleAlert className="mt-2 text-destructive" />
 					<DialogHeader>
-						<DialogTitle className="font-roboto-slab text-2xl">
+						<DialogTitle className="font-roboto-slab text-3xl">
 							{title}
 						</DialogTitle>
 						<DialogDescription className="">

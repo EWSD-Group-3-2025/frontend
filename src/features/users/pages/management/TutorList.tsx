@@ -4,16 +4,24 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	CircleUser,
 	Ellipsis,
+	RefreshCcw,
+	SquareAsterisk,
 	SquarePen,
 	Trash2,
 	UserPlus,
 	UserRoundCheck,
+	UserRoundX,
 } from 'lucide-react';
 
 import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers } from '@/features/users/api';
+import {
+	deallocationStudents,
+	deleteUser,
+	getAllUsers,
+	resetPasswordByAdmin,
+} from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
@@ -34,21 +42,35 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { USER_ROLE } from '@/constants';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import ExportButton from '@/components/export-button';
+import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
+import DeallocationStudent from '@/features/users/components/deallocation-student';
 
 const TutorList = () => {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { isOpen, setIsOpen } = useUserFormModal();
-	const { selectedId, name, setOpen, setSelectedId, setName } =
-		useDeleteModalStore();
+	const {
+		selectedId,
+		name: deletedName,
+		setOpen,
+		setSelectedId,
+		setName: setDeletedName,
+	} = useDeleteModalStore();
 
+	const [name, setName] = useState('');
 	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
+	const [
+		deallocationStudentConfirmation,
+		setDeallocationStudentConfirmation,
+	] = useState(false);
 	const [selectedTutorId, setSelectedTutorId] = useState<number | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
+		useState(false);
 
 	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-tutor'],
@@ -74,7 +96,7 @@ const TutorList = () => {
 							toast.success(response.data.message);
 							setOpen(false);
 							setSelectedId(null);
-							setName(null);
+							setDeletedName(null);
 
 							return response.data;
 						}
@@ -84,7 +106,7 @@ const TutorList = () => {
 					.catch((e) => {
 						setOpen(false);
 						setSelectedId(null);
-						setName(null);
+						setDeletedName(null);
 						toast.error(
 							e.response?.data?.data ?? 'Request Failed',
 							{
@@ -97,6 +119,58 @@ const TutorList = () => {
 					}),
 		}
 	);
+
+	const { mutateAsync: handleResetPassword } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await resetPasswordByAdmin()
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setResetPasswordConfirmation(false);
+						setName('');
+
+						return response.data;
+					}
+
+					throw new Error('Reset Password Fail!');
+				})
+				.catch((e) => {
+					setResetPasswordConfirmation(false);
+					setName('');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const { mutateAsync: handleDeallocationStudents } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await deallocationStudents(`tutorId=${selectedTutorId}`)
+				.then((response) => {
+					if (response.status === 204) {
+						toast.success(`${name}'s students are deallocated`);
+						setDeallocationStudentConfirmation(false);
+						setName('');
+
+						return response.data;
+					}
+
+					throw new Error('Deallocation Fail!');
+				})
+				.catch((e) => {
+					setDeallocationStudentConfirmation(false);
+					setName('');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
@@ -194,25 +268,62 @@ const TutorList = () => {
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56">
-							<DropdownMenuItem
-								disabled={!params.row.original.status}
-								onClick={() => {
-									setSelectedTutorId(params.row.original.id);
-									setIsOpenAllocationModal(true);
-								}}
-							>
-								<UserRoundCheck /> Assign Students
-							</DropdownMenuItem>
-							{user?.roleName === USER_ROLE.ADMIN && (
-								<>
-									<DropdownMenuGroup>
-										<DropdownMenuItem>
-											<CircleUser /> View Profile
-										</DropdownMenuItem>
-									</DropdownMenuGroup>
-									<DropdownMenuSeparator />
-								</>
-							)}
+							<DropdownMenuGroup>
+								{user?.roleName === USER_ROLE.ADMIN && (
+									<DropdownMenuItem>
+										<CircleUser /> View Profile
+									</DropdownMenuItem>
+								)}
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+									onClick={() => {
+										setResetPasswordConfirmation(true);
+										setName(params.row.original.name);
+									}}
+								>
+									<SquareAsterisk /> Reset Password
+								</DropdownMenuItem>
+
+								<DropdownMenuSeparator />
+							</DropdownMenuGroup>
+
+							<DropdownMenuGroup>
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+									onClick={() => {
+										setSelectedTutorId(
+											params.row.original.id
+										);
+										setIsOpenAllocationModal(true);
+									}}
+								>
+									<UserRoundCheck /> Assign Students
+								</DropdownMenuItem>
+
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+									onClick={() => {
+										setDeallocationStudentConfirmation(
+											true
+										);
+										setSelectedTutorId(
+											params.row.original.id
+										);
+										setName(params.row.original.name);
+									}}
+								>
+									<UserRoundX /> Deallocate Students
+								</DropdownMenuItem>
+
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+								>
+									<RefreshCcw /> Transfer Students
+								</DropdownMenuItem>
+
+								<DropdownMenuSeparator />
+							</DropdownMenuGroup>
+
 							<DropdownMenuGroup>
 								<DropdownMenuItem
 									onClick={() => {
@@ -227,7 +338,9 @@ const TutorList = () => {
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
 									onClick={() => {
-										setName(params.row.original.name);
+										setDeletedName(
+											params.row.original.name
+										);
 										setSelectedId(params.row.original.id);
 										setOpen(true);
 									}}
@@ -241,6 +354,19 @@ const TutorList = () => {
 			),
 		},
 	];
+
+	useEffect(() => {
+		if (!resetPasswordConfirmation) {
+			setName('');
+		}
+	}, [resetPasswordConfirmation]);
+
+	useEffect(() => {
+		if (!deallocationStudentConfirmation) {
+			setName('');
+			setSelectedTutorId(null);
+		}
+	}, [deallocationStudentConfirmation]);
 
 	return (
 		<>
@@ -289,9 +415,23 @@ const TutorList = () => {
 				setSelectedUserId={setSelectedUserId}
 			/>
 
+			<ResetPasswordConfirmationModal
+				name={name}
+				isOpen={resetPasswordConfirmation}
+				setIsOpen={setResetPasswordConfirmation}
+				handleReset={() => handleResetPassword()}
+			/>
+
+			<DeallocationStudent
+				name={name}
+				isOpen={deallocationStudentConfirmation}
+				setIsOpen={setDeallocationStudentConfirmation}
+				handleReset={() => handleDeallocationStudents()}
+			/>
+
 			<DeleteDialog
 				title="Delete User"
-				description={`Are you sure to delete ${name}`}
+				description={`Are you sure to delete ${deletedName}`}
 				handleDelete={handleMutationDelete}
 			/>
 

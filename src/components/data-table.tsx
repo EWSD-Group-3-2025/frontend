@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[];
 	isLoading?: boolean;
 	noDataText?: string;
+	className?: string;
 }
 
 const DataTable = <TData, TValue>({
@@ -36,6 +37,7 @@ const DataTable = <TData, TValue>({
 	data,
 	isLoading,
 	noDataText,
+	className,
 }: DataTableProps<TData, TValue>) => {
 	const {
 		search: globalFilter,
@@ -92,7 +94,7 @@ const DataTable = <TData, TValue>({
 		<div className="w-full">
 			<div className="overflow-hidden rounded-md border">
 				<Table
-					wrapperClassName="h-[calc(100vh-330px)]"
+					wrapperClassName={cn('h-[calc(100vh-330px)]', className)}
 					className={cn(isLoading && 'h-full')}
 				>
 					<TableHeader className="sticky top-0 bg-container-bg">
