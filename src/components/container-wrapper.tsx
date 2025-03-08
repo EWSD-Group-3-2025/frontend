@@ -1,8 +1,20 @@
+import { cn } from '@/utils';
 import { ReactNode } from 'react';
 
-const ContainerWrapper = ({ children }: { children: ReactNode }) => {
+const ContainerWrapper = ({
+	children,
+	className,
+}: {
+	children: ReactNode;
+	className?: string;
+}) => {
 	return (
-		<div className="h-[calc(100vh-160px)] rounded-md bg-container-bg p-7 shadow-wrapper">
+		<div
+			className={cn(
+				'h-[calc(100vh-160px)] rounded-md bg-container-bg p-7 shadow-wrapper',
+				className
+			)}
+		>
 			{children}
 		</div>
 	);

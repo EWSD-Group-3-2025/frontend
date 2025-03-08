@@ -1,5 +1,6 @@
-import { USER_ROLE } from '@/constants';
+import CONSTANTS, { USER_ROLE } from '@/constants';
 import { AuthUser } from '@/features/users/types';
+import Cookies from 'js-cookie';
 
 export const hasAccess = ({
 	user,
@@ -49,4 +50,16 @@ export function isAuthDashboardPath({
 
 	// Use the `test` method on the RegExp object
 	return regex.test(pathname);
+}
+
+export function isNewUser() {
+	return Number(Cookies.get(CONSTANTS.NEW_USER)) === 1;
+}
+
+export function setNewUserFlag() {
+	Cookies.set(CONSTANTS.NEW_USER, '1');
+}
+
+export function removeNewUserFlag() {
+	Cookies.remove(CONSTANTS.NEW_USER);
 }

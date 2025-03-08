@@ -12,7 +12,7 @@ import { AuthUser } from '@/features/users/types';
 import { getAuthAccount, logout as authLogout } from '@/features/auth/api';
 import { toast } from 'sonner';
 import { AxiosResponse } from 'axios';
-import { getBrowserName } from '@/utils';
+import { getBrowserName, getPageName } from '@/utils';
 import { useLocation } from 'react-router-dom';
 
 interface AuthContextProps {
@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const queryClient = useQueryClient();
 
 	const browser = getBrowserName();
+	const page = getPageName(location.pathname);
 
 	// Fetch the user details if a refresh token is present
 	const {
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		queryKey: ['authUser'],
 		queryFn: async () =>
 			await getAuthAccount(
-				`routeName=${location.pathname}&browserName=${browser}`
+				`routeName=${location.pathname}&browserName=${browser}&pageName=${page}`
 			),
 		retry: false,
 		enabled: location.pathname !== '/login', // Will not call getAuthAccount for /login page

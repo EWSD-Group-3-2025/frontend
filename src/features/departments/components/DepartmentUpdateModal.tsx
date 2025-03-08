@@ -13,10 +13,11 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import RequiredStar from '@/components/ui/required-star';
 import ResponsiveModal from '@/components/responsive-modal';
 import { updateDepartment } from '@/features/departments/api';
-import { Input } from '@/components/ui/input';
 
 type DepartmentCreateModalProp = {
 	open: boolean;
@@ -115,7 +116,9 @@ const DepartmentUpdateModal = ({
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
+									<FormLabel>
+										Name <RequiredStar />
+									</FormLabel>
 									<FormControl>
 										<Input
 											placeholder="Please enter Name"

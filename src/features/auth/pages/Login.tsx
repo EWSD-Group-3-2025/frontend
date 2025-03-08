@@ -1,14 +1,12 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/context/auth.context';
-import { useForm } from 'react-hook-form';
-import { login } from '@/features/auth/api';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
+
 import {
 	Form,
 	FormControl,
@@ -17,24 +15,23 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { cn } from '@/utils/stringUtils';
-import { getRedirectRoute } from '@/utils/auth';
+import { login } from '@/features/auth/api';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth.context';
+import { cn, getRedirectRoute, setNewUserFlag } from '@/utils';
 
 const formSchema = z.object({
-	email: z
-		.string()
-		.trim()
-		.email({ message: 'Email required' })
-		.min(1, { message: 'Email required' }),
+	email: z.string().trim().nonempty('Email or username required'),
 	password: z.string().trim().min(1, { message: 'Password required' }),
 });
 
 export default function LoginPage() {
-	const [showPassword, setShowPassword] = useState(false);
 	const auth = useAuth();
-
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	const [showPassword, setShowPassword] = useState(false);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -58,7 +55,14 @@ export default function LoginPage() {
 						response.data.data.user.roleName
 					);
 
-					window.location.href = redirectRoute;
+					if (response.data.data.user.firstTimeLogin) {
+						window.location.href = '/change-password';
+
+						setNewUserFlag();
+					} else {
+						window.location.href = redirectRoute;
+					}
+
 					toast.success(response.data.message);
 				}
 			})
@@ -97,7 +101,7 @@ export default function LoginPage() {
 								render={({ field }) => (
 									<FormItem className="mb-3">
 										<FormLabel htmlFor="email">
-											Email
+											Email or Username
 											<span className="ml-1 text-red-500">
 												*
 											</span>
@@ -108,8 +112,7 @@ export default function LoginPage() {
 													form.formState.isSubmitting
 												}
 												id="email"
-												type="email"
-												placeholder="name@work-email.com"
+												placeholder="Email or username"
 												{...field}
 											/>
 										</FormControl>

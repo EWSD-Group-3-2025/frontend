@@ -1,13 +1,36 @@
+import {
+	isNewUser,
+	hasAccess,
+	setNewUserFlag,
+	getAuthPathname,
+	getRedirectRoute,
+	removeNewUserFlag,
+	isAuthDashboardPath,
+} from '@/utils/auth';
+import {
+	cn,
+	buildURL,
+	convertNameToSlug,
+	getPageName,
+} from '@/utils/stringUtils';
 import api from '@/utils/axios';
-import { transformObjects, objectToArray } from '@/utils/dataUtils';
-import { cn, buildURL, convertNameToSlug } from '@/utils/stringUtils';
 import { getBrowserName } from '@/utils/getBrowserName';
+import { transformObjects, objectToArray } from '@/utils/dataUtils';
+
 export {
 	api,
 	cn,
 	buildURL,
+	hasAccess,
+	isNewUser,
+	getPageName,
 	objectToArray,
 	getBrowserName,
-	convertNameToSlug,
+	setNewUserFlag,
+	getAuthPathname,
 	transformObjects,
+	getRedirectRoute,
+	convertNameToSlug,
+	removeNewUserFlag,
+	isAuthDashboardPath,
 };

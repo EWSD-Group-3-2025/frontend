@@ -17,6 +17,7 @@ import ContainerWrapper from '@/components/container-wrapper';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import CourseCreateModal from '@/features/courses/components/CourseCreateModal';
 import CourseUpdateModal from '@/features/courses/components/CourseUpdateModal';
+import ExportButton from '@/components/export-button';
 
 const courseCreateSchema = z.object({
 	name: z.array(z.string()).nonempty('Please at least one item'),
@@ -149,9 +150,21 @@ const CourseList = () => {
 				</Button>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
+				<div className="mb-3 flex justify-between gap-5">
 					<SearchBox />
+					{data && data.data.length > 0 && !isLoading && (
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
+					)}
 				</div>
+
 				<DataTable
 					columns={courseListColumns}
 					isLoading={isLoading}

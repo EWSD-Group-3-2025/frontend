@@ -32,7 +32,7 @@ const SearchBox = ({ placeholder }: { placeholder?: string }) => {
 	return (
 		<div className="relative min-w-32 max-w-60">
 			<Input
-				className="w-full border-form-stroke pl-7 hover:border-form-stroke-hover"
+				className="w-full pl-7"
 				type="search"
 				placeholder={placeholder ?? 'Search . . .'}
 				onChange={(e) => debouncedSearchText(e.target.value)}

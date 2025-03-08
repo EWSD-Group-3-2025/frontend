@@ -8,12 +8,6 @@ export const getBrowserName = (): string => {
 		vendor.includes('opera')
 	) {
 		return 'Opera';
-	} else if (userAgent.includes('vivaldi')) {
-		return 'Vivaldi';
-	} else if (userAgent.includes('samsung')) {
-		return 'Samsung Internet';
-	} else if (userAgent.includes('yabrowser')) {
-		return 'Yandex';
 	} else if (userAgent.includes('edg')) {
 		return 'Edge';
 	} else if (userAgent.includes('brave')) {
@@ -27,6 +21,5 @@ export const getBrowserName = (): string => {
 	} else if (userAgent.includes('msie') || userAgent.includes('trident')) {
 		return 'Internet Explorer';
 	}
-
 	return 'Unknown';
 };

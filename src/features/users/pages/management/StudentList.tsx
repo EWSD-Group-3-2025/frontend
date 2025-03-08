@@ -4,17 +4,23 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	CircleUser,
 	Ellipsis,
+	SquareAsterisk,
 	SquarePen,
 	Trash2,
 	UserPlus,
 	UserRoundCheck,
+	UserRoundX,
 	Users,
 } from 'lucide-react';
 
 import { StudentUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
-import { deleteUser, getAllUsers } from '@/features/users/api';
+import {
+	deleteUser,
+	getAllUsers,
+	resetPasswordByAdmin,
+} from '@/features/users/api';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
@@ -35,22 +41,32 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { USER_ROLE } from '@/constants';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import dayjs from 'dayjs';
+import ExportButton from '@/components/export-button';
+import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 
 const StudentList = () => {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { isOpen, setIsOpen } = useUserFormModal();
-	const { selectedId, name, setOpen, setSelectedId, setName } =
-		useDeleteModalStore();
+	const {
+		selectedId,
+		name: deletedName,
+		setOpen,
+		setSelectedId,
+		setName: setDeletedName,
+	} = useDeleteModalStore();
 
+	const [name, setName] = useState('');
 	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [selectedStudent, setSelectedStudent] = useState<StudentUser | null>(
 		null
 	);
+	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
+		useState(false);
 
 	const { data, isLoading } = useQuery<HTTPResponse<StudentUser[]>>({
 		queryKey: ['get-all-users-student'],
@@ -76,7 +92,7 @@ const StudentList = () => {
 							toast.success(response.data.message);
 							setOpen(false);
 							setSelectedId(null);
-							setName(null);
+							setDeletedName(null);
 
 							return response.data;
 						}
@@ -86,7 +102,7 @@ const StudentList = () => {
 					.catch((e) => {
 						setOpen(false);
 						setSelectedId(null);
-						setName(null);
+						setDeletedName(null);
 						toast.error(
 							e.response?.data?.data ?? 'Request Failed',
 							{
@@ -99,6 +115,32 @@ const StudentList = () => {
 					}),
 		}
 	);
+
+	const { mutateAsync: handleResetPassword } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await resetPasswordByAdmin()
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setResetPasswordConfirmation(false);
+						setName('');
+
+						return response.data;
+					}
+
+					throw new Error('Reset Password Fail!');
+				})
+				.catch((e) => {
+					setResetPasswordConfirmation(false);
+					setName('');
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
@@ -217,6 +259,25 @@ const StudentList = () => {
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
+								{user?.roleName === USER_ROLE.ADMIN && (
+									<DropdownMenuItem>
+										<CircleUser /> View Profile
+									</DropdownMenuItem>
+								)}
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+									onClick={() => {
+										setResetPasswordConfirmation(true);
+										setName(params.row.original.name);
+									}}
+								>
+									<SquareAsterisk /> Reset Password
+								</DropdownMenuItem>
+
+								<DropdownMenuSeparator />
+							</DropdownMenuGroup>
+
+							<DropdownMenuGroup>
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
 									onClick={() => {
@@ -230,17 +291,16 @@ const StudentList = () => {
 										: 'Allocate'}{' '}
 									Tutor
 								</DropdownMenuItem>
+
+								<DropdownMenuItem
+									disabled={!params.row.original.status}
+								>
+									<UserRoundX /> Deallocate Tutor
+								</DropdownMenuItem>
+
+								<DropdownMenuSeparator />
 							</DropdownMenuGroup>
-							{user?.roleName === USER_ROLE.ADMIN && (
-								<>
-									<DropdownMenuGroup>
-										<DropdownMenuItem>
-											<CircleUser /> View Profile
-										</DropdownMenuItem>
-									</DropdownMenuGroup>
-									<DropdownMenuSeparator />
-								</>
-							)}
+
 							<DropdownMenuGroup>
 								<DropdownMenuItem
 									onClick={() => {
@@ -255,7 +315,9 @@ const StudentList = () => {
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
 									onClick={() => {
-										setName(params.row.original.name);
+										setDeletedName(
+											params.row.original.name
+										);
 										setSelectedId(params.row.original.id);
 										setOpen(true);
 									}}
@@ -269,6 +331,12 @@ const StudentList = () => {
 			),
 		},
 	];
+
+	useEffect(() => {
+		if (!resetPasswordConfirmation) {
+			setName('');
+		}
+	}, [resetPasswordConfirmation]);
 
 	return (
 		<>
@@ -292,11 +360,24 @@ const StudentList = () => {
 				</div>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex gap-5">
-					<SearchBox />
-					<div className="block min-w-32">
-						<AccountStatusDropDown />
+				<div className="mb-3 flex justify-between">
+					<div className="flex gap-5">
+						<SearchBox placeholder="Search admin" />
+						<div className="block min-w-32">
+							<AccountStatusDropDown />
+						</div>
 					</div>
+					{data && data.data.length > 0 && !isLoading && (
+						<ExportButton
+							data={
+								data.data as unknown as Record<
+									string,
+									unknown
+								>[]
+							}
+							fileName="admin_list"
+						/>
+					)}
 				</div>
 				<DataTable
 					columns={userListColumns}
@@ -314,9 +395,16 @@ const StudentList = () => {
 				setSelectedUserId={setSelectedUserId}
 			/>
 
+			<ResetPasswordConfirmationModal
+				name={name}
+				isOpen={resetPasswordConfirmation}
+				setIsOpen={setResetPasswordConfirmation}
+				handleReset={() => handleResetPassword()}
+			/>
+
 			<DeleteDialog
 				title="Delete User"
-				description={`Are you sure to delete ${name}`}
+				description={`Are you sure to delete ${deletedName}`}
 				handleDelete={handleMutationDelete}
 			/>
 

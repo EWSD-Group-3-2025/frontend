@@ -20,21 +20,22 @@ import {
 	updateUser,
 	usernameExistsCount,
 } from '@/features/users/api';
-import { convertNameToSlug } from '@/utils';
+import { convertNameToSlug, transformObjects } from '@/utils';
 import { CheckCircle2, Loader, XCircle } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
 import { getAllCourses } from '@/features/courses/api';
 import { getAllSpecializations } from '@/features/specialization/api';
-// import { GENDER } from '@/constants';
+import { GENDER } from '@/constants';
 import { ComboBox } from '@/components/ui/combo-box';
-// import {
-// 	Select,
-// 	SelectContent,
-// 	SelectItem,
-// 	SelectTrigger,
-// 	SelectValue,
-// } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
+import RequiredStar from '@/components/ui/required-star';
 
 type UserFormModalProp = {
 	isOpen: boolean;
@@ -57,7 +58,7 @@ const userFormSchema = z
 		username: z.string(),
 		email: z.string().nonempty('Email Required'),
 		roleId: z.number(),
-		gender: z.number().optional(),
+		gender: z.number(),
 		departmentId: z.number().nullable(),
 		specializationId: z.number().nullable(),
 		courseId: z.number().nullable(),
@@ -102,7 +103,7 @@ const UserFormModal = ({
 	setSelectedUserId,
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
-	// const transform = transformObjects({ GENDER });
+	const transform = transformObjects({ GENDER });
 	const [searchName, setSearchName] = useState('');
 	const [username, setUsername] = useState('');
 	const [isLoadingSearchName, setIsLoadingSearchName] = useState(false);
@@ -236,10 +237,7 @@ const UserFormModal = ({
 							(err: { field: string; message: string }) => {
 								form.setError(
 									err.field as keyof UserFormValue,
-									{
-										type: 'server',
-										message: err.message,
-									}
+									{ type: 'server', message: err.message }
 								);
 							}
 						);
@@ -296,10 +294,7 @@ const UserFormModal = ({
 							(err: { field: string; message: string }) => {
 								form.setError(
 									err.field as keyof UserFormValue,
-									{
-										type: 'server',
-										message: err.message,
-									}
+									{ type: 'server', message: err.message }
 								);
 							}
 						);
@@ -315,6 +310,12 @@ const UserFormModal = ({
 					}
 				}),
 	});
+
+	const handleNameBlur = () => {
+		const currentValue = form.getValues('name');
+		const formattedName = currentValue.trim().replace(/\s+/g, ' ');
+		form.setValue('name', formattedName);
+	};
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newName = e.target.value;
@@ -419,15 +420,16 @@ const UserFormModal = ({
 								name="name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Name </FormLabel>
+										<FormLabel>
+											Name <RequiredStar />
+										</FormLabel>
 										<FormControl>
 											<Input
 												placeholder="Please enter your name"
 												type="text"
 												{...field}
-												onChange={(e) => {
-													handleNameChange(e);
-												}}
+												onChange={handleNameChange}
+												onBlur={handleNameBlur}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -503,7 +505,9 @@ const UserFormModal = ({
 								name="email"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Email</FormLabel>
+										<FormLabel>
+											Email <RequiredStar />
+										</FormLabel>
 										<FormControl>
 											<Input
 												placeholder="Please enter your email"
@@ -517,12 +521,14 @@ const UserFormModal = ({
 								)}
 							/>
 
-							{/* <FormField
+							<FormField
 								control={form.control}
 								name="gender"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Gender</FormLabel>
+										<FormLabel>
+											Gender <RequiredStar />
+										</FormLabel>
 										<Select
 											onValueChange={(value) =>
 												field.onChange(Number(value))
@@ -550,7 +556,7 @@ const UserFormModal = ({
 										<FormMessage />
 									</FormItem>
 								)}
-							/> */}
+							/>
 
 							{(roleId === 1 || roleId === 2) && (
 								<FormField
@@ -558,7 +564,9 @@ const UserFormModal = ({
 									name="departmentId"
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
-											<FormLabel>Department</FormLabel>
+											<FormLabel>
+												Department <RequiredStar />
+											</FormLabel>
 											<FormControl>
 												<ComboBox
 													data={
@@ -597,7 +605,9 @@ const UserFormModal = ({
 									name="courseId"
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
-											<FormLabel>Course</FormLabel>
+											<FormLabel>
+												Course <RequiredStar />
+											</FormLabel>
 											<FormControl>
 												<ComboBox
 													data={
@@ -636,7 +646,7 @@ const UserFormModal = ({
 									render={({ field }) => (
 										<FormItem className="mt-1 flex flex-col space-y-3">
 											<FormLabel>
-												Specialization
+												Specialization <RequiredStar />
 											</FormLabel>
 											<FormControl>
 												<ComboBox

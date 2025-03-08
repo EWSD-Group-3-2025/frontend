@@ -32,6 +32,7 @@ export interface AuthUser {
 	courseName: string | null;
 	departmentId: number | null;
 	departmentName: string | null;
+	firstTimeLogin: boolean;
 	email: string;
 	id: number;
 	name: string;

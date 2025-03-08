@@ -62,6 +62,16 @@ body {
 		--sidebar-accent-foreground: 240 5.9% 10%;
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		--wrapper-bg: 0 0% 96%;
+		--warning: 48 100% 50%;
+		--chrome: 5 69% 57%;
+		--firefox: 19 100% 64%;
+		--safari: 207 89% 47%;
+		--edge: 210 100% 42%;
+		--opera: 350 83% 55%;
+		--brave: 19 97% 58%;
+		--internet-explorer: 194 78% 55%;
+		--unknown: 220 5% 60%;
 	}
 
 	.dark {
@@ -97,6 +107,16 @@ body {
 		--sidebar-accent-foreground: 240 4.8% 95.9%;
 		--sidebar-border: 240 3.7% 15.9%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		--wrapper-bg: 208 90% 8%;
+		--warning: 48 100% 50%;
+		--chrome: 5 80% 57%;
+		--firefox: 240 100% 75%;
+		--safari: 150 75% 60%;
+		--edge: 215 100% 65%;
+		--opera: 344 83% 68%;
+		--brave: 134 61% 60%;
+		--internet-explorer: 220 14% 65%;
+		--unknown: 0 0% 75%;
 	}
 }
 

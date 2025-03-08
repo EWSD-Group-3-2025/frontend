@@ -1,214 +1,226 @@
+import Cookies from 'js-cookie';
 import { createElement, ElementType } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { USER_ROLE } from '@/constants';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import CONSTANTS from '@/constants';
+import HomePage from '@/pages/HomePage';
 import NotFound from '@/pages/notFound/NotFound';
 import LoginPage from '@/features/auth/pages/Login';
 import EndUserLayout from '@/layouts/EndUserLayout';
 import ManagementLayout from '@/layouts/ManagementLayout';
 import StandaloneLayout from '@/layouts/StandaloneLayout';
 import VerifyOTPPage from '@/features/auth/pages/VerifyOTP';
+import CourseList from '@/features/courses/pages/CourseList';
 import AuthGuard from '@/features/auth/components/auth-guard';
-import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
-import AdminDashboard from '@/features/users/pages/admin/Dashboard';
-import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
-import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
-import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
-import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
-import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
-import StaffDashboard from '@/features/users/pages/staff/Dashboard';
+import RouteGuard from '@/features/auth/components/role-guard';
+import BlogPage from '@/features/users/pages/end-user/blog-page';
 import StaffList from '@/features/users/pages/management/StaffList';
-import StudentList from '@/features/users/pages/management/StudentList';
 import TutorList from '@/features/users/pages/management/TutorList';
 import AdminList from '@/features/users/pages/management/AdminList';
-import DepartmentList from '@/features/departments/pages/DepartmentList';
-import CourseList from '@/features/courses/pages/CourseList';
-import SpecializationList from '@/features/specialization/pages/SpecializationList';
-import HomePage from '@/pages/HomePage';
-import RouteGuard from '@/features/auth/components/role-guard';
-import { useAuth } from '@/context/auth.context';
+import ResetPasswordPage from '@/features/auth/pages/ResetPassword';
+import ChangePasswordPage from '@/features/auth/pages/ChangePassword';
 import ActivityLogs from '@/features/activity-logs/page/ActivityLogs';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPassword';
+import StudentList from '@/features/users/pages/management/StudentList';
+import DepartmentList from '@/features/departments/pages/DepartmentList';
 import MessagesPage from '@/features/users/pages/end-user/messages-page';
-import BlogPage from '@/features/users/pages/end-user/blog-page';
-import DocumentsPage from '@/features/users/pages/end-user/documents-page';
 import CalendarPage from '@/features/users/pages/end-user/calendar-page';
 import MeetingsPage from '@/features/users/pages/end-user/meetings-page';
-
-type ChildRoute = {
-	path: string;
-	element: ElementType;
-	role: string[];
-};
+import DocumentsPage from '@/features/users/pages/end-user/documents-page';
+import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
+import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
+import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
+import SpecializationList from '@/features/specialization/pages/SpecializationList';
+import ManagementDashboard from '@/features/users/pages/management/ManagementDashboard';
 
 type Route = {
-	name?: string;
+	name: string;
 	path: string;
 	element: ElementType;
-	children?: ChildRoute[];
 };
 
+const authRouteList: Route[] = [
+	{
+		name: 'Login',
+		path: '/login',
+		element: LoginPage,
+	},
+	{
+		name: 'Forgot Password',
+		path: '/forgot-password',
+		element: ForgotPasswordPage,
+	},
+	{
+		name: 'Verify OTP',
+		path: '/verify-otp',
+		element: VerifyOTPPage,
+	},
+	{
+		name: 'Reset Password',
+		path: '/reset-password',
+		element: ResetPasswordPage,
+	},
+	{
+		name: 'Reset Password Successful',
+		path: '/reset-password-successful',
+		element: ResetPasswordSuccessPage,
+	},
+];
+
+// endUserRoutes is for students and tutors
+const endUserRouteList: Route[] = [
+	{
+		name: 'End User Dashboard',
+		path: '/dashboard/end-user',
+		element: EndUserDashboard,
+	},
+	{
+		name: 'Messages',
+		path: '/dashboard/end-user/messages',
+		element: MessagesPage,
+	},
+	{
+		name: 'Meetings',
+		path: '/dashboard/end-user/meetings',
+		element: MeetingsPage,
+	},
+	{
+		name: 'Calendar',
+		path: '/dashboard/end-user/calendar',
+		element: CalendarPage,
+	},
+	{
+		name: 'Documents',
+		path: '/dashboard/end-user/documents',
+		element: DocumentsPage,
+	},
+	{
+		name: 'Blog',
+		path: '/dashboard/end-user/blog',
+		element: BlogPage,
+	},
+];
+
+const forgetPasswordRouteList: Route[] = [
+	{
+		name: 'Forgot Password',
+		path: '/forgot-password',
+		element: ForgotPasswordPage,
+	},
+	{
+		name: 'Verify OTP',
+		path: '/verify-otp',
+		element: VerifyOTPPage,
+	},
+	{
+		name: 'Reset Password',
+		path: '/reset-password',
+		element: ResetPasswordPage,
+	},
+	{
+		name: 'Reset Password Successful',
+		path: '/reset-password-successful',
+		element: ResetPasswordSuccessPage,
+	},
+	{
+		name: 'Change Password',
+		path: '/change-password',
+		element: ChangePasswordPage,
+	},
+];
+
+// adminRoutes is for admin and staff
+const adminRouteList: Route[] = [
+	{
+		name: 'Management Dashboard',
+		path: '/dashboard/management',
+		element: ManagementDashboard,
+	},
+	{
+		name: 'Departments',
+		path: '/dashboard/management/departments',
+		element: DepartmentList,
+	},
+	{
+		name: 'Courses',
+		path: '/dashboard/management/courses',
+		element: CourseList,
+	},
+	{
+		name: 'Specializations',
+		path: '/dashboard/management/specializations',
+		element: SpecializationList,
+	},
+	{
+		name: 'Student Dashboard',
+		path: '/dashboard/management/student/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Tutor Dashboard',
+		path: '/dashboard/management/tutor/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Staff Dashboard',
+		path: '/dashboard/management/staff/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Staff List',
+		path: '/dashboard/management/staffs',
+		element: StaffList,
+	},
+	{
+		name: 'Student List',
+		path: '/dashboard/management/students',
+		element: StudentList,
+	},
+	{
+		name: 'Tutor List',
+		path: '/dashboard/management/tutors',
+		element: TutorList,
+	},
+	{
+		name: 'Admin List',
+		path: '/dashboard/management/admins',
+		element: AdminList,
+	},
+	{
+		name: 'Analysis',
+		path: '/dashboard/management/analysis',
+		element: SpecializationList,
+	},
+	{
+		name: 'Reports',
+		path: '/dashboard/management/reports',
+		element: SpecializationList,
+	},
+	{
+		name: 'Activity Logs',
+		path: '/dashboard/management/activity-logs',
+		element: ActivityLogs,
+	},
+	{
+		name: 'Not Found',
+		path: '*',
+		element: NotFound,
+	},
+];
+
+export const appRouteList: Route[] = [
+	...authRouteList,
+	...endUserRouteList,
+	...forgetPasswordRouteList,
+	...adminRouteList,
+];
+
 const Router = () => {
-	const { user } = useAuth();
-	const authRouteList = [
-		{
-			path: '/login',
-			element: LoginPage,
-		},
-	];
+	const isLogin =
+		Cookies.get(CONSTANTS.ACCESS_TOKEN_KEY) &&
+		Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 
-	// endUserRoutes is for students and tutors
-	const endUserRouteList = [
-		{
-			path: '/dashboard/end-user',
-			element: EndUserDashboard,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			path: '/dashboard/end-user/messages',
-			element: MessagesPage,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			path: '/dashboard/end-user/meetings',
-			element: MeetingsPage,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			path: '/dashboard/end-user/calendar',
-			element: CalendarPage,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			path: '/dashboard/end-user/documents',
-			element: DocumentsPage,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			path: '/dashboard/end-user/blog',
-			element: BlogPage,
-			role: [USER_ROLE.STUDENT, USER_ROLE.TUTOR],
-		},
-		{
-			name: 'Not Found',
-			path: '*',
-			element: NotFound,
-		},
-	];
-
-	const forgetPasswordRouteList = [
-		{
-			path: '/forgot-password',
-			element: ForgotPasswordPage,
-			role: [USER_ROLE.STUDENT],
-		},
-		{
-			path: '/verify-otp',
-			element: VerifyOTPPage,
-			role: [USER_ROLE.STUDENT],
-		},
-		{
-			path: '/reset-password',
-			element: ResetPasswordPage,
-			role: [USER_ROLE.STUDENT],
-		},
-		{
-			path: '/reset-password-successful',
-			element: ResetPasswordSuccessPage,
-			role: [USER_ROLE.STUDENT],
-		},
-		{
-			path: '/change-password',
-			element: ChangePasswordPage,
-			role: [USER_ROLE.STUDENT],
-		},
-		{
-			name: 'Not Found',
-			path: '*',
-			element: NotFound,
-		},
-	];
-
-	const adminRouteList = [
-		{
-			path: '/dashboard/management',
-			element:
-				user?.roleName === USER_ROLE.ADMIN
-					? AdminDashboard
-					: StaffDashboard,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/departments',
-			element: DepartmentList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/courses',
-			element: CourseList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/specializations',
-			element: SpecializationList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/student/:username',
-			element: OtherUserDashboard,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/tutor/:username',
-			element: OtherUserDashboard,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/staff/:username',
-			element: OtherUserDashboard,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/staffs',
-			element: StaffList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/students',
-			element: StudentList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/tutors',
-			element: TutorList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/admins',
-			element: AdminList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/analysis',
-			element: SpecializationList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/reports',
-			element: SpecializationList,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			path: '/dashboard/management/activity-logs',
-			element: ActivityLogs,
-			role: [USER_ROLE.ADMIN],
-		},
-		{
-			name: 'Not Found',
-			path: '*',
-			element: NotFound,
-		},
-	];
-
-	return (
+	return isLogin ? (
 		<Routes>
 			{/* Forget Password Routes */}
 			<Route element={<StandaloneLayout />}>
@@ -216,7 +228,11 @@ const Router = () => {
 					<Route
 						key={i}
 						path={route.path}
-						element={createElement(route.element)}
+						element={
+							<AuthGuard>
+								{createElement(route.element)}
+							</AuthGuard>
+						}
 					></Route>
 				))}
 			</Route>
@@ -255,17 +271,6 @@ const Router = () => {
 				))}
 			</Route>
 
-			{/* Auth Routes */}
-			<Route element={<StandaloneLayout />}>
-				{authRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={createElement(route.element)}
-					/>
-				))}
-			</Route>
-
 			{/* When user hit to Home and Dashboard routes, it will redirect automatically redirect to their specific route based on their role */}
 			<Route
 				path="/"
@@ -283,6 +288,20 @@ const Router = () => {
 					</AuthGuard>
 				}
 			/>
+		</Routes>
+	) : (
+		<Routes>
+			{/* Auth Routes */}
+			<Route element={<StandaloneLayout />}>
+				{authRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={createElement(route.element)}
+					/>
+				))}
+			</Route>
+			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
 };
