@@ -5,7 +5,15 @@ export interface Blog {
 	title: string;
 	authorName: string;
 	content: string;
-	commentList: [];
+	commentList: Comment[];
 	createdAt: Date;
+	updatedAt: Date;
+}
+
+export interface Comment {
+	commentText: string;
+	commenterName: string;
+	createdAt: Date;
+	id: number;
 	updatedAt: Date;
 }

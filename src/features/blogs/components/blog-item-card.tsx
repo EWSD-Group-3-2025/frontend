@@ -9,7 +9,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Blog } from '@/features/blogs/types';
-import { MessageSquare, ThumbsUp } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import { useOpenBlogMutationDialogStore } from '../store/open-blog-mutation-dialog-store';
 import { format } from 'date-fns';
 import useConfirmDialog from '@/hooks/use-confirm-dialog';
@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteBlog } from '../api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import CommentsContainer from './comments-container';
 
 interface BlogItemCardProps {
 	blog: Blog;
@@ -92,33 +93,45 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 								{blog.authorName.charAt(0)}
 							</AvatarFallback>
 						</Avatar>
-						<div>
-							<CardTitle className="text-xl">
-								{blog.title}
-							</CardTitle>
-							<CardDescription>
-								<span>
-									{format(
-										new Date(blog.createdAt),
-										'do MMMM yyyy'
-									)}
-								</span>
-							</CardDescription>
+						<div className="flex w-full items-center justify-between gap-x-3">
+							<div>
+								<CardTitle className="text-xl">
+									{blog.title}
+								</CardTitle>
+								<CardDescription>
+									<span>
+										{format(
+											new Date(blog.createdAt),
+											'do MMMM yyyy'
+										)}
+									</span>
+								</CardDescription>
+							</div>
+							<div className="flex gap-2">
+								<Button
+									disabled={deleteBlogPending}
+									onClick={() => {
+										setIsOpen({ isOpen: true, blog });
+									}}
+									variant="outline"
+									size="sm"
+								>
+									Edit
+								</Button>
+								<Button
+									disabled={deleteBlogPending}
+									onClick={handleBlogDelete}
+									variant="destructive"
+									size="sm"
+								>
+									Delete
+								</Button>
+							</div>
 						</div>
 					</div>
 				</CardHeader>
 				<CardContent>
 					<p className="whitespace-pre-line">{blog.content}</p>
-					{/* <div className="mt-4 flex flex-wrap gap-2">
-                                        {blog.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div> */}
 				</CardContent>
 				<CardFooter className="flex justify-between border-t p-4">
 					<div className="flex items-center gap-4">
@@ -126,32 +139,10 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 							<ThumbsUp className="h-4 w-4" />
 							{/* <span>{blog.likes}</span> */}
 						</Button>
-						<Button variant="ghost" size="sm" className="gap-1">
-							<MessageSquare className="h-4 w-4" />
-							{/* <span>{blog.comments.length}</span> */}
-						</Button>
-					</div>
-					<div className="flex gap-2">
-						<Button
-							disabled={deleteBlogPending}
-							onClick={() => {
-								setIsOpen({ isOpen: true, blog });
-							}}
-							variant="outline"
-							size="sm"
-						>
-							Edit
-						</Button>
-						<Button
-							disabled={deleteBlogPending}
-							onClick={handleBlogDelete}
-							variant="destructive"
-							size="sm"
-						>
-							Delete
-						</Button>
 					</div>
 				</CardFooter>
+				{/* Comment Section */}
+				<CommentsContainer blog={blog} />
 			</Card>
 		</>
 	);
