@@ -1,7 +1,10 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen } from 'lucide-react';
+import { useOpenBlogMutationDialogStore } from '../store/open-blog-mutation-dialog-store';
 
 export default function BlogNotFoundCard() {
+	const { setIsOpen } = useOpenBlogMutationDialogStore();
 	return (
 		<Card>
 			<CardContent className="flex flex-col items-center justify-center p-6">
@@ -12,6 +15,14 @@ export default function BlogNotFoundCard() {
 				<p className="text-sm text-muted-foreground">
 					Create your first blog post to share your thoughts
 				</p>
+				<Button
+					onClick={() => {
+						setIsOpen({ isOpen: true, blog: null });
+					}}
+					className="mt-4"
+				>
+					Create New Blog
+				</Button>
 			</CardContent>
 		</Card>
 	);

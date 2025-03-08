@@ -21,10 +21,10 @@ import {
 import { Blog } from '@/features/blogs/types';
 import BlogItemCard from './blog-item-card';
 import BlogNotFoundCard from './blog-not-found-card';
+import { useOpenBlogMutationDialogStore } from '../store/open-blog-mutation-dialog-store';
 
 export function BlogView() {
-	const [blogPosts, setBlogPosts] = useState(initialBlogPosts);
-	const [dialogOpen, setDialogOpen] = useState(false);
+	const { setIsOpen } = useOpenBlogMutationDialogStore();
 	const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
 	const {
@@ -65,69 +65,78 @@ export function BlogView() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-				<h1 className="text-2xl font-bold tracking-tight">Blog</h1>
-				<BlogMutationDialog />
-			</div>
+		<>
+			<BlogMutationDialog />
+			<div className="flex flex-col gap-6">
+				<div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+					<h1 className="text-2xl font-bold tracking-tight">Blog</h1>
+					<Button
+						onClick={() => {
+							setIsOpen({ isOpen: true, blog: null });
+						}}
+					>
+						Create New Blog
+					</Button>
+				</div>
 
-			<Tabs defaultValue="all">
-				<TabsList className="mb-4">
-					<TabsTrigger value="all">All Blogs</TabsTrigger>
-					<TabsTrigger value="my">My Blogs</TabsTrigger>
-				</TabsList>
-				<TabsContent value="all" className="space-y-6">
-					{getAllBlogsForCurrentUser &&
-					getAllBlogsForCurrentUser?.data.length > 0 ? (
-						getAllBlogsForCurrentUser?.data.map((blog) => (
-							<BlogItemCard key={blog.id} blog={blog} />
-						))
-					) : (
-						<BlogNotFoundCard />
-					)}
-				</TabsContent>
-				<TabsContent value="my" className="space-y-6">
-					{getAllBlogsByCurrentUser &&
-					getAllBlogsByCurrentUser?.data.length > 0 ? (
-						getAllBlogsByCurrentUser?.data.map((blog) => (
-							<BlogItemCard key={blog.id} blog={blog} />
-						))
-					) : (
-						<BlogNotFoundCard />
-					)}
-				</TabsContent>
-			</Tabs>
+				<Tabs defaultValue="all">
+					<TabsList className="mb-4">
+						<TabsTrigger value="all">All Blogs</TabsTrigger>
+						<TabsTrigger value="my">My Blogs</TabsTrigger>
+					</TabsList>
+					<TabsContent value="all" className="space-y-6">
+						{getAllBlogsForCurrentUser &&
+						getAllBlogsForCurrentUser?.data.length > 0 ? (
+							getAllBlogsForCurrentUser?.data.map((blog) => (
+								<BlogItemCard key={blog.id} blog={blog} />
+							))
+						) : (
+							<BlogNotFoundCard />
+						)}
+					</TabsContent>
+					<TabsContent value="my" className="space-y-6">
+						{getAllBlogsByCurrentUser &&
+						getAllBlogsByCurrentUser?.data.length > 0 ? (
+							getAllBlogsByCurrentUser?.data.map((blog) => (
+								<BlogItemCard key={blog.id} blog={blog} />
+							))
+						) : (
+							<BlogNotFoundCard />
+						)}
+					</TabsContent>
+				</Tabs>
 
-			<Dialog
-				open={commentDialogOpen}
-				onOpenChange={setCommentDialogOpen}
-			>
-				<DialogContent>
-					<form onSubmit={handleAddComment}>
-						<DialogHeader>
-							<DialogTitle>Add Comment</DialogTitle>
-							<DialogDescription>
-								Add a comment to this blog post.
-							</DialogDescription>
-						</DialogHeader>
-						<div className="grid gap-4 py-4">
-							<div className="grid gap-2">
-								<Label htmlFor="comment">Comment</Label>
-								<Textarea
-									id="comment"
-									placeholder="Your thoughts or feedback"
-									className="resize-none"
-									rows={5}
-									required
-								/>
+				<Dialog
+					open={commentDialogOpen}
+					onOpenChange={setCommentDialogOpen}
+				>
+					<DialogContent>
+						<form onSubmit={handleAddComment}>
+							<DialogHeader>
+								<DialogTitle>Add Comment</DialogTitle>
+								<DialogDescription>
+									Add a comment to this blog post.
+								</DialogDescription>
+							</DialogHeader>
+							<div className="grid gap-4 py-4">
+								<div className="grid gap-2">
+									<Label htmlFor="comment">Comment</Label>
+									<Textarea
+										id="comment"
+										placeholder="Your thoughts or feedback"
+										className="resize-none"
+										rows={5}
+										required
+									/>
+								</div>
 							</div>
-						</div>
-						<DialogFooter>
-							<Button type="submit">Submit Comment</Button>
-						</DialogFooter>
-					</form>
-				</DialogContent>
-			</Dialog>
-		</div>
+							<DialogFooter>
+								<Button type="submit">Submit Comment</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
+			</div>
+		</>
 	);
 }

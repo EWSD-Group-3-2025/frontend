@@ -10,12 +10,16 @@ import {
 } from '@/components/ui/card';
 import { Blog } from '@/features/blogs/types';
 import { MessageSquare, ThumbsUp } from 'lucide-react';
+import { useOpenBlogMutationDialogStore } from '../store/open-blog-mutation-dialog-store';
+import { format } from 'date-fns';
 
 interface BlogItemCardProps {
 	blog: Blog;
 }
 
 export default function BlogItemCard({ blog }: BlogItemCardProps) {
+	const { setIsOpen } = useOpenBlogMutationDialogStore();
+
 	return (
 		<Card key={blog.id}>
 			<CardHeader>
@@ -28,7 +32,12 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 					<div>
 						<CardTitle className="text-xl">{blog.title}</CardTitle>
 						<CardDescription>
-							{new Date(blog.createdAt).toLocaleDateString()}
+							<span>
+								{format(
+									new Date(blog.createdAt),
+									'do MMMM yyyy'
+								)}
+							</span>
 						</CardDescription>
 					</div>
 				</div>
@@ -58,7 +67,13 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 					</Button>
 				</div>
 				<div className="flex gap-2">
-					<Button variant="outline" size="sm">
+					<Button
+						onClick={() => {
+							setIsOpen({ isOpen: true, blog });
+						}}
+						variant="outline"
+						size="sm"
+					>
 						Edit
 					</Button>
 					<Button variant="destructive" size="sm">
