@@ -19,7 +19,7 @@ import {
 	getBlogsForCurrentUser,
 } from '@/features/blogs/api';
 import { Blog } from '@/features/blogs/types';
-import BlogItemCard from './blog-item-card';
+import BlogItemCard, { BlogItemCardSkeleton } from './blog-item-card';
 import BlogNotFoundCard from './blog-not-found-card';
 import { useOpenBlogMutationDialogStore } from '../store/open-blog-mutation-dialog-store';
 
@@ -56,7 +56,6 @@ export function BlogView() {
 				throw new Error('Fetch Blogs for current user fail!');
 			}),
 	});
-	console.log(getAllBlogsForCurrentUser, getAllBlogsByCurrentUser);
 
 	const handleAddComment = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -87,9 +86,15 @@ export function BlogView() {
 					<TabsContent value="all" className="space-y-6">
 						{getAllBlogsForCurrentUser &&
 						getAllBlogsForCurrentUser?.data.length > 0 ? (
-							getAllBlogsForCurrentUser?.data.map((blog) => (
-								<BlogItemCard key={blog.id} blog={blog} />
-							))
+							isLoadingGetAllBlogsForCurrentUser ? (
+								[1, 2].map((i) => (
+									<BlogItemCardSkeleton key={i} />
+								))
+							) : (
+								getAllBlogsForCurrentUser?.data.map((blog) => (
+									<BlogItemCard key={blog.id} blog={blog} />
+								))
+							)
 						) : (
 							<BlogNotFoundCard />
 						)}
@@ -97,9 +102,15 @@ export function BlogView() {
 					<TabsContent value="my" className="space-y-6">
 						{getAllBlogsByCurrentUser &&
 						getAllBlogsByCurrentUser?.data.length > 0 ? (
-							getAllBlogsByCurrentUser?.data.map((blog) => (
-								<BlogItemCard key={blog.id} blog={blog} />
-							))
+							isLoadingGetAllBlogsByCurrentUser ? (
+								[1, 2].map((i) => (
+									<BlogItemCardSkeleton key={i} />
+								))
+							) : (
+								getAllBlogsByCurrentUser?.data.map((blog) => (
+									<BlogItemCard key={blog.id} blog={blog} />
+								))
+							)
 						) : (
 							<BlogNotFoundCard />
 						)}
