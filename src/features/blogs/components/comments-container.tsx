@@ -193,7 +193,7 @@ export default function CommentsContainer({ blog }: CommentsContainerProps) {
 					}}
 					className="flex-1"
 				/>
-				<Button disabled={isPending} type="submit">
+				<Button disabled={!newComment || isPending} type="submit">
 					Comment
 				</Button>
 			</form>

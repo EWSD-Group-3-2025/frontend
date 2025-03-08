@@ -6,6 +6,7 @@ export interface Blog {
 	authorName: string;
 	content: string;
 	commentList: Comment[];
+	reactList: Reaction[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -15,5 +16,15 @@ export interface Comment {
 	commenterName: string;
 	createdAt: Date;
 	id: number;
+	updatedAt: Date;
+}
+
+export interface Reaction {
+	react: string;
+	authorName: string;
+	createdAt: Date;
+	id: number;
+	entityId: number;
+	entityType: number;
 	updatedAt: Date;
 }

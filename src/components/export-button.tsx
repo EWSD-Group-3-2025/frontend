@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, CloudDownload } from 'lucide-react';
+import { toast } from 'sonner';
 
 type ExportButtonProps<T> = {
 	data: T[];
@@ -52,7 +53,7 @@ const ExportButton = <T extends Record<string, unknown>>({
 			});
 			saveAs(blob, `${fullFileName}.xlsx`);
 		} else {
-			console.log('Export Error!');
+			toast.error('Export Error!');
 		}
 	};
 
