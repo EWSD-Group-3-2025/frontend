@@ -1,0 +1,7 @@
+const blogRoutes = {
+	create: '/v1/blogs',
+	getBlogsForCurrentAuthUser: '/v1/blogs/mine?fetchFeed=true',
+	getBlogsByCurrentAuthUser: '/v1/blogs/mine?fetchFeed=false',
+};
+
+export default blogRoutes;
