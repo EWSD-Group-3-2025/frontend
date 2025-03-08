@@ -64,14 +64,14 @@ body {
 		--sidebar-ring: 217.2 91.2% 59.8%;
 		--wrapper-bg: 0 0% 96%;
 		--warning: 48 100% 50%;
-		--chrome: 214, 100%, 50%;
-		--firefox: 240, 100%, 50%;
-		--safari: 150, 75%, 45%;
-		--edge: 215, 100%, 40%;
-		--opera: 344, 83%, 48%;
-		--brave: 134, 61%, 41%;
-		--internet-explorer: 220, 14%, 45%;
-		--unknown: 0, 0%, 60%;
+		--chrome: 5 69% 57%;
+		--firefox: 19 100% 64%;
+		--safari: 207 89% 47%;
+		--edge: 210 100% 42%;
+		--opera: 350 83% 55%;
+		--brave: 19 97% 58%;
+		--internet-explorer: 194 78% 55%;
+		--unknown: 220 5% 60%;
 	}
 
 	.dark {
@@ -109,14 +109,14 @@ body {
 		--sidebar-ring: 217.2 91.2% 59.8%;
 		--wrapper-bg: 208 90% 8%;
 		--warning: 48 100% 50%;
-		--chrome: 214, 100%, 70%;
-		--firefox: 240, 100%, 75%;
-		--safari: 150, 75%, 60%;
-		--edge: 215, 100%, 65%;
-		--opera: 344, 83%, 68%;
-		--brave: 134, 61%, 60%;
-		--internet-explorer: 220, 14%, 65%;
-		--unknown: 0, 0%, 75%;
+		--chrome: 5 80% 57%;
+		--firefox: 240 100% 75%;
+		--safari: 150 75% 60%;
+		--edge: 215 100% 65%;
+		--opera: 344 83% 68%;
+		--brave: 134 61% 60%;
+		--internet-explorer: 220 14% 65%;
+		--unknown: 0 0% 75%;
 	}
 }
 

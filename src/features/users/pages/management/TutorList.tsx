@@ -151,7 +151,7 @@ const TutorList = () => {
 			await deallocationStudents(`tutorId=${selectedTutorId}`)
 				.then((response) => {
 					if (response.status === 204) {
-						toast.success(response.data.message);
+						toast.success(`${name}'s students are deallocated`);
 						setDeallocationStudentConfirmation(false);
 						setName('');
 

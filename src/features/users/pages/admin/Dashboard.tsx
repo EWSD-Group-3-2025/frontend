@@ -5,23 +5,32 @@ import {
 	User,
 	UserRoundCheck,
 	UsersRound,
-	TrendingUp,
 } from 'lucide-react';
-import { Label, LabelList, Pie, PieChart } from 'recharts';
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+	Bar,
+	BarChart,
+	CartesianGrid,
+	LabelList,
+	Pie,
+	PieChart,
+	XAxis,
+	YAxis,
+} from 'recharts';
 import {
 	ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
 } from '@/components/ui/chart';
+import { HeaderSorting } from '@/components/header-sorting';
+import { ColumnDef } from '@tanstack/react-table';
+import { StudentUser } from '@/features/users/types';
+import DataTable from '@/components/data-table';
+import { useQueries } from '@tanstack/react-query';
+import { getAllUsers } from '@/features/users/api';
+import AllocateTutor from '@/features/users/components/allocate-tutor';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface CustomConfig {
 	[key: string]: {
@@ -39,7 +48,7 @@ const chartData = [
 	{ browser: 'Opera', value: 160 },
 	{ browser: 'Brave', value: 145 },
 	{ browser: 'Internet Explorer', value: 110 },
-	{ browser: 'Unknown', value: 90 },
+	{ browser: 'Unknown', value: 110 },
 ];
 
 const chartConfig: CustomConfig = {
@@ -80,12 +89,33 @@ const chartConfig: CustomConfig = {
 	},
 	unknown: {
 		label: 'Unknown',
-		color: 'hsl(var(--chart-unknown))',
-		fill: 'hsl(var(--chart-unknown))',
+		color: 'hsl(var(--unknown))',
+		fill: 'hsl(var(--unknown))',
 	},
 };
 
+const barChartData = [
+	{ pageName: 'Admin List', count: 186 },
+	{ pageName: 'Student List', count: 305 },
+	{ pageName: 'Tutor List', count: 237 },
+	{ pageName: 'Chart Dashboard', count: 73 },
+	{ pageName: 'User Dashboard', count: 209 },
+	{ pageName: 'Log in', count: 214 },
+];
+
+const barChartConfig = {
+	count: {
+		label: 'Total User',
+		color: 'hsl(var(--chart-1))',
+	},
+} satisfies ChartConfig;
+
 const AdminDashboard = () => {
+	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
+	const [selectedStudent, setSelectedStudent] = useState<StudentUser | null>(
+		null
+	);
+
 	const formattedChartData = chartData.map((item) => {
 		const key = item.browser.toLowerCase();
 		return {
@@ -94,7 +124,122 @@ const AdminDashboard = () => {
 		};
 	});
 
-	console.log(formattedChartData);
+	const userListColumns: ColumnDef<StudentUser>[] = [
+		{
+			id: 'no',
+			header: 'No.',
+			cell: (params) => params.row.index + 1,
+		},
+		{
+			id: 'name',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Name" />
+			),
+			accessorKey: 'name',
+		},
+		{
+			id: 'username',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="UserName" />
+			),
+			accessorKey: 'username',
+		},
+		{
+			id: 'email',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Email" />
+			),
+			accessorKey: 'email',
+		},
+		{
+			id: 'course',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Course" />
+			),
+			accessorKey: 'courseName',
+		},
+		{
+			id: 'gender',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Gender" />
+			),
+			accessorKey: 'gender',
+			cell: (params) => (
+				<>
+					{params.row.original.gender === 1
+						? 'Male'
+						: params.row.original.gender === 2
+							? 'Female'
+							: 'Other'}
+				</>
+			),
+		},
+		{
+			id: 'action',
+			header: 'Action',
+			accessorKey: 'action',
+			cell: (params) => (
+				<Button
+					className="w-fit"
+					onClick={() => {
+						setSelectedStudent(params.row.original);
+						setIsOpenAllocationModal(true);
+					}}
+				>
+					<UserRoundCheck /> Allocate Tutor
+				</Button>
+			),
+		},
+	];
+
+	const [{ data, isLoading }] = useQueries({
+		queries: [
+			{
+				queryKey: ['get-all-users-unassign-student'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getAllUsers('role=student');
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<StudentUser[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+			{
+				queryKey: ['get-dashboard-data'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getAllUsers('role=student');
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<StudentUser[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+			{
+				queryKey: ['get-most-browser-usage'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getAllUsers('role=student');
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<StudentUser[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+			{
+				queryKey: ['get-most-pages-viewed'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getAllUsers('role=student');
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<StudentUser[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+		],
+	});
 
 	return (
 		<>
@@ -120,17 +265,13 @@ const AdminDashboard = () => {
 					icon={MessageSquareQuote}
 				/>
 			</div>
-			<ContainerWrapper>
-				<Card className="flex flex-col">
-					<CardHeader className="items-center pb-0">
-						<CardTitle>Pie Chart - Label</CardTitle>
-						<CardDescription>January - June 2024</CardDescription>
-					</CardHeader>
-					<CardContent className="flex-1 pb-0">
-						<ChartContainer
-							config={chartConfig}
-							className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-						>
+			<ContainerWrapper className="h-fit">
+				<div className="flex">
+					<div className="pie-chart flex-1">
+						<h2 className="mb-2 text-center font-roboto-slab text-2xl">
+							Most Browser Usage
+						</h2>
+						<ChartContainer config={chartConfig} className="h-full">
 							<PieChart>
 								<ChartTooltip
 									content={<ChartTooltipContent hideLabel />}
@@ -143,18 +284,79 @@ const AdminDashboard = () => {
 								/>
 							</PieChart>
 						</ChartContainer>
-					</CardContent>
-					<CardFooter className="flex-col gap-2 text-sm">
-						<div className="flex items-center gap-2 font-medium leading-none">
-							Trending up by 5.2% this month{' '}
-							<TrendingUp className="h-4 w-4" />
-						</div>
-						<div className="leading-none text-muted-foreground">
-							Showing total visitors for the last 6 months
-						</div>
-					</CardFooter>
-				</Card>
+					</div>
+					<div className="bar-chart flex-1">
+						<h2 className="mb-2 text-center font-roboto-slab text-2xl">
+							Top 5 Most User Viewed Pages
+						</h2>
+						<ChartContainer config={barChartConfig}>
+							<BarChart
+								accessibilityLayer
+								data={barChartData}
+								layout="vertical"
+								margin={{
+									right: 16,
+								}}
+							>
+								<CartesianGrid horizontal={false} />
+								<YAxis
+									dataKey="pageName"
+									type="category"
+									tickLine={false}
+									tickMargin={10}
+									axisLine={false}
+									tickFormatter={(value) => value.slice(0, 3)}
+									hide
+								/>
+								<XAxis dataKey="count" type="number" hide />
+								<ChartTooltip
+									cursor={false}
+									content={
+										<ChartTooltipContent indicator="line" />
+									}
+								/>
+								<Bar
+									dataKey="count"
+									layout="vertical"
+									fill="hsl(var(--chart-2))"
+									radius={4}
+								>
+									<LabelList
+										dataKey="pageName"
+										position="insideLeft"
+										offset={8}
+										className="fill-font-white"
+										fontSize={12}
+									/>
+									<LabelList
+										dataKey="count"
+										position="right"
+										offset={8}
+										className="fill-foreground"
+										fontSize={12}
+									/>
+								</Bar>
+							</BarChart>
+						</ChartContainer>
+					</div>
+				</div>
+
+				<div className="mt-10">
+					<DataTable
+						className="h-fit"
+						columns={userListColumns}
+						isLoading={isLoading}
+						data={data?.data ?? []}
+					/>
+				</div>
 			</ContainerWrapper>
+
+			<AllocateTutor
+				isOpen={isOpenAllocationModal}
+				setIsOpen={setIsOpenAllocationModal}
+				setSelectedStudent={setSelectedStudent}
+				selectedStudent={selectedStudent}
+			/>
 		</>
 	);
 };
