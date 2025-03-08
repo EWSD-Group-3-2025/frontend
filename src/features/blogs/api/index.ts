@@ -95,3 +95,20 @@ export const deleteComment = async ({ commentId }: { commentId: number }) => {
 		`${blogRoutes.getBlogCommentBaseUrl}/${commentId}`
 	);
 };
+
+export const createBlogReact = async ({
+	blogId,
+	react,
+}: {
+	blogId: number;
+	react: string;
+}) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.post<HTTPResponse>(blogRoutes.getBlogReactBaseUrl, {
+		react,
+		entityId: blogId,
+		entityType: 2, // For Blog
+	});
+};
