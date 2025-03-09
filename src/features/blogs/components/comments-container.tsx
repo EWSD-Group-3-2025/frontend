@@ -9,12 +9,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNewComment, deleteComment, updateComment } from '../api';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/context/auth.context';
 
 interface CommentsContainerProps {
 	blog: Blog;
 }
 
 export default function CommentsContainer({ blog }: CommentsContainerProps) {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const [newComment, setNewComment] = useState('');
 	const [editMode, setEditMode] = useState<number | null>(null);
@@ -257,27 +259,29 @@ export default function CommentsContainer({ blog }: CommentsContainerProps) {
 								</div>
 							</div>
 						)}
-						<div className="flex gap-2">
-							<Button
-								size="sm"
-								variant="ghost"
-								onClick={() => {
-									setEditMode(comment.id);
-									setEditCommentText(comment.commentText);
-								}}
-							>
-								<Edit className="h-4 w-4" />
-							</Button>
-							<Button
-								size="sm"
-								variant="destructive"
-								onClick={async () => {
-									await handleDeleteComment(comment.id);
-								}}
-							>
-								<Trash className="h-4 w-4" />
-							</Button>
-						</div>
+						{blog.authorId === user?.id && (
+							<div className="flex gap-2">
+								<Button
+									size="sm"
+									variant="ghost"
+									onClick={() => {
+										setEditMode(comment.id);
+										setEditCommentText(comment.commentText);
+									}}
+								>
+									<Edit className="h-4 w-4" />
+								</Button>
+								<Button
+									size="sm"
+									variant="destructive"
+									onClick={async () => {
+										await handleDeleteComment(comment.id);
+									}}
+								>
+									<Trash className="h-4 w-4" />
+								</Button>
+							</div>
+						)}
 					</div>
 				))}
 			</div>
