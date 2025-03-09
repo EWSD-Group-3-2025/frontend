@@ -16,7 +16,7 @@ jobs:
 
             # 2️⃣ Deploy to the server using SSH
             - name: Deploy to Production
-              uses: appleboy/ssh-action@v1
+              uses: appleboy/ssh-action@v1.2.1
               with:
                   host: ${{ secrets.PRODUCTION_HOST }}
                   username: ${{ secrets.PRODUCTION_USERNAME }}
