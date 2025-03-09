@@ -21,7 +21,7 @@ export default function useConfirmDialog(
 
 	const confirm = () =>
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		new Promise((resolve: (value: boolean) => void, reject) => {
+		new Promise((resolve: (value: boolean) => void, _reject) => {
 			setPromise({ resolve });
 		});
 

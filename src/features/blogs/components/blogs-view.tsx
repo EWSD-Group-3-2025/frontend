@@ -11,7 +11,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { blogPosts as initialBlogPosts } from '@/data';
 import BlogMutationDialog from './blog-mutation-dialog';
 import { useQuery } from '@tanstack/react-query';
 import {

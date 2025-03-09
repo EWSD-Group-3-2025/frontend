@@ -49,3 +49,66 @@ export const deleteBlog = async (blogId: number) => {
 
 	return await api.delete<HTTPResponse>(`${blogRoutes.create}/${blogId}`);
 };
+
+export const createNewComment = async ({
+	blogId,
+	commentText,
+}: {
+	blogId: number;
+	commentText: string;
+}) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.post<HTTPResponse>(blogRoutes.getBlogCommentBaseUrl, {
+		commentText,
+		blogId,
+	});
+};
+
+export const updateComment = async ({
+	commentId,
+	blogId,
+	commentText,
+}: {
+	commentId: number;
+	blogId: number;
+	commentText: string;
+}) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.patch<HTTPResponse>(
+		`${blogRoutes.getBlogCommentBaseUrl}/${commentId}`,
+		{
+			commentText,
+			blogId,
+		}
+	);
+};
+
+export const deleteComment = async ({ commentId }: { commentId: number }) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.delete<HTTPResponse>(
+		`${blogRoutes.getBlogCommentBaseUrl}/${commentId}`
+	);
+};
+
+export const createBlogReact = async ({
+	blogId,
+	react,
+}: {
+	blogId: number;
+	react: string | null;
+}) => {
+	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
+	if (!refreshToken) throw new Error('No refresh token found');
+
+	return await api.post<HTTPResponse>(blogRoutes.getBlogReactBaseUrl, {
+		react,
+		entityId: blogId,
+		entityType: 2, // For Blog
+	});
+};
