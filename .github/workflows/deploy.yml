@@ -1,0 +1,37 @@
+name: Deploy Frontend React App
+
+on:
+    push:
+        branches:
+            - develop # Runs only when pushing to 'develop' branch
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            # 1️⃣ Checkout the repository
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            # 2️⃣ Deploy to the server using SSH
+            - name: Deploy to Production
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ secrets.PRODUCTION_HOST }}
+                  username: ${{ secrets.PRODUCTION_USERNAME }}
+                  key: ${{ secrets.PRODUCTION_SSH_KEY }}
+                  script: |
+                      cd /path/to/your/project
+
+                      echo "🔄 Pulling latest changes from GitHub..."
+                      git checkout develop
+                      git pull origin develop
+
+                      echo "🐳 Rebuilding and restarting the Docker containers..."
+                      docker-compose -f docker/docker-compose.yml down
+                      docker-compose -f docker/docker-compose.yml build --no-cache
+                      docker-compose -f docker/docker-compose.yml up -d --remove-orphans
+
+                      echo "🧹 Cleaning up unused Docker images..."
+                      docker system prune -f

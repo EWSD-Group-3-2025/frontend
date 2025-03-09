@@ -1,0 +1,9 @@
+services:
+    ewsd_frontend_react_app:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        container_name: ewsd-frontend-react-app
+        restart: always
+        ports:
+            - '9999:9999'
