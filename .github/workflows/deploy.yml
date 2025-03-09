@@ -22,16 +22,16 @@ jobs:
                   username: ${{ secrets.PRODUCTION_USERNAME }}
                   key: ${{ secrets.PRODUCTION_SSH_KEY }}
                   script: |
-                      cd /path/to/your/project
+                      cd frontend/
 
                       echo "🔄 Pulling latest changes from GitHub..."
                       git checkout develop
                       git pull origin develop
 
                       echo "🐳 Rebuilding and restarting the Docker containers..."
-                      docker-compose -f docker/docker-compose.yml down
-                      docker-compose -f docker/docker-compose.yml build --no-cache
-                      docker-compose -f docker/docker-compose.yml up -d --remove-orphans
+                      docker compose -f docker/docker-compose.yml --down
+                      docker compose -f docker/docker-compose.yml build --no-cache
+                      docker compose -f docker/docker-compose.yml up -d --remove-orphans
 
                       echo "🧹 Cleaning up unused Docker images..."
                       docker system prune -f
