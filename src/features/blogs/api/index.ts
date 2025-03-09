@@ -101,7 +101,7 @@ export const createBlogReact = async ({
 	react,
 }: {
 	blogId: number;
-	react: string;
+	react: string | null;
 }) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');

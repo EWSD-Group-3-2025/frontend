@@ -19,12 +19,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import CommentsContainer from './comments-container';
 import EmojiPickerComponent from '@/components/emoji-picker-component';
 import { useMemo } from 'react';
+import { useAuth } from '@/context/auth.context';
 
 interface BlogItemCardProps {
 	blog: Blog;
 }
 
 export default function BlogItemCard({ blog }: BlogItemCardProps) {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const [DeleteConfirmDialog, deleteConfirm] = useConfirmDialog(
 		'Are you sure?',
@@ -89,7 +91,7 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 			react,
 		}: {
 			blogId: number;
-			react: string;
+			react: string | null;
 		}): Promise<HTTPResponse> =>
 			await createBlogReact({ blogId, react })
 				.then((response) => {
@@ -122,8 +124,21 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 	});
 
 	const handleCreateBlogReact = async (react: string) => {
-		if (blog && react !== '') {
-			await createBlogReactFn({ blogId: blog.id, react });
+		if (blog && react !== '' && user) {
+			let newReact: string | null = null;
+			const [currentUserReaction] = blog.reactList.filter(
+				(r) => r.authorId === user?.id && r.authorName === user?.name
+			);
+
+			if (currentUserReaction) {
+				if (currentUserReaction.react !== react) {
+					newReact = react;
+				}
+			} else {
+				newReact = react;
+			}
+
+			await createBlogReactFn({ blogId: blog.id, react: newReact });
 		}
 	};
 
@@ -162,26 +177,28 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 									</span>
 								</CardDescription>
 							</div>
-							<div className="flex gap-2">
-								<Button
-									disabled={deleteBlogPending}
-									onClick={() => {
-										setIsOpen({ isOpen: true, blog });
-									}}
-									variant="outline"
-									size="sm"
-								>
-									Edit
-								</Button>
-								<Button
-									disabled={deleteBlogPending}
-									onClick={handleBlogDelete}
-									variant="destructive"
-									size="sm"
-								>
-									Delete
-								</Button>
-							</div>
+							{blog.authorId === user?.id && (
+								<div className="flex gap-2">
+									<Button
+										disabled={deleteBlogPending}
+										onClick={() => {
+											setIsOpen({ isOpen: true, blog });
+										}}
+										variant="outline"
+										size="sm"
+									>
+										Edit
+									</Button>
+									<Button
+										disabled={deleteBlogPending}
+										onClick={handleBlogDelete}
+										variant="destructive"
+										size="sm"
+									>
+										Delete
+									</Button>
+								</div>
+							)}
 						</div>
 					</div>
 				</CardHeader>
