@@ -166,16 +166,6 @@ const adminRouteList: Route[] = [
 		element: AdminList,
 	},
 	{
-		name: 'Analysis',
-		path: '/dashboard/management/analysis',
-		element: SpecializationList,
-	},
-	{
-		name: 'Reports',
-		path: '/dashboard/management/reports',
-		element: SpecializationList,
-	},
-	{
 		name: 'Activity Logs',
 		path: '/dashboard/management/activity-logs',
 		element: ActivityLogs,

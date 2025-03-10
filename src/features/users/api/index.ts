@@ -62,7 +62,7 @@ export const getAdminDashboard = async () =>
 	await api.get<HTTPResponse<AdminDashboard>>(userRoutes.adminDashboard);
 
 export const getStudentDashboard = async (id: number) =>
-	await api.get<HTTPResponse<TutorUser>>(
+	await api.get<HTTPResponse<TutorUser | null>>(
 		buildURL(userRoutes.studentDashboard, { id })
 	);
 
@@ -78,4 +78,4 @@ export const getMostViewedPages = async () =>
 	await api.get(userRoutes.mostViewedPages);
 
 export const getUnassignStudentList = async () =>
-	await api.get<HTTPResponse<StudentUser[]>>(userRoutes.unassignStudent);
+	await api.get<StudentUser[]>(userRoutes.unassignStudent);

@@ -34,9 +34,9 @@ export function StudentDashboard() {
 
 	console.log(id, 'mmmmmmmmmm');
 
-	const { data, isLoading } = useQuery<HTTPResponse<TutorUser>>({
+	const { data, isLoading } = useQuery<HTTPResponse<TutorUser | null>>({
 		queryKey: ['student-dashboard'],
-		queryFn: async (): Promise<HTTPResponse<TutorUser>> =>
+		queryFn: async (): Promise<HTTPResponse<TutorUser | null>> =>
 			await getStudentDashboard(id ? Number(id) : (user?.id ?? 0)).then(
 				(response) => {
 					if (response.data.code === 200) {
@@ -54,7 +54,9 @@ export function StudentDashboard() {
 				<CardHeader>
 					<CardTitle>My Personal Tutor</CardTitle>
 					<CardDescription>
-						Your assigned personal tutor
+						{data?.data
+							? 'Your assigned personal tutor'
+							: "You currently doesn't have tutor"}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -71,33 +73,45 @@ export function StudentDashboard() {
 						) : (
 							<Avatar className="h-12 w-12">
 								<AvatarImage
-									src={data?.data.name}
-									alt={data?.data.name}
+									src={data?.data?.name ?? 'A'}
+									alt={data?.data?.name ?? 'A'}
 								/>
 								<AvatarFallback>
-									{data?.data.name?.charAt(0)}
+									{data?.data?.name?.charAt(0) ?? 'N/A'}
 								</AvatarFallback>
 							</Avatar>
 						)}
 						{!isLoading && (
 							<div>
-								<p className="font-medium">{data?.data.name}</p>
-								<p className="text-sm text-muted-foreground">
-									{data?.data.specializationName}
+								<p className="font-medium">
+									{data?.data?.name ?? 'N/A'}
 								</p>
 								<p className="text-sm text-muted-foreground">
-									{data?.data.email}
+									{data?.data?.specializationName ?? 'N/A'}
+								</p>
+								<p className="text-sm text-muted-foreground">
+									{data?.data?.email ?? 'N/A'}
 								</p>
 							</div>
 						)}
 					</div>
 
 					<div className="mt-4 flex gap-2">
-						<Button size="sm" variant="outline" className="w-full">
+						<Button
+							size="sm"
+							variant="outline"
+							className="w-full"
+							disabled={!data?.data}
+						>
 							<MessageSquare className="mr-2 h-4 w-4" />
 							Message
 						</Button>
-						<Button size="sm" variant="outline" className="w-full">
+						<Button
+							size="sm"
+							variant="outline"
+							className="w-full"
+							disabled={!data?.data}
+						>
 							<Calendar className="mr-2 h-4 w-4" />
 							Schedule Meeting
 						</Button>

@@ -1,14 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-import {
-	Cog,
-	FileChartColumnIncreasing,
-	LayoutDashboard,
-	Logs,
-	Newspaper,
-	UsersRound,
-} from 'lucide-react';
+import { Cog, LayoutDashboard, Logs, UsersRound } from 'lucide-react';
 
 import {
 	Sidebar,
@@ -28,18 +21,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			title: 'Dashboard',
 			url: '/dashboard/management',
 			icon: LayoutDashboard,
-			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-		},
-		{
-			title: 'Analysis',
-			url: '/dashboard/management/analysis',
-			icon: FileChartColumnIncreasing,
-			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
-		},
-		{
-			title: 'Report',
-			url: '/dashboard/management/reports',
-			icon: Newspaper,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
 		{

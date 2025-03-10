@@ -9,7 +9,6 @@ import {
 import {
 	Bar,
 	BarChart,
-	CartesianGrid,
 	LabelList,
 	Pie,
 	PieChart,
@@ -184,15 +183,10 @@ const AdminDashboard = () => {
 				queryKey: ['get-all-users-unassign-student'],
 				queryFn: async (): Promise<StudentUser[]> => {
 					const response = await getUnassignStudentList();
-					if (response.data.code === 200) {
-						const filterData = (
-							response.data.data as StudentUser[]
-						).filter(
-							(student: StudentUser) =>
-								student.allocateTutorId === null &&
-								student.status
-						);
-						return filterData as StudentUser[];
+
+					if (response.status === 200) {
+						console.log('AAA');
+						return response.data as StudentUser[];
 					}
 
 					throw new Error('Fetch Student Listing Fail!');
@@ -243,7 +237,6 @@ const AdminDashboard = () => {
 			},
 		],
 	});
-
 	return (
 		<>
 			<div className="mb-3 flex flex-col flex-wrap gap-3 md:flex-row">
@@ -317,43 +310,30 @@ const AdminDashboard = () => {
 								data={barChartData?.data}
 								layout="vertical"
 								margin={{
-									right: 16,
+									left: 100,
 								}}
 							>
-								<CartesianGrid horizontal={false} />
+								<XAxis
+									type="number"
+									dataKey="visitCount"
+									hide
+								/>
 								<YAxis
 									dataKey="routeName"
 									type="category"
 									tickLine={false}
 									tickMargin={10}
 									axisLine={false}
-									tickFormatter={(value) => value.slice(0, 3)}
-									hide
-								/>
-								<XAxis
-									dataKey="visitCount"
-									type="number"
-									hide
 								/>
 								<ChartTooltip
 									cursor={false}
-									content={
-										<ChartTooltipContent indicator="line" />
-									}
+									content={<ChartTooltipContent hideLabel />}
 								/>
 								<Bar
 									dataKey="visitCount"
-									layout="vertical"
 									fill="hsl(var(--chart-2))"
-									radius={4}
+									radius={5}
 								>
-									<LabelList
-										dataKey="routeName"
-										position="insideLeft"
-										offset={8}
-										className="fill-font-white"
-										fontSize={12}
-									/>
 									<LabelList
 										dataKey="visitCount"
 										position="right"
