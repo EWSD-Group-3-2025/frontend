@@ -3,9 +3,11 @@ import { useAuth } from '@/context/auth.context';
 import { Loader2 } from 'lucide-react';
 import TutorDashboard from './tutor-dashboard';
 import { StudentDashboard } from './student-dashboard';
+import { useLocation } from 'react-router-dom';
 
 export default function EndUserDashboard() {
 	const { user, loading } = useAuth();
+	const location = useLocation();
 
 	if (loading) {
 		return (
@@ -15,9 +17,17 @@ export default function EndUserDashboard() {
 		);
 	}
 
-	if (user?.roleName === USER_ROLE.TUTOR) {
+	if (
+		user?.roleName === USER_ROLE.TUTOR ||
+		(user?.roleName === USER_ROLE.ADMIN &&
+			location.pathname.includes('/dashboard/management/tutor'))
+	) {
 		return <TutorDashboard />;
-	} else if (user?.roleName === USER_ROLE.STUDENT) {
+	} else if (
+		user?.roleName === USER_ROLE.STUDENT ||
+		(user?.roleName === USER_ROLE.ADMIN &&
+			location.pathname.includes('/dashboard/management/student'))
+	) {
 		return <StudentDashboard />;
 	} else {
 		return null;

@@ -25,11 +25,10 @@ import MessagesPage from '@/features/users/pages/end-user/messages-page';
 import CalendarPage from '@/features/users/pages/end-user/calendar-page';
 import MeetingsPage from '@/features/users/pages/end-user/meetings-page';
 import DocumentsPage from '@/features/users/pages/end-user/documents-page';
-import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard';
 import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
-import AdminDashboard from '@/features/users/pages/admin/Dashboard';
+import AdminDashboard from '@/features/users/pages/management/Dashboard';
 
 export type Route = {
 	name: string;
@@ -133,18 +132,18 @@ const adminRouteList: Route[] = [
 	},
 	{
 		name: 'Student Dashboard',
-		path: '/dashboard/management/student/:username',
-		element: OtherUserDashboard,
+		path: '/dashboard/management/student/:id',
+		element: EndUserDashboard,
 	},
 	{
 		name: 'Tutor Dashboard',
-		path: '/dashboard/management/tutor/:username',
-		element: OtherUserDashboard,
+		path: '/dashboard/management/tutor/:id',
+		element: EndUserDashboard,
 	},
 	{
 		name: 'Staff Dashboard',
-		path: '/dashboard/management/staff/:username',
-		element: OtherUserDashboard,
+		path: '/dashboard/management/staff/:id',
+		element: AdminDashboard,
 	},
 	{
 		name: 'Staff List',

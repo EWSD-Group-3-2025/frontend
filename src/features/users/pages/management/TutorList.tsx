@@ -48,9 +48,11 @@ import AllocateTutor from '@/features/users/components/allocate-tutor';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 import DeallocationStudent from '@/features/users/components/deallocation-student';
+import { useNavigate } from 'react-router-dom';
 
 const TutorList = () => {
 	const { user } = useAuth();
+	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { isOpen, setIsOpen } = useUserFormModal();
 	const {
@@ -270,7 +272,13 @@ const TutorList = () => {
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
 								{user?.roleName === USER_ROLE.ADMIN && (
-									<DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											navigate(
+												`/dashboard/management/tutor/${params.row.original.id}`
+											)
+										}
+									>
 										<CircleUser /> View Profile
 									</DropdownMenuItem>
 								)}

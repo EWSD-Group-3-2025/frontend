@@ -42,10 +42,12 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
+import { useNavigate } from 'react-router-dom';
 
 const StaffList = () => {
 	const queryClient = useQueryClient();
 	const { user } = useAuth();
+	const navigate = useNavigate();
 	const { isOpen, setIsOpen } = useUserFormModal();
 	const {
 		selectedId,
@@ -232,7 +234,13 @@ const StaffList = () => {
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
 								{user?.roleName === USER_ROLE.ADMIN && (
-									<DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											navigate(
+												`/dashboard/management/staff/${params.row.original.id}`
+											)
+										}
+									>
 										<CircleUser /> View Profile
 									</DropdownMenuItem>
 								)}

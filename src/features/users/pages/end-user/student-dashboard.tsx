@@ -8,19 +8,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar, MessageSquare, FileText, Clock } from 'lucide-react';
-import { tutors, messages, meetings, documents } from '@/data';
+import { messages, meetings, documents } from '@/data';
 import { getStudentDashboard } from '@/features/users/api';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/auth.context';
 import { TutorUser } from '@/features/users/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useParams } from 'react-router-dom';
 
 export function StudentDashboard() {
 	const { user } = useAuth();
-
-	// Get assigned tutor
-	const myTutor = tutors[0];
-
+	const { id } = useParams();
 	// Get recent messages
 	const recentMessages = messages.slice(0, 3);
 
@@ -34,16 +32,20 @@ export function StudentDashboard() {
 	// Get recent documents
 	const recentDocuments = documents.slice(0, 3);
 
+	console.log(id, 'mmmmmmmmmm');
+
 	const { data, isLoading } = useQuery<HTTPResponse<TutorUser>>({
 		queryKey: ['student-dashboard'],
 		queryFn: async (): Promise<HTTPResponse<TutorUser>> =>
-			await getStudentDashboard(user?.id ?? 0).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
+			await getStudentDashboard(id ? Number(id) : (user?.id ?? 0)).then(
+				(response) => {
+					if (response.data.code === 200) {
+						return response.data;
+					}
 
-				throw new Error('Fetch Admin Listing Fail!');
-			}),
+					throw new Error('Fetch Admin Listing Fail!');
+				}
+			),
 	});
 
 	return (

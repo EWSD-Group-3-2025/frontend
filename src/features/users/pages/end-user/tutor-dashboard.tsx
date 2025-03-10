@@ -26,9 +26,11 @@ import { students, messages, meetings } from '@/data';
 import { getTutorDashboard } from '@/features/users/api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useParams } from 'react-router-dom';
 
 export default function TutorDashboard() {
 	const { user } = useAuth();
+	const { id } = useParams();
 	const [searchQuery, setSearchQuery] = useState('');
 
 	// TODO Use recent messages
@@ -48,13 +50,15 @@ export default function TutorDashboard() {
 	const { data, isLoading } = useQuery<HTTPResponse<StudentUser[]>>({
 		queryKey: ['tutor-dashboard'],
 		queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
-			await getTutorDashboard(user?.id ?? 0).then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
+			await getTutorDashboard(id ? Number(id) : (user?.id ?? 0)).then(
+				(response) => {
+					if (response.data.code === 200) {
+						return response.data;
+					}
 
-				throw new Error('Fetch Tutor Dashboard Fail!');
-			}),
+					throw new Error('Fetch Tutor Dashboard Fail!');
+				}
+			),
 	});
 
 	return (

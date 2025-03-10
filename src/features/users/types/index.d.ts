@@ -1,4 +1,4 @@
-import { AdminDashboard } from '@/features/users/pages/admin/Dashboard';
+import { AdminDashboard } from '@/features/users/pages/management/Dashboard';
 import { USER_ROLE } from '@/constants';
 
 export interface User {

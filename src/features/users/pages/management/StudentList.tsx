@@ -46,9 +46,11 @@ import AllocateTutor from '@/features/users/components/allocate-tutor';
 import dayjs from 'dayjs';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
+import { useNavigate } from 'react-router-dom';
 
 const StudentList = () => {
 	const { user } = useAuth();
+	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { isOpen, setIsOpen } = useUserFormModal();
 	const {
@@ -260,7 +262,13 @@ const StudentList = () => {
 						<DropdownMenuContent className="w-56">
 							<DropdownMenuGroup>
 								{user?.roleName === USER_ROLE.ADMIN && (
-									<DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											navigate(
+												`/dashboard/management/student/${params.row.original.id}`
+											)
+										}
+									>
 										<CircleUser /> View Profile
 									</DropdownMenuItem>
 								)}
