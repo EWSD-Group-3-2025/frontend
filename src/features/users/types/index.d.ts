@@ -1,3 +1,4 @@
+import { AdminDashboard } from '@/features/users/pages/admin/Dashboard';
 import { USER_ROLE } from '@/constants';
 
 export interface User {
@@ -47,4 +48,16 @@ export interface AuthUser {
 export interface ChangePasswordRequest {
 	oldPassword: string;
 	newPassword: string;
+}
+
+export interface AdminDashboard {
+	totalUsers: number;
+	assignedStudents: number;
+	activeTutors: number;
+	totalMessages: number;
+}
+
+export interface MostBrowserUsagePieChart {
+	browserName: string;
+	uniqueUserCount: number;
 }

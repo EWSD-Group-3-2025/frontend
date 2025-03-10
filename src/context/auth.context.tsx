@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const browser = getBrowserName();
 	const page = getPageName(location.pathname);
 
-	// Fetch the user details if a refresh token is present
 	const {
 		isLoading,
 		data: userResponse,

@@ -1,4 +1,4 @@
-import { appRouteList } from '@/router';
+import { appRouteList, Route } from '@/router';
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
 
@@ -6,8 +6,19 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const getPageName = (pathname: string) => {
-	return appRouteList.find((route) => route.path === pathname)?.name;
+export const getPageName = (pathname: string): string | undefined => {
+	const findRoute = (routes: Route[], path: string): string | undefined => {
+		for (const route of routes) {
+			if (route.path === path) return route.name;
+			if (route.children) {
+				const found = findRoute(route.children, path);
+				if (found) return found;
+			}
+		}
+		return undefined;
+	};
+
+	return findRoute(appRouteList, pathname);
 };
 
 export function convertNameToSlug(name: string): string {

@@ -24,10 +24,19 @@ import {
 } from '@/components/ui/chart';
 import { HeaderSorting } from '@/components/header-sorting';
 import { ColumnDef } from '@tanstack/react-table';
-import { StudentUser } from '@/features/users/types';
+import {
+	AdminDashboard as AdminDashboardDataType,
+	MostBrowserUsagePieChart,
+	StudentUser,
+} from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import { useQueries } from '@tanstack/react-query';
-import { getAllUsers } from '@/features/users/api';
+import {
+	getAdminDashboard,
+	getAllUsers,
+	getBrowserCount,
+	getMostViewedPages,
+} from '@/features/users/api';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -39,17 +48,6 @@ interface CustomConfig {
 		fill?: string;
 	};
 }
-
-const chartData = [
-	{ browser: 'Chrome', value: 275 },
-	{ browser: 'Firefox', value: 287 },
-	{ browser: 'Safari', value: 200 },
-	{ browser: 'Edge', value: 173 },
-	{ browser: 'Opera', value: 160 },
-	{ browser: 'Brave', value: 145 },
-	{ browser: 'Internet Explorer', value: 110 },
-	{ browser: 'Unknown', value: 110 },
-];
 
 const chartConfig: CustomConfig = {
 	chrome: {
@@ -115,14 +113,6 @@ const AdminDashboard = () => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentUser | null>(
 		null
 	);
-
-	const formattedChartData = chartData.map((item) => {
-		const key = item.browser.toLowerCase();
-		return {
-			...item,
-			fill: chartConfig[key]?.fill ?? 'hsl(var(--chart-unknown))',
-		};
-	});
 
 	const userListColumns: ColumnDef<StudentUser>[] = [
 		{
@@ -192,25 +182,38 @@ const AdminDashboard = () => {
 		},
 	];
 
-	const [{ data, isLoading }] = useQueries({
+	const [
+		{ data: unassignStudentData, isLoading: unassignStudentLoading },
+		{ data: adminDashboardData, isLoading: adminDashboardLoading },
+		{ data: mostBrowserUsageData },
+	] = useQueries({
 		queries: [
 			{
 				queryKey: ['get-all-users-unassign-student'],
-				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+				queryFn: async (): Promise<StudentUser[]> => {
 					const response = await getAllUsers('role=student');
 					if (response.data.code === 200) {
-						return response.data as HTTPResponse<StudentUser[]>;
+						const filterData = (
+							response.data.data as StudentUser[]
+						).filter(
+							(student: StudentUser) =>
+								student.allocateTutorId === null &&
+								student.status
+						);
+						return filterData as StudentUser[];
 					}
 
 					throw new Error('Fetch Student Listing Fail!');
 				},
 			},
 			{
-				queryKey: ['get-dashboard-data'],
-				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
-					const response = await getAllUsers('role=student');
+				queryKey: ['get-admin-dashboard'],
+				queryFn: async (): Promise<
+					HTTPResponse<AdminDashboardDataType>
+				> => {
+					const response = await getAdminDashboard();
 					if (response.data.code === 200) {
-						return response.data as HTTPResponse<StudentUser[]>;
+						return response.data;
 					}
 
 					throw new Error('Fetch Student Listing Fail!');
@@ -218,10 +221,18 @@ const AdminDashboard = () => {
 			},
 			{
 				queryKey: ['get-most-browser-usage'],
-				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
-					const response = await getAllUsers('role=student');
+				queryFn: async (): Promise<MostBrowserUsagePieChart[]> => {
+					const response = await getBrowserCount();
 					if (response.data.code === 200) {
-						return response.data as HTTPResponse<StudentUser[]>;
+						return response.data.data.map((item) => {
+							const key = item.browserName.toLowerCase();
+							return {
+								...item,
+								fill:
+									chartConfig[key]?.fill ??
+									'hsl(var(--unknown))',
+							};
+						});
 					}
 
 					throw new Error('Fetch Student Listing Fail!');
@@ -230,7 +241,7 @@ const AdminDashboard = () => {
 			{
 				queryKey: ['get-most-pages-viewed'],
 				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
-					const response = await getAllUsers('role=student');
+					const response = await getMostViewedPages();
 					if (response.data.code === 200) {
 						return response.data as HTTPResponse<StudentUser[]>;
 					}
@@ -243,30 +254,49 @@ const AdminDashboard = () => {
 
 	return (
 		<>
-			<div className="mb-3 flex gap-3">
-				<DashboardCard
-					title="Total Users"
-					value={55}
-					icon={UsersRound}
-				/>
-				<DashboardCard
-					title="Assigned Student"
-					value={55}
-					icon={User}
-				/>
-				<DashboardCard
-					title="Active Tutors"
-					value={55}
-					icon={UserRoundCheck}
-				/>
-				<DashboardCard
-					title="Total Message"
-					value={55}
-					icon={MessageSquareQuote}
-				/>
+			<div className="mb-3 flex flex-col flex-wrap gap-3 md:flex-row">
+				{adminDashboardLoading ? (
+					<>
+						<div className="flex flex-1 gap-3">
+							<DashboardCard title="Total Users" loading />
+							<DashboardCard title="Assigned Student" loading />
+						</div>
+						<div className="flex flex-1 gap-3">
+							<DashboardCard title="Active Tutors" loading />
+							<DashboardCard title="Total Message" loading />
+						</div>
+					</>
+				) : adminDashboardData ? (
+					<>
+						<div className="flex flex-1 gap-3">
+							<DashboardCard
+								title="Total Users"
+								value={adminDashboardData.data.totalUsers}
+								icon={UsersRound}
+							/>
+							<DashboardCard
+								title="Assigned Student"
+								value={adminDashboardData.data.assignedStudents}
+								icon={User}
+							/>
+						</div>
+						<div className="flex flex-1 gap-3">
+							<DashboardCard
+								title="Active Tutors"
+								value={adminDashboardData.data.activeTutors}
+								icon={UserRoundCheck}
+							/>
+							<DashboardCard
+								title="Total Message"
+								value={adminDashboardData.data.totalMessages}
+								icon={MessageSquareQuote}
+							/>
+						</div>
+					</>
+				) : null}
 			</div>
 			<ContainerWrapper className="h-fit">
-				<div className="flex">
+				<div className="flex flex-col flex-wrap gap-10 lg:flex-row">
 					<div className="pie-chart flex-1">
 						<h2 className="mb-2 text-center font-roboto-slab text-2xl">
 							Most Browser Usage
@@ -277,8 +307,8 @@ const AdminDashboard = () => {
 									content={<ChartTooltipContent hideLabel />}
 								/>
 								<Pie
-									data={formattedChartData}
-									dataKey="value"
+									data={mostBrowserUsageData}
+									dataKey="uniqueUserCount"
 									label
 									nameKey="browser"
 								/>
@@ -345,12 +375,11 @@ const AdminDashboard = () => {
 					<DataTable
 						className="h-fit"
 						columns={userListColumns}
-						isLoading={isLoading}
-						data={data?.data ?? []}
+						isLoading={unassignStudentLoading}
+						data={unassignStudentData ?? []}
 					/>
 				</div>
 			</ContainerWrapper>
-
 			<AllocateTutor
 				isOpen={isOpenAllocationModal}
 				setIsOpen={setIsOpenAllocationModal}

@@ -1,15 +1,6 @@
 import { useState } from 'react';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useQuery } from '@tanstack/react-query';
+
 import {
 	Calendar,
 	MessageSquare,
@@ -18,17 +9,27 @@ import {
 	Search,
 	AlertCircle,
 } from 'lucide-react';
+
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth.context';
+import { Skeleton } from '@/components/ui/skeleton';
+import { StudentUser } from '@/features/users/types';
 import { students, messages, meetings } from '@/data';
+import { getTutorDashboard } from '@/features/users/api';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function TutorDashboard() {
+	const { user } = useAuth();
 	const [searchQuery, setSearchQuery] = useState('');
-
-	// Filter students based on search query
-	const filteredStudents = students.filter(
-		(student) =>
-			student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			student.id.toLowerCase().includes(searchQuery.toLowerCase())
-	);
 
 	// TODO Use recent messages
 	// Get recent messages
@@ -43,6 +44,18 @@ export default function TutorDashboard() {
 
 	// Students with no interaction for 7 days
 	const inactiveStudents = students.slice(0, 2);
+
+	const { data, isLoading } = useQuery<HTTPResponse<StudentUser[]>>({
+		queryKey: ['tutor-dashboard'],
+		queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
+			await getTutorDashboard(user?.id ?? 0).then((response) => {
+				if (response.data.code === 200) {
+					return response.data;
+				}
+
+				throw new Error('Fetch Tutor Dashboard Fail!');
+			}),
+	});
 
 	return (
 		<div className="space-y-6">
@@ -231,123 +244,175 @@ export default function TutorDashboard() {
 							<TabsTrigger value="active">Active</TabsTrigger>
 							<TabsTrigger value="inactive">Inactive</TabsTrigger>
 						</TabsList>
-						<TabsContent value="all" className="space-y-4">
-							{filteredStudents.map((student) => (
-								<div
-									key={student.id}
-									className="flex items-center justify-between rounded-lg border p-4"
-								>
-									<div className="flex items-center gap-4">
-										<Avatar className="h-10 w-10">
-											<AvatarImage
-												src={student.avatar}
-												alt={student.name}
-											/>
-											<AvatarFallback>
-												{student.name.charAt(0)}
-											</AvatarFallback>
-										</Avatar>
-										<div>
-											<p className="font-medium">
-												{student.name}
-											</p>
-											<p className="text-sm text-muted-foreground">
-												{student.course}
-											</p>
+						{isLoading ? (
+							<div className="space-y-4">
+								{Array.from({ length: 5 }).map((_, index) => (
+									<div
+										key={index}
+										className="flex items-center justify-between rounded-lg border p-4"
+									>
+										<div className="flex items-center gap-4">
+											<Skeleton className="h-10 w-10 rounded-full" />
+											<div>
+												<Skeleton className="mb-1 h-4 w-32" />
+												<Skeleton className="h-3 w-24" />
+											</div>
+										</div>
+										<div className="flex gap-2">
+											<Skeleton className="h-8 w-20" />
+											<Skeleton className="h-8 w-20" />
 										</div>
 									</div>
-									<div className="flex gap-2">
-										<Button size="sm" variant="outline">
-											<MessageSquare className="mr-2 h-4 w-4" />
-											Message
-										</Button>
-										<Button size="sm" variant="outline">
-											<Calendar className="mr-2 h-4 w-4" />
-											Schedule
-										</Button>
-									</div>
-								</div>
-							))}
-						</TabsContent>
-						<TabsContent value="active" className="space-y-4">
-							{filteredStudents.slice(0, 3).map((student) => (
-								<div
-									key={student.id}
-									className="flex items-center justify-between rounded-lg border p-4"
-								>
-									<div className="flex items-center gap-4">
-										<Avatar className="h-10 w-10">
-											<AvatarImage
-												src={student.avatar}
-												alt={student.name}
-											/>
-											<AvatarFallback>
-												{student.name.charAt(0)}
-											</AvatarFallback>
-										</Avatar>
-										<div>
-											<p className="font-medium">
-												{student.name}
-											</p>
-											<p className="text-sm text-muted-foreground">
-												{student.course}
-											</p>
+								))}
+							</div>
+						) : (
+							<>
+								<TabsContent value="all" className="space-y-4">
+									{data?.data.map((student) => (
+										<div
+											key={student.id}
+											className="flex items-center justify-between rounded-lg border p-4"
+										>
+											<div className="flex items-center gap-4">
+												<Avatar className="h-10 w-10">
+													<AvatarImage
+														src={student.name}
+														alt={student.name}
+													/>
+													<AvatarFallback>
+														{student.name.charAt(0)}
+													</AvatarFallback>
+												</Avatar>
+												<div>
+													<p className="font-medium">
+														{student.name}
+													</p>
+													<p className="text-sm text-muted-foreground">
+														{student.courseName}
+													</p>
+												</div>
+											</div>
+											<div className="flex gap-2">
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<MessageSquare className="mr-2 h-4 w-4" />
+													Message
+												</Button>
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<Calendar className="mr-2 h-4 w-4" />
+													Schedule
+												</Button>
+											</div>
 										</div>
-									</div>
-									<div className="flex gap-2">
-										<Button size="sm" variant="outline">
-											<MessageSquare className="mr-2 h-4 w-4" />
-											Message
-										</Button>
-										<Button size="sm" variant="outline">
-											<Calendar className="mr-2 h-4 w-4" />
-											Schedule
-										</Button>
-									</div>
-								</div>
-							))}
-						</TabsContent>
-						<TabsContent value="inactive" className="space-y-4">
-							{inactiveStudents.map((student) => (
-								<div
-									key={student.id}
-									className="flex items-center justify-between rounded-lg border p-4"
+									))}
+								</TabsContent>
+
+								<TabsContent
+									value="active"
+									className="space-y-4"
 								>
-									<div className="flex items-center gap-4">
-										<Avatar className="h-10 w-10">
-											<AvatarImage
-												src={student.avatar}
-												alt={student.name}
-											/>
-											<AvatarFallback>
-												{student.name.charAt(0)}
-											</AvatarFallback>
-										</Avatar>
-										<div>
-											<p className="font-medium">
-												{student.name}
-											</p>
-											<p className="text-sm text-muted-foreground">
-												{student.course}
-											</p>
-											<p className="text-xs text-destructive">
-												No interaction for 8+ days
-											</p>
+									{data?.data.map((student) => (
+										<div
+											key={student.id}
+											className="flex items-center justify-between rounded-lg border p-4"
+										>
+											<div className="flex items-center gap-4">
+												<Avatar className="h-10 w-10">
+													<AvatarImage
+														src={student.name}
+														alt={student.name}
+													/>
+													<AvatarFallback>
+														{student.name.charAt(0)}
+													</AvatarFallback>
+												</Avatar>
+												<div>
+													<p className="font-medium">
+														{student.name}
+													</p>
+													<p className="text-sm text-muted-foreground">
+														{student.courseName}
+													</p>
+												</div>
+											</div>
+											<div className="flex gap-2">
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<MessageSquare className="mr-2 h-4 w-4" />
+													Message
+												</Button>
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<Calendar className="mr-2 h-4 w-4" />
+													Schedule
+												</Button>
+											</div>
 										</div>
-									</div>
-									<div className="flex gap-2">
-										<Button size="sm" variant="outline">
-											<MessageSquare className="mr-2 h-4 w-4" />
-											Message
-										</Button>
-										<Button size="sm" variant="outline">
-											<Calendar className="mr-2 h-4 w-4" />
-											Schedule
-										</Button>
-									</div>
-								</div>
-							))}
-						</TabsContent>
+									))}
+								</TabsContent>
+
+								<TabsContent
+									value="inactive"
+									className="space-y-4"
+								>
+									{inactiveStudents.map((student) => (
+										<div
+											key={student.id}
+											className="flex items-center justify-between rounded-lg border p-4"
+										>
+											<div className="flex items-center gap-4">
+												<Avatar className="h-10 w-10">
+													<AvatarImage
+														src={student.avatar}
+														alt={student.name}
+													/>
+													<AvatarFallback>
+														{student.name.charAt(0)}
+													</AvatarFallback>
+												</Avatar>
+												<div>
+													<p className="font-medium">
+														{student.name}
+													</p>
+													<p className="text-sm text-muted-foreground">
+														{student.course}
+													</p>
+													<p className="text-xs text-destructive">
+														No interaction for 8+
+														days
+													</p>
+												</div>
+											</div>
+											<div className="flex gap-2">
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<MessageSquare className="mr-2 h-4 w-4" />
+													Message
+												</Button>
+												<Button
+													size="sm"
+													variant="outline"
+												>
+													<Calendar className="mr-2 h-4 w-4" />
+													Schedule
+												</Button>
+											</div>
+										</div>
+									))}
+								</TabsContent>
+							</>
+						)}
 					</Tabs>
 				</CardContent>
 			</Card>

@@ -258,6 +258,17 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
 			[]
 		);
 
+		React.useEffect(() => {
+			if (value.length === 0 && inputValue.trim() !== '') {
+				const timeout = setTimeout(() => {
+					onValueChangeHandler(inputValue.trim());
+					setInputValue('');
+				}, 500);
+
+				return () => clearTimeout(timeout);
+			}
+		}, [value, inputValue, onValueChangeHandler]);
+
 		return (
 			<TagInputContext.Provider
 				value={{

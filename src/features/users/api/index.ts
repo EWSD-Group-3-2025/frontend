@@ -1,7 +1,13 @@
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
 import api from '@/utils/axios';
-import { ChangePasswordRequest, User } from '../types';
+import {
+	AdminDashboard,
+	ChangePasswordRequest,
+	MostBrowserUsagePieChart,
+	TutorUser,
+	User,
+} from '../types';
 import userRoutes from './routes';
 import { buildURL } from '@/utils';
 import { UserFormValue } from '@/features/users/components/user-form-modal';
@@ -50,3 +56,22 @@ export const deallocationStudents = async (params: string = '') =>
 
 export const resetPasswordByAdmin = async () =>
 	await api.post(userRoutes.resetPasswordByAdmin);
+
+export const getAdminDashboard = async () =>
+	await api.get<HTTPResponse<AdminDashboard>>(userRoutes.adminDashboard);
+
+export const getStudentDashboard = async (id: number) =>
+	await api.get<HTTPResponse<TutorUser>>(
+		buildURL(userRoutes.studentDashboard, { id })
+	);
+
+export const getTutorDashboard = async (id: number) =>
+	await api.get(buildURL(userRoutes.tutorDashboard, { id }));
+
+export const getBrowserCount = async () =>
+	await api.get<HTTPResponse<MostBrowserUsagePieChart[]>>(
+		userRoutes.browserCount
+	);
+
+export const getMostViewedPages = async () =>
+	await api.get(userRoutes.mostViewedPages);

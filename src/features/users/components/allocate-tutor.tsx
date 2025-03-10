@@ -40,8 +40,11 @@ type AllocateTutorProp = {
 const allocateTutorSchema = z.object({
 	studentUsername: z
 		.array(z.string())
-		.nonempty('At least one student is required'),
-	studentIds: z.array(z.string()),
+		.nonempty('At least one student is required')
+		.max(10, 'You can select up to 10 students in one allocation'),
+	studentIds: z
+		.array(z.string())
+		.max(10, 'You can select up to 10 students in one allocation'),
 	tutorId: z.string().nonempty('Tutor required'),
 });
 
@@ -109,6 +112,11 @@ const AllocateTutor = ({
 					queryClient.invalidateQueries({
 						queryKey: ['get-all-users-student'],
 					});
+
+					queryClient.invalidateQueries({
+						queryKey: ['get-all-users-unassign-student'],
+					});
+
 					return response.data;
 				}
 				throw new Error('Allocation Create Fail!');
@@ -298,7 +306,7 @@ const AllocateTutor = ({
 										return (
 											<FormItem className="hidden">
 												<FormLabel>
-													Select Student
+													Select Students
 												</FormLabel>
 												<FormControl>
 													<MultiSelector

@@ -14,6 +14,7 @@ interface RouteGuardProps {
 export default function RouteGuard({ children }: RouteGuardProps) {
 	const location = useLocation();
 	const { user } = useAuth();
+
 	if (!user) {
 		return <Navigate to={'/login'} state={{ from: location }} replace />;
 	}
@@ -21,8 +22,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
 	const authPathname = getAuthPathname(user?.roleName);
 
 	if (
-		location.pathname === '/' ||
-		location.pathname === '/dashboard' ||
+		(location.pathname === '/' || location.pathname === '/dashboard') &&
 		!isAuthDashboardPath({ pathname: location.pathname, authPathname })
 	) {
 		const redirectRoute = getRedirectRoute(user?.roleName);

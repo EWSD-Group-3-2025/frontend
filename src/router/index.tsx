@@ -1,8 +1,6 @@
-import Cookies from 'js-cookie';
 import { createElement, ElementType } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
-import CONSTANTS from '@/constants';
 import HomePage from '@/pages/HomePage';
 import NotFound from '@/pages/notFound/NotFound';
 import LoginPage from '@/features/auth/pages/Login';
@@ -31,175 +29,172 @@ import OtherUserDashboard from '@/features/users/pages/admin/OtherUserDashboard'
 import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard';
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
-import ManagementDashboard from '@/features/users/pages/management/ManagementDashboard';
+import AdminDashboard from '@/features/users/pages/admin/Dashboard';
 
-type Route = {
+export type Route = {
 	name: string;
 	path: string;
 	element: ElementType;
+	isPublic?: boolean;
+	children?: Route[];
 };
 
-const authRouteList: Route[] = [
+export const appRouteList: Route[] = [
 	{
-		name: 'Login',
-		path: '/login',
-		element: LoginPage,
+		name: 'Stand alone Layout',
+		path: '/',
+		element: StandaloneLayout,
+		children: [
+			{
+				name: 'Login',
+				path: '/login',
+				element: LoginPage,
+				isPublic: true,
+			},
+			{
+				name: 'Forgot Password',
+				path: '/forgot-password',
+				element: ForgotPasswordPage,
+				isPublic: true,
+			},
+			{
+				name: 'Verify OTP',
+				path: '/verify-otp',
+				element: VerifyOTPPage,
+				isPublic: true,
+			},
+			{
+				name: 'Reset Password',
+				path: '/reset-password',
+				element: ResetPasswordPage,
+				isPublic: true,
+			},
+			{
+				name: 'Reset Password Successful',
+				path: '/reset-password-successful',
+				element: ResetPasswordSuccessPage,
+				isPublic: true,
+			},
+			{
+				name: 'Change Password',
+				path: '/change-password',
+				element: ChangePasswordPage,
+			},
+		],
 	},
 	{
-		name: 'Forgot Password',
-		path: '/forgot-password',
-		element: ForgotPasswordPage,
-	},
-	{
-		name: 'Verify OTP',
-		path: '/verify-otp',
-		element: VerifyOTPPage,
-	},
-	{
-		name: 'Reset Password',
-		path: '/reset-password',
-		element: ResetPasswordPage,
-	},
-	{
-		name: 'Reset Password Successful',
-		path: '/reset-password-successful',
-		element: ResetPasswordSuccessPage,
-	},
-];
-
-// endUserRoutes is for students and tutors
-const endUserRouteList: Route[] = [
-	{
-		name: 'End User Dashboard',
+		name: 'End User Layout',
 		path: '/dashboard/end-user',
-		element: EndUserDashboard,
+		element: EndUserLayout,
+		children: [
+			{
+				name: 'End User Dashboard',
+				path: '/dashboard/end-user',
+				element: EndUserDashboard,
+			},
+			{
+				name: 'Messages',
+				path: '/dashboard/end-user/messages',
+				element: MessagesPage,
+			},
+			{
+				name: 'Meetings',
+				path: '/dashboard/end-user/meetings',
+				element: MeetingsPage,
+			},
+			{
+				name: 'Calendar',
+				path: '/dashboard/end-user/calendar',
+				element: CalendarPage,
+			},
+			{
+				name: 'Documents',
+				path: '/dashboard/end-user/documents',
+				element: DocumentsPage,
+			},
+			{
+				name: 'Blog',
+				path: '/dashboard/end-user/blog',
+				element: BlogPage,
+			},
+		],
 	},
 	{
-		name: 'Messages',
-		path: '/dashboard/end-user/messages',
-		element: MessagesPage,
-	},
-	{
-		name: 'Meetings',
-		path: '/dashboard/end-user/meetings',
-		element: MeetingsPage,
-	},
-	{
-		name: 'Calendar',
-		path: '/dashboard/end-user/calendar',
-		element: CalendarPage,
-	},
-	{
-		name: 'Documents',
-		path: '/dashboard/end-user/documents',
-		element: DocumentsPage,
-	},
-	{
-		name: 'Blog',
-		path: '/dashboard/end-user/blog',
-		element: BlogPage,
-	},
-];
-
-const forgetPasswordRouteList: Route[] = [
-	{
-		name: 'Forgot Password',
-		path: '/forgot-password',
-		element: ForgotPasswordPage,
-	},
-	{
-		name: 'Verify OTP',
-		path: '/verify-otp',
-		element: VerifyOTPPage,
-	},
-	{
-		name: 'Reset Password',
-		path: '/reset-password',
-		element: ResetPasswordPage,
-	},
-	{
-		name: 'Reset Password Successful',
-		path: '/reset-password-successful',
-		element: ResetPasswordSuccessPage,
-	},
-	{
-		name: 'Change Password',
-		path: '/change-password',
-		element: ChangePasswordPage,
-	},
-];
-
-// adminRoutes is for admin and staff
-const adminRouteList: Route[] = [
-	{
-		name: 'Management Dashboard',
+		name: 'Admin Layout',
 		path: '/dashboard/management',
-		element: ManagementDashboard,
-	},
-	{
-		name: 'Departments',
-		path: '/dashboard/management/departments',
-		element: DepartmentList,
-	},
-	{
-		name: 'Courses',
-		path: '/dashboard/management/courses',
-		element: CourseList,
-	},
-	{
-		name: 'Specializations',
-		path: '/dashboard/management/specializations',
-		element: SpecializationList,
-	},
-	{
-		name: 'Student Dashboard',
-		path: '/dashboard/management/student/:username',
-		element: OtherUserDashboard,
-	},
-	{
-		name: 'Tutor Dashboard',
-		path: '/dashboard/management/tutor/:username',
-		element: OtherUserDashboard,
-	},
-	{
-		name: 'Staff Dashboard',
-		path: '/dashboard/management/staff/:username',
-		element: OtherUserDashboard,
-	},
-	{
-		name: 'Staff List',
-		path: '/dashboard/management/staffs',
-		element: StaffList,
-	},
-	{
-		name: 'Student List',
-		path: '/dashboard/management/students',
-		element: StudentList,
-	},
-	{
-		name: 'Tutor List',
-		path: '/dashboard/management/tutors',
-		element: TutorList,
-	},
-	{
-		name: 'Admin List',
-		path: '/dashboard/management/admins',
-		element: AdminList,
-	},
-	{
-		name: 'Analysis',
-		path: '/dashboard/management/analysis',
-		element: SpecializationList,
-	},
-	{
-		name: 'Reports',
-		path: '/dashboard/management/reports',
-		element: SpecializationList,
-	},
-	{
-		name: 'Activity Logs',
-		path: '/dashboard/management/activity-logs',
-		element: ActivityLogs,
+		element: ManagementLayout,
+		children: [
+			{
+				name: 'Management Dashboard',
+				path: '/dashboard/management',
+				element: AdminDashboard,
+			},
+			{
+				name: 'Departments',
+				path: '/dashboard/management/departments',
+				element: DepartmentList,
+			},
+			{
+				name: 'Courses',
+				path: '/dashboard/management/courses',
+				element: CourseList,
+			},
+			{
+				name: 'Specializations',
+				path: '/dashboard/management/specializations',
+				element: SpecializationList,
+			},
+			{
+				name: 'Student Dashboard',
+				path: '/dashboard/management/student/:username',
+				element: OtherUserDashboard,
+			},
+			{
+				name: 'Tutor Dashboard',
+				path: '/dashboard/management/tutor/:username',
+				element: OtherUserDashboard,
+			},
+			{
+				name: 'Staff Dashboard',
+				path: '/dashboard/management/staff/:username',
+				element: OtherUserDashboard,
+			},
+			{
+				name: 'Staff List',
+				path: '/dashboard/management/staffs',
+				element: StaffList,
+			},
+			{
+				name: 'Student List',
+				path: '/dashboard/management/students',
+				element: StudentList,
+			},
+			{
+				name: 'Tutor List',
+				path: '/dashboard/management/tutors',
+				element: TutorList,
+			},
+			{
+				name: 'Admin List',
+				path: '/dashboard/management/admins',
+				element: AdminList,
+			},
+			{
+				name: 'Analysis',
+				path: '/dashboard/management/analysis',
+				element: SpecializationList,
+			},
+			{
+				name: 'Reports',
+				path: '/dashboard/management/reports',
+				element: SpecializationList,
+			},
+			{
+				name: 'Activity Logs',
+				path: '/dashboard/management/activity-logs',
+				element: ActivityLogs,
+			},
+		],
 	},
 	{
 		name: 'Not Found',
@@ -208,68 +203,38 @@ const adminRouteList: Route[] = [
 	},
 ];
 
-export const appRouteList: Route[] = [
-	...authRouteList,
-	...endUserRouteList,
-	...forgetPasswordRouteList,
-	...adminRouteList,
-];
-
 const Router = () => {
-	const isLogin =
-		Cookies.get(CONSTANTS.ACCESS_TOKEN_KEY) &&
-		Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
-
-	return isLogin ? (
+	return (
 		<Routes>
-			{/* Forget Password Routes */}
-			<Route element={<StandaloneLayout />}>
-				{forgetPasswordRouteList.map((route, i) => (
+			{appRouteList.map((route) => {
+				return (
 					<Route
-						key={i}
+						key={route.path}
 						path={route.path}
-						element={
-							<AuthGuard>
-								{createElement(route.element)}
-							</AuthGuard>
-						}
-					></Route>
-				))}
-			</Route>
-
-			{/* Student Routes */}
-			<Route element={<EndUserLayout />}>
-				{endUserRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={
-							<AuthGuard>
-								<RouteGuard>
-									{createElement(route.element)}
-								</RouteGuard>
-							</AuthGuard>
-						}
-					></Route>
-				))}
-			</Route>
-
-			{/* Admin Routes */}
-			<Route element={<ManagementLayout />}>
-				{adminRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={
-							<AuthGuard>
-								<RouteGuard>
-									{createElement(route.element)}
-								</RouteGuard>
-							</AuthGuard>
-						}
-					></Route>
-				))}
-			</Route>
+						element={<route.element />}
+					>
+						{route.children &&
+							route.children.map((childRoute) => {
+								const renderWithAuth = !!childRoute.isPublic ? (
+									<childRoute.element />
+								) : (
+									<AuthGuard>
+										<RouteGuard>
+											<childRoute.element />
+										</RouteGuard>
+									</AuthGuard>
+								);
+								return (
+									<Route
+										key={childRoute.path}
+										path={childRoute.path}
+										element={renderWithAuth}
+									/>
+								);
+							})}
+					</Route>
+				);
+			})}
 
 			{/* When user hit to Home and Dashboard routes, it will redirect automatically redirect to their specific route based on their role */}
 			<Route
@@ -280,6 +245,7 @@ const Router = () => {
 					</AuthGuard>
 				}
 			/>
+
 			<Route
 				path="/dashboard"
 				element={
@@ -288,20 +254,6 @@ const Router = () => {
 					</AuthGuard>
 				}
 			/>
-		</Routes>
-	) : (
-		<Routes>
-			{/* Auth Routes */}
-			<Route element={<StandaloneLayout />}>
-				{authRouteList.map((route, i) => (
-					<Route
-						key={i}
-						path={route.path}
-						element={createElement(route.element)}
-					/>
-				))}
-			</Route>
-			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
 };

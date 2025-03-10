@@ -9,8 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar, MessageSquare, FileText, Clock } from 'lucide-react';
 import { tutors, messages, meetings, documents } from '@/data';
+import { getStudentDashboard } from '@/features/users/api';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/context/auth.context';
+import { TutorUser } from '@/features/users/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function StudentDashboard() {
+	const { user } = useAuth();
+
 	// Get assigned tutor
 	const myTutor = tutors[0];
 
@@ -26,7 +33,18 @@ export function StudentDashboard() {
 	// TODO Use recent documents
 	// Get recent documents
 	const recentDocuments = documents.slice(0, 3);
-	console.log(recentDocuments);
+
+	const { data, isLoading } = useQuery<HTTPResponse<TutorUser>>({
+		queryKey: ['student-dashboard'],
+		queryFn: async (): Promise<HTTPResponse<TutorUser>> =>
+			await getStudentDashboard(user?.id ?? 0).then((response) => {
+				if (response.data.code === 200) {
+					return response.data;
+				}
+
+				throw new Error('Fetch Admin Listing Fail!');
+			}),
+	});
 
 	return (
 		<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -39,25 +57,39 @@ export function StudentDashboard() {
 				</CardHeader>
 				<CardContent>
 					<div className="flex items-center gap-4">
-						<Avatar className="h-12 w-12">
-							<AvatarImage
-								src={myTutor.avatar}
-								alt={myTutor.name}
-							/>
-							<AvatarFallback>
-								{myTutor.name.charAt(0)}
-							</AvatarFallback>
-						</Avatar>
-						<div>
-							<p className="font-medium">{myTutor.name}</p>
-							<p className="text-sm text-muted-foreground">
-								{myTutor.department}
-							</p>
-							<p className="text-sm text-muted-foreground">
-								{myTutor.email}
-							</p>
-						</div>
+						{isLoading ? (
+							<>
+								<Skeleton className="h-12 w-12 rounded-full" />
+								<div>
+									<Skeleton className="mb-2 h-4 w-32" />
+									<Skeleton className="mb-1 h-3 w-40" />
+									<Skeleton className="h-3 w-48" />
+								</div>
+							</>
+						) : (
+							<Avatar className="h-12 w-12">
+								<AvatarImage
+									src={data?.data.name}
+									alt={data?.data.name}
+								/>
+								<AvatarFallback>
+									{data?.data.name?.charAt(0)}
+								</AvatarFallback>
+							</Avatar>
+						)}
+						{!isLoading && (
+							<div>
+								<p className="font-medium">{data?.data.name}</p>
+								<p className="text-sm text-muted-foreground">
+									{data?.data.specializationName}
+								</p>
+								<p className="text-sm text-muted-foreground">
+									{data?.data.email}
+								</p>
+							</div>
+						)}
 					</div>
+
 					<div className="mt-4 flex gap-2">
 						<Button size="sm" variant="outline" className="w-full">
 							<MessageSquare className="mr-2 h-4 w-4" />
