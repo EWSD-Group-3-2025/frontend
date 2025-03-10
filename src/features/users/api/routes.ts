@@ -11,6 +11,7 @@ const userRoutes = {
 	tutorDashboard: '/v1/tutor/dashboard/${id}',
 	browserCount: '/v1/admin/report/browser-count',
 	mostViewedPages: '/v1/admin/report/top-routes',
+	unassignStudent: '/v1/admin/dashboard/get-unassigned-students',
 };
 
 export default userRoutes;

@@ -33,9 +33,9 @@ import DataTable from '@/components/data-table';
 import { useQueries } from '@tanstack/react-query';
 import {
 	getAdminDashboard,
-	getAllUsers,
 	getBrowserCount,
 	getMostViewedPages,
+	getUnassignStudentList,
 } from '@/features/users/api';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import { useState } from 'react';
@@ -92,17 +92,8 @@ const chartConfig: CustomConfig = {
 	},
 };
 
-const barChartData = [
-	{ pageName: 'Admin List', count: 186 },
-	{ pageName: 'Student List', count: 305 },
-	{ pageName: 'Tutor List', count: 237 },
-	{ pageName: 'Chart Dashboard', count: 73 },
-	{ pageName: 'User Dashboard', count: 209 },
-	{ pageName: 'Log in', count: 214 },
-];
-
 const barChartConfig = {
-	count: {
+	routeName: {
 		label: 'Total User',
 		color: 'hsl(var(--chart-1))',
 	},
@@ -186,12 +177,13 @@ const AdminDashboard = () => {
 		{ data: unassignStudentData, isLoading: unassignStudentLoading },
 		{ data: adminDashboardData, isLoading: adminDashboardLoading },
 		{ data: mostBrowserUsageData },
+		{ data: barChartData },
 	] = useQueries({
 		queries: [
 			{
 				queryKey: ['get-all-users-unassign-student'],
 				queryFn: async (): Promise<StudentUser[]> => {
-					const response = await getAllUsers('role=student');
+					const response = await getUnassignStudentList();
 					if (response.data.code === 200) {
 						const filterData = (
 							response.data.data as StudentUser[]
@@ -322,7 +314,7 @@ const AdminDashboard = () => {
 						<ChartContainer config={barChartConfig}>
 							<BarChart
 								accessibilityLayer
-								data={barChartData}
+								data={barChartData?.data}
 								layout="vertical"
 								margin={{
 									right: 16,
@@ -330,7 +322,7 @@ const AdminDashboard = () => {
 							>
 								<CartesianGrid horizontal={false} />
 								<YAxis
-									dataKey="pageName"
+									dataKey="routeName"
 									type="category"
 									tickLine={false}
 									tickMargin={10}
@@ -338,7 +330,11 @@ const AdminDashboard = () => {
 									tickFormatter={(value) => value.slice(0, 3)}
 									hide
 								/>
-								<XAxis dataKey="count" type="number" hide />
+								<XAxis
+									dataKey="visitCount"
+									type="number"
+									hide
+								/>
 								<ChartTooltip
 									cursor={false}
 									content={
@@ -346,20 +342,20 @@ const AdminDashboard = () => {
 									}
 								/>
 								<Bar
-									dataKey="count"
+									dataKey="visitCount"
 									layout="vertical"
 									fill="hsl(var(--chart-2))"
 									radius={4}
 								>
 									<LabelList
-										dataKey="pageName"
+										dataKey="routeName"
 										position="insideLeft"
 										offset={8}
 										className="fill-font-white"
 										fontSize={12}
 									/>
 									<LabelList
-										dataKey="count"
+										dataKey="visitCount"
 										position="right"
 										offset={8}
 										className="fill-foreground"

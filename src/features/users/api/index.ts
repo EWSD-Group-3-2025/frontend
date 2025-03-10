@@ -5,6 +5,7 @@ import {
 	AdminDashboard,
 	ChangePasswordRequest,
 	MostBrowserUsagePieChart,
+	StudentUser,
 	TutorUser,
 	User,
 } from '../types';
@@ -75,3 +76,6 @@ export const getBrowserCount = async () =>
 
 export const getMostViewedPages = async () =>
 	await api.get(userRoutes.mostViewedPages);
+
+export const getUnassignStudentList = async () =>
+	await api.get<HTTPResponse<StudentUser[]>>(userRoutes.unassignStudent);

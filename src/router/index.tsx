@@ -39,162 +39,147 @@ export type Route = {
 	children?: Route[];
 };
 
-export const appRouteList: Route[] = [
+const authRouteList: Route[] = [
 	{
-		name: 'Stand alone Layout',
-		path: '/',
-		element: StandaloneLayout,
-		children: [
-			{
-				name: 'Login',
-				path: '/login',
-				element: LoginPage,
-				isPublic: true,
-			},
-			{
-				name: 'Forgot Password',
-				path: '/forgot-password',
-				element: ForgotPasswordPage,
-				isPublic: true,
-			},
-			{
-				name: 'Verify OTP',
-				path: '/verify-otp',
-				element: VerifyOTPPage,
-				isPublic: true,
-			},
-			{
-				name: 'Reset Password',
-				path: '/reset-password',
-				element: ResetPasswordPage,
-				isPublic: true,
-			},
-			{
-				name: 'Reset Password Successful',
-				path: '/reset-password-successful',
-				element: ResetPasswordSuccessPage,
-				isPublic: true,
-			},
-			{
-				name: 'Change Password',
-				path: '/change-password',
-				element: ChangePasswordPage,
-			},
-		],
+		name: 'Login',
+		path: '/login',
+		element: LoginPage,
 	},
+];
+
+// endUserRoutes is for students and tutors
+const endUserRouteList: Route[] = [
 	{
-		name: 'End User Layout',
+		name: 'End User Dashboard',
 		path: '/dashboard/end-user',
-		element: EndUserLayout,
-		children: [
-			{
-				name: 'End User Dashboard',
-				path: '/dashboard/end-user',
-				element: EndUserDashboard,
-			},
-			{
-				name: 'Messages',
-				path: '/dashboard/end-user/messages',
-				element: MessagesPage,
-			},
-			{
-				name: 'Meetings',
-				path: '/dashboard/end-user/meetings',
-				element: MeetingsPage,
-			},
-			{
-				name: 'Calendar',
-				path: '/dashboard/end-user/calendar',
-				element: CalendarPage,
-			},
-			{
-				name: 'Documents',
-				path: '/dashboard/end-user/documents',
-				element: DocumentsPage,
-			},
-			{
-				name: 'Blog',
-				path: '/dashboard/end-user/blog',
-				element: BlogPage,
-			},
-		],
+		element: EndUserDashboard,
 	},
 	{
-		name: 'Admin Layout',
+		name: 'Messages',
+		path: '/dashboard/end-user/messages',
+		element: MessagesPage,
+	},
+	{
+		name: 'Meetings',
+		path: '/dashboard/end-user/meetings',
+		element: MeetingsPage,
+	},
+	{
+		name: 'Calendar',
+		path: '/dashboard/end-user/calendar',
+		element: CalendarPage,
+	},
+	{
+		name: 'Documents',
+		path: '/dashboard/end-user/documents',
+		element: DocumentsPage,
+	},
+	{
+		name: 'Blog',
+		path: '/dashboard/end-user/blog',
+		element: BlogPage,
+	},
+];
+
+const forgetPasswordRouteList: Route[] = [
+	{
+		name: 'Forgot Password',
+		path: '/forgot-password',
+		element: ForgotPasswordPage,
+	},
+	{
+		name: 'Verify OTP',
+		path: '/verify-otp',
+		element: VerifyOTPPage,
+	},
+	{
+		name: 'Reset Password',
+		path: '/reset-password',
+		element: ResetPasswordPage,
+	},
+	{
+		name: 'Reset Password Successful',
+		path: '/reset-password-successful',
+		element: ResetPasswordSuccessPage,
+	},
+	{
+		name: 'Change Password',
+		path: '/change-password',
+		element: ChangePasswordPage,
+	},
+];
+
+// adminRoutes is for admin and staff
+const adminRouteList: Route[] = [
+	{
+		name: 'Management Dashboard',
 		path: '/dashboard/management',
-		element: ManagementLayout,
-		children: [
-			{
-				name: 'Management Dashboard',
-				path: '/dashboard/management',
-				element: AdminDashboard,
-			},
-			{
-				name: 'Departments',
-				path: '/dashboard/management/departments',
-				element: DepartmentList,
-			},
-			{
-				name: 'Courses',
-				path: '/dashboard/management/courses',
-				element: CourseList,
-			},
-			{
-				name: 'Specializations',
-				path: '/dashboard/management/specializations',
-				element: SpecializationList,
-			},
-			{
-				name: 'Student Dashboard',
-				path: '/dashboard/management/student/:username',
-				element: OtherUserDashboard,
-			},
-			{
-				name: 'Tutor Dashboard',
-				path: '/dashboard/management/tutor/:username',
-				element: OtherUserDashboard,
-			},
-			{
-				name: 'Staff Dashboard',
-				path: '/dashboard/management/staff/:username',
-				element: OtherUserDashboard,
-			},
-			{
-				name: 'Staff List',
-				path: '/dashboard/management/staffs',
-				element: StaffList,
-			},
-			{
-				name: 'Student List',
-				path: '/dashboard/management/students',
-				element: StudentList,
-			},
-			{
-				name: 'Tutor List',
-				path: '/dashboard/management/tutors',
-				element: TutorList,
-			},
-			{
-				name: 'Admin List',
-				path: '/dashboard/management/admins',
-				element: AdminList,
-			},
-			{
-				name: 'Analysis',
-				path: '/dashboard/management/analysis',
-				element: SpecializationList,
-			},
-			{
-				name: 'Reports',
-				path: '/dashboard/management/reports',
-				element: SpecializationList,
-			},
-			{
-				name: 'Activity Logs',
-				path: '/dashboard/management/activity-logs',
-				element: ActivityLogs,
-			},
-		],
+		element: AdminDashboard,
+	},
+	{
+		name: 'Departments',
+		path: '/dashboard/management/departments',
+		element: DepartmentList,
+	},
+	{
+		name: 'Courses',
+		path: '/dashboard/management/courses',
+		element: CourseList,
+	},
+	{
+		name: 'Specializations',
+		path: '/dashboard/management/specializations',
+		element: SpecializationList,
+	},
+	{
+		name: 'Student Dashboard',
+		path: '/dashboard/management/student/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Tutor Dashboard',
+		path: '/dashboard/management/tutor/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Staff Dashboard',
+		path: '/dashboard/management/staff/:username',
+		element: OtherUserDashboard,
+	},
+	{
+		name: 'Staff List',
+		path: '/dashboard/management/staffs',
+		element: StaffList,
+	},
+	{
+		name: 'Student List',
+		path: '/dashboard/management/students',
+		element: StudentList,
+	},
+	{
+		name: 'Tutor List',
+		path: '/dashboard/management/tutors',
+		element: TutorList,
+	},
+	{
+		name: 'Admin List',
+		path: '/dashboard/management/admins',
+		element: AdminList,
+	},
+	{
+		name: 'Analysis',
+		path: '/dashboard/management/analysis',
+		element: SpecializationList,
+	},
+	{
+		name: 'Reports',
+		path: '/dashboard/management/reports',
+		element: SpecializationList,
+	},
+	{
+		name: 'Activity Logs',
+		path: '/dashboard/management/activity-logs',
+		element: ActivityLogs,
 	},
 	{
 		name: 'Not Found',
@@ -203,38 +188,71 @@ export const appRouteList: Route[] = [
 	},
 ];
 
+export const appRouteList: Route[] = [
+	...authRouteList,
+	...endUserRouteList,
+	...forgetPasswordRouteList,
+	...adminRouteList,
+];
+
 const Router = () => {
 	return (
 		<Routes>
-			{appRouteList.map((route) => {
-				return (
+			{/* Forget Password Routes */}
+			<Route element={<StandaloneLayout />}>
+				{forgetPasswordRouteList.map((route, i) => (
 					<Route
-						key={route.path}
+						key={i}
 						path={route.path}
-						element={<route.element />}
-					>
-						{route.children &&
-							route.children.map((childRoute) => {
-								const renderWithAuth = !!childRoute.isPublic ? (
-									<childRoute.element />
-								) : (
-									<AuthGuard>
-										<RouteGuard>
-											<childRoute.element />
-										</RouteGuard>
-									</AuthGuard>
-								);
-								return (
-									<Route
-										key={childRoute.path}
-										path={childRoute.path}
-										element={renderWithAuth}
-									/>
-								);
-							})}
-					</Route>
-				);
-			})}
+						element={createElement(route.element)}
+					></Route>
+				))}
+			</Route>
+
+			{/* Student Routes */}
+			<Route element={<EndUserLayout />}>
+				{endUserRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								<RouteGuard>
+									{createElement(route.element)}
+								</RouteGuard>
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
+			{/* Admin Routes */}
+			<Route element={<ManagementLayout />}>
+				{adminRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={
+							<AuthGuard>
+								<RouteGuard>
+									{createElement(route.element)}
+								</RouteGuard>
+							</AuthGuard>
+						}
+					></Route>
+				))}
+			</Route>
+
+			{/* Auth Routes */}
+			<Route element={<StandaloneLayout />}>
+				{authRouteList.map((route, i) => (
+					<Route
+						key={i}
+						path={route.path}
+						element={createElement(route.element)}
+					/>
+				))}
+			</Route>
 
 			{/* When user hit to Home and Dashboard routes, it will redirect automatically redirect to their specific route based on their role */}
 			<Route
@@ -245,7 +263,6 @@ const Router = () => {
 					</AuthGuard>
 				}
 			/>
-
 			<Route
 				path="/dashboard"
 				element={

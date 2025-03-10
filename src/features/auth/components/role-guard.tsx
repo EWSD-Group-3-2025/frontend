@@ -22,7 +22,8 @@ export default function RouteGuard({ children }: RouteGuardProps) {
 	const authPathname = getAuthPathname(user?.roleName);
 
 	if (
-		(location.pathname === '/' || location.pathname === '/dashboard') &&
+		location.pathname === '/' ||
+		location.pathname === '/dashboard' ||
 		!isAuthDashboardPath({ pathname: location.pathname, authPathname })
 	) {
 		const redirectRoute = getRedirectRoute(user?.roleName);
