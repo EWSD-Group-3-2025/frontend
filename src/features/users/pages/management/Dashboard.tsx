@@ -39,6 +39,7 @@ import {
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useMedia } from 'react-use';
 
 interface CustomConfig {
 	[key: string]: {
@@ -99,6 +100,8 @@ const barChartConfig = {
 } satisfies ChartConfig;
 
 const AdminDashboard = () => {
+	const isDesktop = useMedia('(min-width: 1048px)', true);
+
 	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
 	const [selectedStudent, setSelectedStudent] = useState<StudentUser | null>(
 		null
@@ -237,6 +240,7 @@ const AdminDashboard = () => {
 			},
 		],
 	});
+
 	return (
 		<>
 			<div className="mb-3 flex flex-col flex-wrap gap-3 md:flex-row">
@@ -281,9 +285,9 @@ const AdminDashboard = () => {
 				) : null}
 			</div>
 			<ContainerWrapper className="h-fit">
-				<div className="flex flex-col flex-wrap gap-10 lg:flex-row">
+				<div className="flex flex-col flex-wrap gap-10 md:flex-row">
 					<div className="pie-chart flex-1">
-						<h2 className="mb-2 text-center font-roboto-slab text-2xl">
+						<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
 							Most Browser Usage
 						</h2>
 						<ChartContainer config={chartConfig} className="h-full">
@@ -295,13 +299,13 @@ const AdminDashboard = () => {
 									data={mostBrowserUsageData}
 									dataKey="uniqueUserCount"
 									label
-									nameKey="browser"
+									nameKey="browserName"
 								/>
 							</PieChart>
 						</ChartContainer>
 					</div>
 					<div className="bar-chart flex-1">
-						<h2 className="mb-2 text-center font-roboto-slab text-2xl">
+						<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
 							Top 5 Most User Viewed Pages
 						</h2>
 						<ChartContainer config={barChartConfig}>
@@ -310,7 +314,8 @@ const AdminDashboard = () => {
 								data={barChartData?.data}
 								layout="vertical"
 								margin={{
-									left: 100,
+									left: isDesktop ? 30 : 40,
+									right: 20,
 								}}
 							>
 								<XAxis
@@ -319,7 +324,7 @@ const AdminDashboard = () => {
 									hide
 								/>
 								<YAxis
-									dataKey="routeName"
+									dataKey="pageName"
 									type="category"
 									tickLine={false}
 									tickMargin={10}
