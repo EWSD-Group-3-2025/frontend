@@ -8,7 +8,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar, MessageSquare, FileText, Clock } from 'lucide-react';
-import { messages, meetings, documents } from '@/data';
+import { messages, meetings } from '@/data';
 import { getStudentDashboard } from '@/features/users/api';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/auth.context';
@@ -27,12 +27,6 @@ export function StudentDashboard() {
 		.filter((meeting) => new Date(meeting.date) > new Date())
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.slice(0, 2);
-
-	// TODO Use recent documents
-	// Get recent documents
-	const recentDocuments = documents.slice(0, 3);
-
-	console.log(id, 'mmmmmmmmmm');
 
 	const { data, isLoading } = useQuery<HTTPResponse<TutorUser | null>>({
 		queryKey: ['student-dashboard'],

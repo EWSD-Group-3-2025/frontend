@@ -70,23 +70,6 @@ export const meetings = [
 	},
 ];
 
-export const documents = [
-	{
-		id: 'doc-1',
-		title: 'Assignment 1',
-		description: 'First assignment for Introduction to Programming',
-		uploadDate: '2024-03-01T12:00:00Z',
-		owner: students[0],
-	},
-	{
-		id: 'doc-2',
-		title: 'Midterm Exam',
-		description: 'Midterm exam for Data Structures and Algorithms',
-		uploadDate: '2024-03-10T15:00:00Z',
-		owner: students[1],
-	},
-];
-
 export const blogPosts = [
 	{
 		id: 'post-1',

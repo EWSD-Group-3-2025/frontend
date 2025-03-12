@@ -1,4 +1,4 @@
-import { DocumentsView } from '../../components/documents-view';
+import { DocumentsView } from '@/features/documents/components/documents-view';
 
 export default function DocumentsPage() {
 	return <DocumentsView />;
