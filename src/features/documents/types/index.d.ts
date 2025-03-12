@@ -8,7 +8,7 @@ export interface Document {
 	entityType: number;
 	filetype: string;
 	storedName: string;
-	storedUUID: string;
+	storedUUID: number;
 	description: string;
 	createdAt: Date;
 	updatedAt: Date;

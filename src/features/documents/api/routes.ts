@@ -1,5 +1,5 @@
 const documentRoutes = {
-	baseDocumentUrl: '/v1/documents',
+	baseDocumentUrl: '/v1/media',
 };
 
 export default documentRoutes;

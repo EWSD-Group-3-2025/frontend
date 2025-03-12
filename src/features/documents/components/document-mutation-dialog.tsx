@@ -15,16 +15,19 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useOpenDocumentMutationDialogStore } from '../store/open-document-mutation-dialog-store';
 import UploadcareFileUploader from '@/utils/uploadcare-file-uploader';
+import { create, update } from '../api';
+import { useAuth } from '@/context/auth.context';
+import { Button } from '@/components/ui/button';
+import { File, X } from 'lucide-react';
 
 const documentCreateSchema = z.object({
 	title: z.string().min(5, {
@@ -33,11 +36,45 @@ const documentCreateSchema = z.object({
 	description: z.string().min(10, {
 		message: 'Description must be at least 10 characters.',
 	}),
+	fileType: z
+		.string()
+		.min(10, {
+			message: 'File Type must be at least 10 characters.',
+		})
+		.optional(),
+	fileUrl: z
+		.string()
+		.min(10, {
+			message: 'File Url must be at least 10 characters.',
+		})
+		.optional(),
+	userName: z
+		.string()
+		.min(10, {
+			message: 'User Name must be at least 10 characters.',
+		})
+		.optional(),
+	storedUUID: z.number().optional(),
+	storedName: z
+		.string()
+		.min(10, {
+			message: 'Stored Name must be at least 10 characters.',
+		})
+		.optional(),
+	userId: z.number().optional(),
+	entityType: z.number().default(6).optional(),
 });
 
 export type DocumentCreateSchema = z.infer<typeof documentCreateSchema>;
 
 export default function DocumentMutationDialog() {
+	const [uploadCompleteObj, setUploadCompleteObj] = useState<{
+		fileType: string;
+		fileUrl: string;
+		storedUUID: number;
+		storedName: string;
+	} | null>(null);
+	const { user } = useAuth();
 	const {
 		document: initialDocument,
 		isOpen,
@@ -53,110 +90,135 @@ export default function DocumentMutationDialog() {
 		},
 	});
 
-	// const { mutateAsync: createNewBlogFn, isPending: createNewBlogPending } =
-	// 	useMutation<HTTPResponse, unknown, DocumentCreateSchema>({
-	// 		mutationFn: async (
-	// 			createDocumentBody: DocumentCreateSchema
-	// 		): Promise<HTTPResponse> =>
-	// 			// await createNewBlog(createBlogBody)
-	// 			// 	.then((response) => {
-	// 			// 		if (response.status === 201) {
-	// 			// 			queryClient.invalidateQueries({
-	// 			// 				queryKey: ['get-all-blogs-for-current-user'],
-	// 			// 			});
-	// 			// 			queryClient.invalidateQueries({
-	// 			// 				queryKey: ['get-all-blogs-by-current-user'],
-	// 			// 			});
-	// 			// 			setIsOpen({ isOpen: false, document: null });
-	// 			// 			return response.data;
-	// 			// 		}
+	const {
+		mutateAsync: createNewDocumentFn,
+		isPending: createNewDocumentPending,
+	} = useMutation<HTTPResponse, unknown, DocumentCreateSchema>({
+		mutationFn: async (
+			createDocumentBody: DocumentCreateSchema
+		): Promise<HTTPResponse> =>
+			await create(createDocumentBody)
+				.then((response) => {
+					if (response.status === 201) {
+						queryClient.invalidateQueries({
+							queryKey: ['get-all-documents'],
+						});
 
-	// 			// 		throw new Error('Blog creation Fail!');
-	// 			// 	})
-	// 			// 	.catch((e) => {
-	// 			// 		setIsOpen({
-	// 			// 			isOpen: false,
-	// 			// 			document: null,
-	// 			// 		});
+						setIsOpen({ isOpen: false, document: null });
+						setUploadCompleteObj(null);
+						return response.data;
+					}
 
-	// 			// 		toast.error(
-	// 			// 			e.response?.data?.data ?? 'Request Failed',
-	// 			// 			{
-	// 			// 				description:
-	// 			// 					e.response?.data?.message ??
-	// 			// 					'Something wrong plz try again',
-	// 			// 			}
-	// 			// 		);
-	// 			// 		throw e;
-	// 			// 	}),
-	// 	});
+					throw new Error('Document creation Fail!');
+				})
+				.catch((e) => {
+					setIsOpen({
+						isOpen: false,
+						document: null,
+					});
 
-	// const { mutateAsync: updateBlogFn, isPending: updateBlogPending } =
-	// 	useMutation({
-	// 		mutationFn: async ({
-	// 			blogId,
-	// 			createBlogBody,
-	// 		}: {
-	// 			blogId: number;
-	// 			updateDocumentBody: DocumentCreateSchema;
-	// 		}): Promise<HTTPResponse> =>
-	// 			// await updateBlog(blogId, createBlogBody)
-	// 			// 	.then((response) => {
-	// 			// 		if (response.status === 200) {
-	// 			// 			queryClient.invalidateQueries({
-	// 			// 				queryKey: ['get-all-blogs-for-current-user'],
-	// 			// 			});
-	// 			// 			queryClient.invalidateQueries({
-	// 			// 				queryKey: ['get-all-blogs-by-current-user'],
-	// 			// 			});
-	// 			// 			setIsOpen({ isOpen: false, document: null });
-	// 			// 			return response.data;
-	// 			// 		}
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
-	// 			// 		throw new Error('Blog update Fail!');
-	// 			// 	})
-	// 			// 	.catch((e) => {
-	// 			// 		setIsOpen({
-	// 			// 			isOpen: false,
-	// 			// 			document: null,
-	// 			// 		});
+	const { mutateAsync: updateDocumentFn, isPending: updateDocumentPending } =
+		useMutation({
+			mutationFn: async ({
+				id,
+				updateDocumentBody,
+			}: {
+				id: number;
+				updateDocumentBody: DocumentCreateSchema;
+			}): Promise<HTTPResponse> =>
+				await update(id, updateDocumentBody)
+					.then((response) => {
+						if (response.status === 204) {
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents'],
+							});
 
-	// 			// 		toast.error(
-	// 			// 			e.response?.data?.data ?? 'Request Failed',
-	// 			// 			{
-	// 			// 				description:
-	// 			// 					e.response?.data?.message ??
-	// 			// 					'Something wrong plz try again',
-	// 			// 			}
-	// 			// 		);
-	// 			// 		throw e;
-	// 			// 	}),
-	// 	});
+							setUploadCompleteObj(null);
+							setIsOpen({ isOpen: false, document: null });
+							return response.data;
+						}
 
-	// const handleBlogMutation = async (
-	// 	values: z.infer<typeof documentCreateSchema>
-	// ) => {
-	// 	if (!!initialDocument) {
-	// 		const blogUpdateRes = await updateBlogFn({
-	// 			blogId: initialDocument.id,
-	// 			createBlogBody: values,
-	// 		});
-	// 		toast.success(blogUpdateRes.message);
-	// 	} else {
-	// 		const blogCreatedRes = await createNewBlogFn(values);
-	// 		toast.success(blogCreatedRes.message);
-	// 	}
-	// };
+						throw new Error('Document update Fail!');
+					})
+					.catch((e) => {
+						setIsOpen({
+							isOpen: false,
+							document: null,
+						});
+
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
+						throw e;
+					}),
+		});
+
+	const handleDocumentMutation = async (
+		values: z.infer<typeof documentCreateSchema>
+	) => {
+		if (!!initialDocument) {
+			// TODO Check why fileType is null for update
+			await updateDocumentFn({
+				id: initialDocument.id,
+				updateDocumentBody: {
+					...values,
+					fileType: uploadCompleteObj?.fileType,
+					fileUrl: uploadCompleteObj?.fileUrl,
+					storedName: uploadCompleteObj?.storedName,
+					storedUUID: uploadCompleteObj?.storedUUID,
+					userName: user?.name,
+					userId: user?.id,
+					entityType: 6, // For Document
+				},
+			});
+			toast.success('Successfully update the document');
+		} else {
+			const documentCreatedRes = await createNewDocumentFn({
+				...values,
+				fileType: uploadCompleteObj?.fileType,
+				fileUrl: uploadCompleteObj?.fileUrl,
+				storedName: uploadCompleteObj?.storedName,
+				storedUUID: uploadCompleteObj?.storedUUID,
+				userName: user?.name,
+				userId: user?.id,
+				entityType: 6, // For Document
+			});
+			toast.success(documentCreatedRes.message);
+		}
+	};
 
 	useEffect(() => {
 		if (initialDocument) {
 			form.setValue('title', initialDocument.title);
 			form.setValue('description', initialDocument.description);
+			form.setValue('fileType', initialDocument.filetype);
+
+			const newUploadObj = {
+				fileType: initialDocument.filetype,
+				fileUrl: initialDocument.fileUrl,
+				storedName: initialDocument.storedName,
+				storedUUID: initialDocument.storedUUID,
+			};
+
+			setUploadCompleteObj(newUploadObj);
 		}
 	}, [initialDocument]);
 
 	const isPending = false;
-
 	const watchedValues = form.watch(['title', 'description']);
 	const formInputHaveValue =
 		watchedValues[0].length > 3 && watchedValues[1].length > 10;
@@ -166,6 +228,10 @@ export default function DocumentMutationDialog() {
 			open={isOpen}
 			onOpenChange={(isOpen) => {
 				setIsOpen({ isOpen, document: null });
+				if (!isOpen) {
+					form.reset();
+					setUploadCompleteObj(null);
+				}
 			}}
 		>
 			<DialogContent>
@@ -181,7 +247,7 @@ export default function DocumentMutationDialog() {
 				</DialogHeader>
 				<Form {...form}>
 					<form
-						onSubmit={form.handleSubmit(() => {})}
+						onSubmit={form.handleSubmit(handleDocumentMutation)}
 						className="space-y-4"
 					>
 						<FormField
@@ -220,20 +286,57 @@ export default function DocumentMutationDialog() {
 						/>
 						<div className="space-y-3">
 							<span>Upload Document</span>
-							<div
-								style={{
-									pointerEvents: !formInputHaveValue
-										? 'none'
-										: 'all',
-								}}
-							>
-								<UploadcareFileUploader
-									handleSubmit={async () => {}}
-								/>
-							</div>
+							{!!uploadCompleteObj ? (
+								<div className="relative flex items-center gap-x-2">
+									<File className="size-10" />
+									<div className="">
+										<span className="text-sm">
+											{uploadCompleteObj.storedName}
+										</span>
+									</div>
+									<X
+										onClick={() => {
+											setUploadCompleteObj(null);
+										}}
+										className="absolute -right-1.5 -top-1.5 cursor-pointer text-red-500 transition-all hover:text-red-600"
+									/>
+								</div>
+							) : (
+								<div
+									style={{
+										pointerEvents: !formInputHaveValue
+											? 'none'
+											: 'all',
+									}}
+								>
+									<UploadcareFileUploader
+										uploadComplete={async ({
+											fileType,
+											fileUrl,
+											storedName,
+											storedUUID,
+										}: {
+											fileType: string;
+											fileUrl: string;
+											storedUUID: number;
+											storedName: string;
+										}) => {
+											setUploadCompleteObj({
+												fileType,
+												fileUrl,
+												storedName,
+												storedUUID,
+											});
+										}}
+									/>
+								</div>
+							)}
 						</div>
 						<DialogFooter>
-							<Button disabled={isPending} type="submit">
+							<Button
+								disabled={isPending || !uploadCompleteObj}
+								type="submit"
+							>
 								{!!initialDocument ? 'Save' : 'Upload'}
 							</Button>
 						</DialogFooter>
@@ -243,33 +346,3 @@ export default function DocumentMutationDialog() {
 		</Dialog>
 	);
 }
-
-// <form onSubmit={handleUploadDocument}>
-// 	<DialogHeader>
-// 		<DialogTitle>Upload Document</DialogTitle>
-// 		<DialogDescription>
-// 			Upload a document to share with your tutor or students.
-// 		</DialogDescription>
-// 	</DialogHeader>
-// 	<div className="grid gap-4 py-4">
-// 		<div className="grid gap-2">
-// 			<Label htmlFor="title">Document Title</Label>
-// 			<Input id="title" placeholder="Assignment Draft" required />
-// 		</div>
-// 		<div className="grid gap-2">
-// 			<Label htmlFor="description">Description</Label>
-// 			<Textarea
-// 				id="description"
-// 				placeholder="Brief description of the document"
-// 				className="resize-none"
-// 			/>
-// 		</div>
-// 		<div className="grid gap-2">
-// 			<Label htmlFor="file">File</Label>
-// 			<UploadcareFileUploader />
-// 		</div>
-// 	</div>
-// 	<DialogFooter>
-// 		<Button type="submit">Upload</Button>
-// 	</DialogFooter>
-// </form>;

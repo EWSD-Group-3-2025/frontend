@@ -1,14 +1,15 @@
 import { create } from 'zustand';
+import { Document } from '../types';
 
 interface OpenDocumentMutationDialogStoreProps {
 	isOpen: boolean;
-	document?: any | null;
+	document?: Document | null;
 	setIsOpen: ({
 		isOpen,
 		document,
 	}: {
 		isOpen: boolean;
-		document?: any | null;
+		document?: Document | null;
 	}) => void;
 }
 
@@ -21,6 +22,6 @@ export const useOpenDocumentMutationDialogStore =
 			document,
 		}: {
 			isOpen: boolean;
-			document?: any | null;
+			document?: Document | null;
 		}) => set({ isOpen, document }),
 	}));

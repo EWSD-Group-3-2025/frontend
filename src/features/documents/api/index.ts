@@ -18,7 +18,7 @@ export const create = async (createRequest: DocumentCreateSchema) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 
-	return await api.post<HTTPResponse<Document>>(
+	return await api.post<HTTPResponse>(
 		documentRoutes.baseDocumentUrl,
 		createRequest
 	);
