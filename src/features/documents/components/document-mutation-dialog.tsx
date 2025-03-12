@@ -90,10 +90,11 @@ export default function DocumentMutationDialog() {
 		},
 	});
 
-	const {
-		mutateAsync: createNewDocumentFn,
-		isPending: createNewDocumentPending,
-	} = useMutation<HTTPResponse, unknown, DocumentCreateSchema>({
+	const { mutateAsync: createNewDocumentFn } = useMutation<
+		HTTPResponse,
+		unknown,
+		DocumentCreateSchema
+	>({
 		mutationFn: async (
 			createDocumentBody: DocumentCreateSchema
 		): Promise<HTTPResponse> =>
@@ -126,46 +127,42 @@ export default function DocumentMutationDialog() {
 				}),
 	});
 
-	const { mutateAsync: updateDocumentFn, isPending: updateDocumentPending } =
-		useMutation({
-			mutationFn: async ({
-				id,
-				updateDocumentBody,
-			}: {
-				id: number;
-				updateDocumentBody: DocumentCreateSchema;
-			}): Promise<HTTPResponse> =>
-				await update(id, updateDocumentBody)
-					.then((response) => {
-						if (response.status === 204) {
-							queryClient.invalidateQueries({
-								queryKey: ['get-all-documents'],
-							});
-
-							setUploadCompleteObj(null);
-							setIsOpen({ isOpen: false, document: null });
-							return response.data;
-						}
-
-						throw new Error('Document update Fail!');
-					})
-					.catch((e) => {
-						setIsOpen({
-							isOpen: false,
-							document: null,
+	const { mutateAsync: updateDocumentFn } = useMutation({
+		mutationFn: async ({
+			id,
+			updateDocumentBody,
+		}: {
+			id: number;
+			updateDocumentBody: DocumentCreateSchema;
+		}): Promise<HTTPResponse> =>
+			await update(id, updateDocumentBody)
+				.then((response) => {
+					if (response.status === 204) {
+						queryClient.invalidateQueries({
+							queryKey: ['get-all-documents'],
 						});
 
-						toast.error(
-							e.response?.data?.data ?? 'Request Failed',
-							{
-								description:
-									e.response?.data?.message ??
-									'Something wrong plz try again',
-							}
-						);
-						throw e;
-					}),
-		});
+						setUploadCompleteObj(null);
+						setIsOpen({ isOpen: false, document: null });
+						return response.data;
+					}
+
+					throw new Error('Document update Fail!');
+				})
+				.catch((e) => {
+					setIsOpen({
+						isOpen: false,
+						document: null,
+					});
+
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
 	const handleDocumentMutation = async (
 		values: z.infer<typeof documentCreateSchema>

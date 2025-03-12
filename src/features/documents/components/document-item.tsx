@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import useConfirmDialog from '@/hooks/use-confirm-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuth } from '@/context/auth.context';
 import { Document } from '../types';
 import { Download, FileText } from 'lucide-react';
 import { downloadFile } from '@/utils/client-side-file-download';

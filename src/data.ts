@@ -1,5 +1,3 @@
-import { Document } from './features/documents/types';
-
 export const tutors = [
 	{
 		id: 't1',
@@ -69,35 +67,6 @@ export const meetings = [
 		time: '10:00 AM',
 		type: 'In-Person',
 		with: students[1].name,
-	},
-];
-
-export const documents: Document[] = [
-	{
-		id: 1,
-		title: 'Assignment 1',
-		description: 'First assignment for Introduction to Programming',
-		createdAt: new Date('2024-03-01T12:00:00Z'),
-		updatedAt: new Date('2024-03-01T12:00:00Z'),
-		storedUUID: 'lsajdflajsfdlsajfj',
-		fileUrl: 'fileurl',
-		filetype: 'pdf',
-		storedName: 'Assignment 1',
-		userId: 1,
-		entityType: 6,
-	},
-	{
-		id: 2,
-		title: 'Assignment 2',
-		description: 'First assignment for Introduction to Programming',
-		createdAt: new Date('2024-03-01T12:00:00Z'),
-		updatedAt: new Date('2024-03-01T12:00:00Z'),
-		storedUUID: 'lsajdflajsfdlsajfj',
-		fileUrl: 'fileurl',
-		filetype: 'pdf',
-		storedName: 'Assignment 2',
-		userId: 1,
-		entityType: 6,
 	},
 ];
 
