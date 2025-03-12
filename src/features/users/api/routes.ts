@@ -12,6 +12,7 @@ const userRoutes = {
 	browserCount: '/v1/admin/report/browser-count',
 	mostViewedPages: '/v1/admin/report/top-routes',
 	unassignStudent: '/v1/admin/dashboard/get-unassigned-students',
+	transferStudent: '/v1/allocations/transfer',
 };
 
 export default userRoutes;

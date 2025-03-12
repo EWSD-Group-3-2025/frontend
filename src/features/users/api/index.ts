@@ -1,3 +1,4 @@
+import { TransferStudentFormValue } from './../components/transfer-student-modal';
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
 import api from '@/utils/axios';
@@ -79,3 +80,6 @@ export const getMostViewedPages = async () =>
 
 export const getUnassignStudentList = async () =>
 	await api.get<StudentUser[]>(userRoutes.unassignStudent);
+
+export const transferStudent = async (body: TransferStudentFormValue) =>
+	await api.post<HTTPResponse<boolean>>(userRoutes.transferStudent, body);

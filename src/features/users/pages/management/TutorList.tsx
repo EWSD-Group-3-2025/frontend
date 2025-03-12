@@ -13,7 +13,7 @@ import {
 	UserRoundX,
 } from 'lucide-react';
 
-import { User } from '@/features/users/types';
+import { TutorUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
@@ -49,6 +49,7 @@ import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 import DeallocationStudent from '@/features/users/components/deallocation-student';
 import { useNavigate } from 'react-router-dom';
+import TransferStudentModal from '@/features/users/components/transfer-student-modal';
 
 const TutorList = () => {
 	const { user } = useAuth();
@@ -63,23 +64,24 @@ const TutorList = () => {
 		setName: setDeletedName,
 	} = useDeleteModalStore();
 
-	const [name, setName] = useState('');
+	const [selectedTutorName, setSelectedTutorName] = useState('');
+	const [selectedTutorId, setSelectedTutorId] = useState<number | null>(null);
 	const [isOpenAllocationModal, setIsOpenAllocationModal] = useState(false);
 	const [
 		deallocationStudentConfirmation,
 		setDeallocationStudentConfirmation,
 	] = useState(false);
-	const [selectedTutorId, setSelectedTutorId] = useState<number | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [isTransferStudentModal, setIsTransferStudentModal] = useState(false);
 
-	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
+	const { data, isLoading } = useQuery<HTTPResponse<TutorUser[]>>({
 		queryKey: ['get-all-users-tutor'],
-		queryFn: async (): Promise<HTTPResponse<User[]>> =>
+		queryFn: async (): Promise<HTTPResponse<TutorUser[]>> =>
 			await getAllUsers('role=tutor').then((response) => {
 				if (response.data.code === 200) {
-					return response.data;
+					return response.data as HTTPResponse<TutorUser[]>;
 				}
 
 				throw new Error('Fetch Tutor Listing Fail!');
@@ -129,7 +131,7 @@ const TutorList = () => {
 					if (response.data.code === 200) {
 						toast.success(response.data.message);
 						setResetPasswordConfirmation(false);
-						setName('');
+						setSelectedTutorName('');
 
 						return response.data;
 					}
@@ -138,7 +140,7 @@ const TutorList = () => {
 				})
 				.catch((e) => {
 					setResetPasswordConfirmation(false);
-					setName('');
+					setSelectedTutorName('');
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
 							e.response?.data?.message ??
@@ -153,9 +155,11 @@ const TutorList = () => {
 			await deallocationStudents(`tutorId=${selectedTutorId}`)
 				.then((response) => {
 					if (response.status === 204) {
-						toast.success(`${name}'s students are deallocated`);
+						toast.success(
+							`${selectedTutorName}'s students are deallocated`
+						);
 						setDeallocationStudentConfirmation(false);
-						setName('');
+						setSelectedTutorName('');
 
 						return response.data;
 					}
@@ -164,7 +168,7 @@ const TutorList = () => {
 				})
 				.catch((e) => {
 					setDeallocationStudentConfirmation(false);
-					setName('');
+					setSelectedTutorName('');
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
 							e.response?.data?.message ??
@@ -180,7 +184,7 @@ const TutorList = () => {
 		}
 	};
 
-	const userListColumns: ColumnDef<User>[] = [
+	const userListColumns: ColumnDef<TutorUser>[] = [
 		{
 			id: 'no',
 			header: 'No.',
@@ -286,7 +290,9 @@ const TutorList = () => {
 									disabled={!params.row.original.status}
 									onClick={() => {
 										setResetPasswordConfirmation(true);
-										setName(params.row.original.name);
+										setSelectedTutorName(
+											params.row.original.name
+										);
 									}}
 								>
 									<SquareAsterisk /> Reset Password
@@ -317,7 +323,9 @@ const TutorList = () => {
 										setSelectedTutorId(
 											params.row.original.id
 										);
-										setName(params.row.original.name);
+										setSelectedTutorName(
+											params.row.original.name
+										);
 									}}
 								>
 									<UserRoundX /> Deallocate Students
@@ -325,6 +333,15 @@ const TutorList = () => {
 
 								<DropdownMenuItem
 									disabled={!params.row.original.status}
+									onClick={() => {
+										setIsTransferStudentModal(true);
+										setSelectedTutorName(
+											params.row.original.name
+										);
+										setSelectedTutorId(
+											params.row.original.id
+										);
+									}}
 								>
 									<RefreshCcw /> Transfer Students
 								</DropdownMenuItem>
@@ -365,16 +382,23 @@ const TutorList = () => {
 
 	useEffect(() => {
 		if (!resetPasswordConfirmation) {
-			setName('');
+			setSelectedTutorName('');
 		}
 	}, [resetPasswordConfirmation]);
 
 	useEffect(() => {
 		if (!deallocationStudentConfirmation) {
-			setName('');
+			setSelectedTutorName('');
 			setSelectedTutorId(null);
 		}
 	}, [deallocationStudentConfirmation]);
+
+	useEffect(() => {
+		if (!isTransferStudentModal) {
+			setSelectedTutorId(null);
+			setSelectedTutorName('');
+		}
+	}, []);
 
 	return (
 		<>
@@ -424,14 +448,26 @@ const TutorList = () => {
 			/>
 
 			<ResetPasswordConfirmationModal
-				name={name}
+				name={selectedTutorName}
 				isOpen={resetPasswordConfirmation}
 				setIsOpen={setResetPasswordConfirmation}
 				handleReset={() => handleResetPassword()}
 			/>
 
+			{selectedTutorId && selectedTutorName && (
+				<TransferStudentModal
+					isOpen={isTransferStudentModal}
+					setIsOpen={setIsTransferStudentModal}
+					tutorData={{
+						id: selectedTutorId,
+						name: selectedTutorName,
+					}}
+					tutorList={data?.data ?? []}
+				/>
+			)}
+
 			<DeallocationStudent
-				name={name}
+				name={selectedTutorName}
 				isOpen={deallocationStudentConfirmation}
 				setIsOpen={setDeallocationStudentConfirmation}
 				handleReset={() => handleDeallocationStudents()}
