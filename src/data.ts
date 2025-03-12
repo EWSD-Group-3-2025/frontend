@@ -1,3 +1,5 @@
+import { Document } from './features/documents/types';
+
 export const tutors = [
 	{
 		id: 't1',
@@ -70,20 +72,32 @@ export const meetings = [
 	},
 ];
 
-export const documents = [
+export const documents: Document[] = [
 	{
-		id: 'doc-1',
+		id: 1,
 		title: 'Assignment 1',
 		description: 'First assignment for Introduction to Programming',
-		uploadDate: '2024-03-01T12:00:00Z',
-		owner: students[0],
+		createdAt: new Date('2024-03-01T12:00:00Z'),
+		updatedAt: new Date('2024-03-01T12:00:00Z'),
+		storedUUID: 'lsajdflajsfdlsajfj',
+		fileUrl: 'fileurl',
+		filetype: 'pdf',
+		storedName: 'Assignment 1',
+		userId: 1,
+		entityType: 6,
 	},
 	{
-		id: 'doc-2',
-		title: 'Midterm Exam',
-		description: 'Midterm exam for Data Structures and Algorithms',
-		uploadDate: '2024-03-10T15:00:00Z',
-		owner: students[1],
+		id: 2,
+		title: 'Assignment 2',
+		description: 'First assignment for Introduction to Programming',
+		createdAt: new Date('2024-03-01T12:00:00Z'),
+		updatedAt: new Date('2024-03-01T12:00:00Z'),
+		storedUUID: 'lsajdflajsfdlsajfj',
+		fileUrl: 'fileurl',
+		filetype: 'pdf',
+		storedName: 'Assignment 2',
+		userId: 1,
+		entityType: 6,
 	},
 ];
 
