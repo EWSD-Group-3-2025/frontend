@@ -55,9 +55,15 @@ export interface AdminDashboard {
 	assignedStudents: number;
 	activeTutors: number;
 	totalMessages: number;
+	increaseThisMonthCount: number;
 }
 
 export interface MostBrowserUsagePieChart {
 	browserName: string;
 	uniqueUserCount: number;
+}
+
+export interface MostViewedPage {
+	pageName: string;
+	visitCount: number;
 }

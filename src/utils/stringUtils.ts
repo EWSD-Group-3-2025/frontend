@@ -1,6 +1,7 @@
 import { appRouteList } from '@/router';
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
+import { GENDER, USER_ROLE } from '@/constants';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -27,4 +28,32 @@ export const buildURL = <T extends Record<string, string | number>>(
 	return template.replace(/\${(.*?)}/g, (_, key: string) => {
 		return key in values ? String(values[key as keyof T]) : '';
 	});
+};
+
+export const getGenderName = (genderId: number): string => {
+	switch (genderId) {
+		case GENDER.MALE.value:
+			return GENDER.MALE.label;
+		case GENDER.FEMALE.value:
+			return GENDER.FEMALE.label;
+		case GENDER.OTHER.value:
+			return GENDER.OTHER.label;
+		default:
+			return 'Unknown';
+	}
+};
+
+export const getRoleColor = (status: string) => {
+	switch (status) {
+		case USER_ROLE.ADMIN:
+			return 'bg-badge-admin hover:bg-badge-admin text-font';
+		case USER_ROLE.STAFF:
+			return 'bg-badge-staff hover:bg-badge-staff text-font';
+		case USER_ROLE.STUDENT:
+			return 'bg-badge-student hover:bg-badge-student dark:text-font-white';
+		case USER_ROLE.TUTOR:
+			return 'bg-badge-tutor hover:bg-badge-tutor text-font';
+		default:
+			return 'bg-secondary';
+	}
 };

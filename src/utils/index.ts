@@ -10,8 +10,10 @@ import {
 import {
 	cn,
 	buildURL,
-	convertNameToSlug,
 	getPageName,
+	getRoleColor,
+	getGenderName,
+	convertNameToSlug,
 } from '@/utils/stringUtils';
 import api from '@/utils/axios';
 import { getBrowserName } from '@/utils/getBrowserName';
@@ -24,7 +26,9 @@ export {
 	hasAccess,
 	isNewUser,
 	getPageName,
+	getRoleColor,
 	objectToArray,
+	getGenderName,
 	getBrowserName,
 	setNewUserFlag,
 	getAuthPathname,

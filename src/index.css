@@ -72,6 +72,10 @@ body {
 		--brave: 19 97% 58%;
 		--internet-explorer: 194 78% 55%;
 		--unknown: 220 5% 60%;
+		--badge-admin: 187 76% 50%;
+		--badge-staff: 32 88% 50%;
+		--badge-student: 220 80% 50%;
+		--badge-tutor: 150 75% 40%;
 	}
 
 	.dark {
@@ -117,6 +121,10 @@ body {
 		--brave: 134 61% 60%;
 		--internet-explorer: 220 14% 65%;
 		--unknown: 0 0% 75%;
+		--badge-admin: 187 76% 45%;
+		--badge-staff: 32 88% 40%;
+		--badge-student: 220 80% 40%;
+		--badge-tutor: 150 75% 35%;
 	}
 }
 

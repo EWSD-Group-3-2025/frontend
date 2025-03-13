@@ -50,6 +50,7 @@ import ResetPasswordConfirmationModal from '@/features/users/components/reset-pa
 import DeallocationStudent from '@/features/users/components/deallocation-student';
 import { useNavigate } from 'react-router-dom';
 import TransferStudentModal from '@/features/users/components/transfer-student-modal';
+import { getGenderName } from '@/utils';
 
 const TutorList = () => {
 	const { user } = useAuth();
@@ -224,15 +225,7 @@ const TutorList = () => {
 				<HeaderSorting column={column} title="Gender" />
 			),
 			accessorKey: 'gender',
-			cell: (params) => (
-				<>
-					{params.row.original.gender === 1
-						? 'Male'
-						: params.row.original.gender === 2
-							? 'Female'
-							: 'Other'}
-				</>
-			),
+			cell: (params) => getGenderName(params.row.original.gender),
 		},
 		{
 			id: 'status',

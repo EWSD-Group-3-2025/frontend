@@ -39,6 +39,7 @@ import UserFormModal from '@/features/users/components/user-form-modal';
 import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
+import { getGenderName } from '@/utils';
 
 const AdminList = () => {
 	const queryClient = useQueryClient();

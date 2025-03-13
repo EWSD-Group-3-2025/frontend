@@ -26,6 +26,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	AdminDashboard as AdminDashboardDataType,
 	MostBrowserUsagePieChart,
+	MostViewedPage,
 	StudentUser,
 } from '@/features/users/types';
 import DataTable from '@/components/data-table';
@@ -33,6 +34,8 @@ import { useQueries } from '@tanstack/react-query';
 import {
 	getAdminDashboard,
 	getBrowserCount,
+	getInactivityStudents,
+	getMostActiveUsers,
 	getMostViewedPages,
 	getUnassignStudentList,
 } from '@/features/users/api';
@@ -40,6 +43,9 @@ import AllocateTutor from '@/features/users/components/allocate-tutor';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMedia } from 'react-use';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn, getGenderName, getRoleColor } from '@/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface CustomConfig {
 	[key: string]: {
@@ -142,20 +148,29 @@ const AdminDashboard = () => {
 			accessorKey: 'courseName',
 		},
 		{
+			id: 'roleId',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="Role" />
+			),
+			accessorKey: 'roleId',
+			cell: (params) => (
+				<Badge
+					className={cn(
+						'w-16 justify-center rounded-[3px] capitalize tracking-wide',
+						getRoleColor(params.row.original.roleName)
+					)}
+				>
+					{params.row.original.roleName.toLocaleLowerCase()}
+				</Badge>
+			),
+		},
+		{
 			id: 'gender',
 			header: ({ column }) => (
 				<HeaderSorting column={column} title="Gender" />
 			),
 			accessorKey: 'gender',
-			cell: (params) => (
-				<>
-					{params.row.original.gender === 1
-						? 'Male'
-						: params.row.original.gender === 2
-							? 'Female'
-							: 'Other'}
-				</>
-			),
+			cell: (params) => getGenderName(params.row.original.gender),
 		},
 		{
 			id: 'action',
@@ -164,6 +179,7 @@ const AdminDashboard = () => {
 			cell: (params) => (
 				<Button
 					className="w-fit"
+					size="sm"
 					onClick={() => {
 						setSelectedStudent(params.row.original);
 						setIsOpenAllocationModal(true);
@@ -178,8 +194,10 @@ const AdminDashboard = () => {
 	const [
 		{ data: unassignStudentData, isLoading: unassignStudentLoading },
 		{ data: adminDashboardData, isLoading: adminDashboardLoading },
-		{ data: mostBrowserUsageData },
-		{ data: barChartData },
+		{ data: mostBrowserUsageData, isLoading: mostBrowserUsageLoading },
+		{ data: mostViewedPageData, isLoading: mostViewedPageLoading },
+		{ data: mostActiveUsersData, isLoading: mostActiveUsersLoading },
+		{ data: inactiveStudentData, isLoading: inactiveStudentLoading },
 	] = useQueries({
 		queries: [
 			{
@@ -188,8 +206,7 @@ const AdminDashboard = () => {
 					const response = await getUnassignStudentList();
 
 					if (response.status === 200) {
-						console.log('AAA');
-						return response.data as StudentUser[];
+						return response.data.data as StudentUser[];
 					}
 
 					throw new Error('Fetch Student Listing Fail!');
@@ -229,8 +246,30 @@ const AdminDashboard = () => {
 			},
 			{
 				queryKey: ['get-most-pages-viewed'],
-				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+				queryFn: async (): Promise<HTTPResponse<MostViewedPage[]>> => {
 					const response = await getMostViewedPages();
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<MostViewedPage[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+			{
+				queryKey: ['get-most-active-users'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getMostActiveUsers();
+					if (response.data.code === 200) {
+						return response.data as HTTPResponse<StudentUser[]>;
+					}
+
+					throw new Error('Fetch Student Listing Fail!');
+				},
+			},
+			{
+				queryKey: ['get-inactive-students'],
+				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
+					const response = await getInactivityStudents();
 					if (response.data.code === 200) {
 						return response.data as HTTPResponse<StudentUser[]>;
 					}
@@ -240,6 +279,20 @@ const AdminDashboard = () => {
 			},
 		],
 	});
+
+	const getFilteredColumns = (type: 'unassigned' | 'inactive' | 'active') => {
+		const excludedFields: Record<string, string[]> = {
+			unassigned: ['roleId'],
+			inactive: ['action', 'course', 'roleId'],
+			active: ['action', 'course'],
+		};
+
+		return userListColumns.filter(
+			(col) => !excludedFields[type]?.includes(col.id ?? '')
+		);
+	};
+
+	console.log(mostActiveUsersData?.data);
 
 	return (
 		<>
@@ -260,6 +313,10 @@ const AdminDashboard = () => {
 						<div className="flex flex-1 gap-3">
 							<DashboardCard
 								title="Total Users"
+								description={`+ ${
+									adminDashboardData.data
+										.increaseThisMonthCount
+								} last month`}
 								value={adminDashboardData.data.totalUsers}
 								icon={UsersRound}
 							/>
@@ -290,74 +347,114 @@ const AdminDashboard = () => {
 						<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
 							Most Browser Usage
 						</h2>
-						<ChartContainer config={chartConfig} className="h-full">
-							<PieChart>
-								<ChartTooltip
-									content={<ChartTooltipContent hideLabel />}
-								/>
-								<Pie
-									data={mostBrowserUsageData}
-									dataKey="uniqueUserCount"
-									label
-									nameKey="browserName"
-								/>
-							</PieChart>
-						</ChartContainer>
+						{mostBrowserUsageLoading ? (
+							<Skeleton className="h-64 w-full rounded-lg" />
+						) : (
+							<ChartContainer
+								config={chartConfig}
+								className="h-full"
+							>
+								<PieChart>
+									<ChartTooltip
+										content={
+											<ChartTooltipContent hideLabel />
+										}
+									/>
+									<Pie
+										data={mostBrowserUsageData}
+										dataKey="uniqueUserCount"
+										label
+										nameKey="browserName"
+									/>
+								</PieChart>
+							</ChartContainer>
+						)}
 					</div>
 					<div className="bar-chart flex-1">
 						<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
 							Top 5 Most User Viewed Pages
 						</h2>
-						<ChartContainer config={barChartConfig}>
-							<BarChart
-								accessibilityLayer
-								data={barChartData?.data}
-								layout="vertical"
-								margin={{
-									left: isDesktop ? 30 : 40,
-									right: 20,
-								}}
-							>
-								<XAxis
-									type="number"
-									dataKey="visitCount"
-									hide
-								/>
-								<YAxis
-									dataKey="pageName"
-									type="category"
-									tickLine={false}
-									tickMargin={10}
-									axisLine={false}
-								/>
-								<ChartTooltip
-									cursor={false}
-									content={<ChartTooltipContent hideLabel />}
-								/>
-								<Bar
-									dataKey="visitCount"
-									fill="hsl(var(--chart-2))"
-									radius={5}
+						{mostViewedPageLoading ? (
+							<Skeleton className="h-64 w-full rounded-lg" />
+						) : (
+							<ChartContainer config={barChartConfig}>
+								<BarChart
+									accessibilityLayer
+									data={mostViewedPageData?.data}
+									layout="vertical"
+									margin={{
+										left: isDesktop ? 30 : 40,
+										right: 20,
+									}}
 								>
-									<LabelList
+									<XAxis
+										type="number"
 										dataKey="visitCount"
-										position="right"
-										offset={8}
-										className="fill-foreground"
-										fontSize={12}
+										hide
 									/>
-								</Bar>
-							</BarChart>
-						</ChartContainer>
+									<YAxis
+										dataKey="pageName"
+										type="category"
+										tickLine={false}
+										tickMargin={10}
+										axisLine={false}
+									/>
+									<ChartTooltip
+										cursor={false}
+										content={
+											<ChartTooltipContent hideLabel />
+										}
+									/>
+									<Bar
+										dataKey="visitCount"
+										fill="hsl(var(--chart-2))"
+										radius={5}
+									>
+										<LabelList
+											dataKey="visitCount"
+											position="right"
+											offset={8}
+											className="fill-foreground"
+											fontSize={12}
+										/>
+									</Bar>
+								</BarChart>
+							</ChartContainer>
+						)}
 					</div>
 				</div>
 
 				<div className="mt-10">
+					<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
+						Unassigned Student List
+					</h2>
 					<DataTable
-						className="h-fit"
-						columns={userListColumns}
+						columns={getFilteredColumns('unassigned')}
 						isLoading={unassignStudentLoading}
 						data={unassignStudentData ?? []}
+						cellClassName="py-1"
+					/>
+				</div>
+
+				<div className="mt-5">
+					<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
+						Inactive 7days - 28days Student List
+					</h2>
+					<DataTable
+						columns={getFilteredColumns('inactive')}
+						isLoading={inactiveStudentLoading}
+						data={inactiveStudentData?.data ?? []}
+					/>
+				</div>
+
+				<div className="mt-5">
+					<h2 className="mb-2 text-center font-roboto-slab text-xl lg:text-2xl">
+						Most Active User List
+					</h2>
+					<DataTable
+						columns={getFilteredColumns('active')}
+						isLoading={mostActiveUsersLoading}
+						data={mostActiveUsersData?.data ?? []}
 					/>
 				</div>
 			</ContainerWrapper>

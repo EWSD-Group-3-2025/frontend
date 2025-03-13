@@ -47,6 +47,7 @@ import dayjs from 'dayjs';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 import { useNavigate } from 'react-router-dom';
+import { getGenderName } from '@/utils';
 
 const StudentList = () => {
 	const { user } = useAuth();
@@ -190,15 +191,7 @@ const StudentList = () => {
 				<HeaderSorting column={column} title="Gender" />
 			),
 			accessorKey: 'gender',
-			cell: (params) => (
-				<>
-					{params.row.original.gender === 1
-						? 'Male'
-						: params.row.original.gender === 2
-							? 'Female'
-							: 'Other'}
-				</>
-			),
+			cell: (params) => getGenderName(params.row.original.gender),
 		},
 		{
 			id: 'isAssigned',

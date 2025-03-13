@@ -75,6 +75,10 @@ export default {
 				},
 				'container-bg': 'hsl(var(--wrapper-bg))',
 				warning: 'hsl(var(--warning))',
+				'badge-admin': 'hsl(var(--badge-admin))',
+				'badge-staff': 'hsl(var(--badge-staff))',
+				'badge-student': 'hsl(var(--badge-student))',
+				'badge-tutor': 'hsl(var(--badge-tutor))',
 			},
 			screens: {
 				xs: '450px',
