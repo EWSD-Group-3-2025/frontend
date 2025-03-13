@@ -56,11 +56,10 @@ export default function LoginPage() {
 					);
 
 					if (response.data.data.user.firstTimeLogin) {
-						window.location.href = '/change-password';
-
+						navigate('/change-password');
 						setNewUserFlag();
 					} else {
-						window.location.href = redirectRoute;
+						navigate(redirectRoute);
 					}
 
 					toast.success(response.data.message);
