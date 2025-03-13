@@ -6,6 +6,7 @@ import SearchBox from '@/components/search-box';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import { getAllActivityLogs } from '@/features/activity-logs/api';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
 
 const ActivityLogs = () => {
 	const { data, isLoading } = useQuery<HTTPResponse<ActivityLog[]>>({
@@ -47,9 +48,7 @@ const ActivityLogs = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
-					Activity Logs
-				</h1>
+				<ResponsiveTitle title="Activity Logs" />
 			</div>
 			<ContainerWrapper>
 				<div className="mb-3 flex gap-5">

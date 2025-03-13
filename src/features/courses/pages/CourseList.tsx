@@ -18,6 +18,8 @@ import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import CourseCreateModal from '@/features/courses/components/CourseCreateModal';
 import CourseUpdateModal from '@/features/courses/components/CourseUpdateModal';
 import ExportButton from '@/components/export-button';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
+import ResponsiveButton from '@/components/responsive/responsive-button';
 
 const courseCreateSchema = z.object({
 	name: z.array(z.string()).nonempty('Please at least one item'),
@@ -141,17 +143,17 @@ const CourseList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
-					Course List
-				</h1>
-				<Button onClick={() => setOpenModal(true)}>
-					<Plus />
-					Create Course
-				</Button>
+				<ResponsiveTitle title="Course List" />
+				<ResponsiveButton
+					text="Create Course"
+					icon={Plus}
+					handleClick={() => setOpenModal(true)}
+				/>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex justify-between gap-5">
-					<SearchBox />
+				<div className="mb-3 flex flex-wrap justify-between gap-3">
+					<SearchBox placeholder="Search Course" />
+
 					{data && data.data.length > 0 && !isLoading && (
 						<ExportButton
 							data={

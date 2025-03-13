@@ -51,6 +51,8 @@ import DeallocationStudent from '@/features/users/components/deallocation-studen
 import { useNavigate } from 'react-router-dom';
 import TransferStudentModal from '@/features/users/components/transfer-student-modal';
 import { getGenderName } from '@/utils';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
+import ResponsiveButton from '@/components/responsive/responsive-button';
 
 const TutorList = () => {
 	const { user } = useAuth();
@@ -396,18 +398,17 @@ const TutorList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
-					Tutor Management
-				</h1>
-				<Button onClick={() => setIsOpen(true)}>
-					<UserPlus className="font-bold" />
-					Add Tutor
-				</Button>
+				<ResponsiveTitle title="Tutor Management" />
+				<ResponsiveButton
+					text="Add Tutor"
+					icon={UserPlus}
+					handleClick={() => setIsOpen(true)}
+				/>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex justify-between">
-					<div className="flex gap-5">
-						<SearchBox placeholder="Search admin" />
+				<div className="mb-3 flex flex-wrap justify-between gap-3">
+					<div className="flex flex-wrap gap-3">
+						<SearchBox placeholder="Search Tutor" />
 						<div className="block min-w-32">
 							<AccountStatusDropDown />
 						</div>

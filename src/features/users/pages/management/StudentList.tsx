@@ -48,6 +48,8 @@ import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 import { useNavigate } from 'react-router-dom';
 import { getGenderName } from '@/utils';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
+import ResponsiveButton from '@/components/responsive/responsive-button';
 
 const StudentList = () => {
 	const { user } = useAuth();
@@ -342,28 +344,25 @@ const StudentList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
-					Student Management
-				</h1>
-				<div className="">
-					<Button
-						className="me-2"
+				<ResponsiveTitle title="Student Management" />
+				<div className="flex flex-wrap justify-center gap-2">
+					<ResponsiveButton
+						text="Bulk Allocation"
 						variant="outline"
-						onClick={() => setIsOpenAllocationModal(true)}
-					>
-						<Users className="font-bold" />
-						Bulk Allocation
-					</Button>
-					<Button onClick={() => setIsOpen(true)}>
-						<UserPlus className="font-bold" />
-						Add Student
-					</Button>
+						icon={Users}
+						handleClick={() => setIsOpenAllocationModal(true)}
+					/>
+					<ResponsiveButton
+						text="Add Student"
+						icon={UserPlus}
+						handleClick={() => setIsOpen(true)}
+					/>
 				</div>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex justify-between">
-					<div className="flex gap-5">
-						<SearchBox placeholder="Search admin" />
+				<div className="mb-3 flex flex-wrap justify-between gap-3">
+					<div className="flex flex-wrap gap-3">
+						<SearchBox placeholder="Search Student" />
 						<div className="block min-w-32">
 							<AccountStatusDropDown />
 						</div>

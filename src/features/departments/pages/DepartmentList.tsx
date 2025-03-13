@@ -19,6 +19,8 @@ import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
 import DepartmentCreateModal from '@/features/departments/components/DepartmentCreateModal';
 import DepartmentUpdateModal from '@/features/departments/components/DepartmentUpdateModal';
 import ExportButton from '@/components/export-button';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
+import ResponsiveButton from '@/components/responsive/responsive-button';
 
 const DepartmentList = () => {
 	const queryClient = useQueryClient();
@@ -131,17 +133,16 @@ const DepartmentList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-3xl font-semibold">
-					Department List
-				</h1>
-				<Button onClick={() => setOpenModal(true)}>
-					<Plus />
-					Create Department
-				</Button>
+				<ResponsiveTitle title="Department List" />
+				<ResponsiveButton
+					text="Create Department"
+					icon={Plus}
+					handleClick={() => setOpenModal(true)}
+				/>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex justify-between gap-5">
-					<SearchBox />
+				<div className="mb-3 flex flex-wrap justify-between gap-3">
+					<SearchBox placeholder="Search Department" />
 					{data && data.data.length > 0 && !isLoading && (
 						<ExportButton
 							data={

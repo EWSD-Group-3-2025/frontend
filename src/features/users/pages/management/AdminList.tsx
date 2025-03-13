@@ -40,6 +40,8 @@ import { useUserFormModal } from '@/features/users/store/user-form-modal';
 import AccountStatusDropDown from '@/features/users/components/account-status-dropdown';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
 import { getGenderName } from '@/utils';
+import ResponsiveTitle from '@/components/responsive/responsive-title';
+import ResponsiveButton from '@/components/responsive/responsive-button';
 
 const AdminList = () => {
 	const queryClient = useQueryClient();
@@ -172,15 +174,7 @@ const AdminList = () => {
 				<HeaderSorting column={column} title="Gender" />
 			),
 			accessorKey: 'gender',
-			cell: (params) => (
-				<>
-					{params.row.original.gender === 1
-						? 'Male'
-						: params.row.original.gender === 2
-							? 'Female'
-							: 'Other'}
-				</>
-			),
+			cell: (params) => getGenderName(params.row.original.gender),
 		},
 		{
 			id: 'status',
@@ -274,18 +268,17 @@ const AdminList = () => {
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
-				<h1 className="font-roboto-slab text-2xl font-semibold transition-all duration-300 ease-linear sm:text-3xl">
-					Admin Management
-				</h1>
-				<Button onClick={() => setIsOpen(true)}>
-					<UserPlus className="font-bold" />
-					Add Admin
-				</Button>
+				<ResponsiveTitle title="Admin Management" />
+				<ResponsiveButton
+					text="Add Admin"
+					icon={UserPlus}
+					handleClick={() => setIsOpen(true)}
+				/>
 			</div>
 			<ContainerWrapper>
-				<div className="mb-3 flex justify-between">
-					<div className="flex gap-5">
-						<SearchBox placeholder="Search admin" />
+				<div className="mb-3 flex flex-wrap justify-between gap-3">
+					<div className="flex flex-wrap gap-3">
+						<SearchBox placeholder="Search Admin" />
 						<div className="block min-w-32">
 							<AccountStatusDropDown />
 						</div>
