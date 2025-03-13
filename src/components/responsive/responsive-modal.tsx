@@ -1,8 +1,8 @@
 'use client';
 
 import { useMedia } from 'react-use';
-import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
-import { Drawer, DrawerContent, DrawerTitle } from './ui/drawer';
+import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
+import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { cn } from '@/utils';
 
 interface ResponsiveModalProps {
