@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
 	isLoading?: boolean;
 	noDataText?: string;
 	className?: string;
+	cellClassName?: string;
 }
 
 const DataTable = <TData, TValue>({
@@ -38,6 +39,7 @@ const DataTable = <TData, TValue>({
 	isLoading,
 	noDataText,
 	className,
+	cellClassName,
 }: DataTableProps<TData, TValue>) => {
 	const {
 		search: globalFilter,
@@ -137,7 +139,10 @@ const DataTable = <TData, TValue>({
 										{row.getVisibleCells().map((cell) => (
 											<TableCell
 												key={cell.id}
-												className="whitespace-nowrap"
+												className={cn(
+													'whitespace-nowrap',
+													cellClassName
+												)}
 											>
 												{flexRender(
 													cell.column.columnDef.cell,
