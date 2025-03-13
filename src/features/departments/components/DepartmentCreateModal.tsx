@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth.context';
 import { TagsInput } from '@/components/ui/tags-input';
 import RequiredStar from '@/components/ui/required-star';
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import { createDepartment } from '@/features/departments/api';
 
 type DepartmentCreateModalProp = {

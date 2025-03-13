@@ -1,4 +1,4 @@
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import { allocation, getAllUsers } from '@/features/users/api';
 import { StudentUser, TutorUser } from '@/features/users/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

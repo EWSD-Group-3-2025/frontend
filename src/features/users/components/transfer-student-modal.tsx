@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import {
 	Form,
 	FormControl,

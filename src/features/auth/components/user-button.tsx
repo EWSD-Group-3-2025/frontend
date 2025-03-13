@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, User } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import UserProfile from './user-profile';
 import { useOpenProfileStore } from '../store/use-open-profile-store';
 import { Skeleton } from '@/components/ui/skeleton';

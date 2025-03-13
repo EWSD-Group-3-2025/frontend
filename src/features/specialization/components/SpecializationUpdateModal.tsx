@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import RequiredStar from '@/components/ui/required-star';
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import { updateSpecialization } from '@/features/specialization/api';
 
 type SpecializationUpdateModalProp = {

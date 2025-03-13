@@ -1,4 +1,4 @@
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';

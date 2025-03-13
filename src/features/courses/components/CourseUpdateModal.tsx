@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { updateCourse } from '@/features/courses/api';
 import RequiredStar from '@/components/ui/required-star';
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 
 type CourseUpdateModalProp = {
 	open: boolean;

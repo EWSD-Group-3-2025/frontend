@@ -18,7 +18,7 @@ import { useAuth } from '@/context/auth.context';
 import { createCourse } from '@/features/courses/api';
 import { TagsInput } from '@/components/ui/tags-input';
 import RequiredStar from '@/components/ui/required-star';
-import ResponsiveModal from '@/components/responsive-modal';
+import ResponsiveModal from '@/components/responsive/responsive-modal';
 
 type CourseCreateModalProp = {
 	open: boolean;
