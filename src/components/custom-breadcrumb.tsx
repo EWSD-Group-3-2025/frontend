@@ -34,7 +34,7 @@ const CustomBreadcrumbs = () => {
 							className="inline-flex items-center gap-1.5"
 							key={index}
 						>
-							<BreadcrumbItem>
+							<BreadcrumbItem className="text-xs xs:text-sm">
 								<BreadcrumbLink
 									className={`${
 										isDashboard || isLast
