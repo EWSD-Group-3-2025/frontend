@@ -6,11 +6,12 @@ import {
 	AdminDashboard,
 	ChangePasswordRequest,
 	MostBrowserUsagePieChart,
+	MostViewedPage,
 	StudentUser,
 	TutorUser,
 	User,
 } from '../types';
-import userRoutes from './routes';
+import { userRoutes, allocationRoutes, dashboardRoutes } from './routes';
 import { buildURL } from '@/utils';
 import { UserFormValue } from '@/features/users/components/user-form-modal';
 import { AllocateTutor } from '@/features/users/components/allocate-tutor';
@@ -50,36 +51,49 @@ export const deleteUser = async (id: number) =>
 		buildURL(userRoutes.userId, { id })
 	);
 
-export const allocation = async (body: AllocateTutor) =>
-	await api.post(userRoutes.allocation, body);
-
-export const deallocationStudents = async (params: string = '') =>
-	await api.delete(userRoutes.deallocationStudents.concat(`?${params}`));
-
 export const resetPasswordByAdmin = async () =>
 	await api.post(userRoutes.resetPasswordByAdmin);
 
+export const allocation = async (body: AllocateTutor) =>
+	await api.post(allocationRoutes.allocation, body);
+
+export const deallocationStudents = async (params: string = '') =>
+	await api.delete(
+		allocationRoutes.deallocationStudents.concat(`?${params}`)
+	);
+
+export const transferStudent = async (body: TransferStudentFormValue) =>
+	await api.post<HTTPResponse<boolean>>(
+		allocationRoutes.transferStudent,
+		body
+	);
+
 export const getAdminDashboard = async () =>
-	await api.get<HTTPResponse<AdminDashboard>>(userRoutes.adminDashboard);
+	await api.get<HTTPResponse<AdminDashboard>>(dashboardRoutes.adminDashboard);
 
 export const getStudentDashboard = async (id: number) =>
 	await api.get<HTTPResponse<TutorUser | null>>(
-		buildURL(userRoutes.studentDashboard, { id })
+		buildURL(dashboardRoutes.studentDashboard, { id })
 	);
 
 export const getTutorDashboard = async (id: number) =>
-	await api.get(buildURL(userRoutes.tutorDashboard, { id }));
+	await api.get(buildURL(dashboardRoutes.tutorDashboard, { id }));
 
 export const getBrowserCount = async () =>
 	await api.get<HTTPResponse<MostBrowserUsagePieChart[]>>(
-		userRoutes.browserCount
+		dashboardRoutes.browserCount
 	);
 
 export const getMostViewedPages = async () =>
-	await api.get(userRoutes.mostViewedPages);
+	await api.get<HTTPResponse<MostViewedPage[]>>(
+		dashboardRoutes.mostViewedPages
+	);
 
 export const getUnassignStudentList = async () =>
-	await api.get<StudentUser[]>(userRoutes.unassignStudent);
+	await api.get<HTTPResponse<StudentUser[]>>(dashboardRoutes.unassignStudent);
 
-export const transferStudent = async (body: TransferStudentFormValue) =>
-	await api.post<HTTPResponse<boolean>>(userRoutes.transferStudent, body);
+export const getMostActiveUsers = async () =>
+	await api.get<HTTPResponse<User[]>>(dashboardRoutes.mostActiveUser);
+
+export const getInactivityStudents = async () =>
+	await api.get(dashboardRoutes.inactivityStudents);
