@@ -22,6 +22,8 @@ export interface StudentUser extends User {
 	courseId: number | null;
 	courseName: string | null;
 	allocateTutorId: number | null;
+	inactive: boolean;
+	inactiveDays: number;
 }
 
 export interface TutorUser extends User {

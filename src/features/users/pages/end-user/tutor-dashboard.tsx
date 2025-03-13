@@ -330,8 +330,15 @@ export default function TutorDashboard() {
 									value="active"
 									className="space-y-4"
 								>
-									{data && data.data && data.data.length > 0
-										? data?.data.map((student) => (
+									{data &&
+									data.data.filter(
+										(student) => !student.inactive
+									).length > 0 ? (
+										data.data
+											.filter(
+												(student) => !student.inactive
+											)
+											.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"
@@ -381,59 +388,84 @@ export default function TutorDashboard() {
 													</div>
 												</div>
 											))
-										: 'There is No Active Student'}
+									) : (
+										<p>There are No Active Students</p>
+									)}
 								</TabsContent>
 
 								<TabsContent
 									value="inactive"
 									className="space-y-4"
 								>
-									{inactiveStudents.map((student) => (
-										<div
-											key={student.id}
-											className="flex items-center justify-between rounded-lg border p-4"
-										>
-											<div className="flex items-center gap-4">
-												<Avatar className="h-10 w-10">
-													<AvatarImage
-														src={student.avatar}
-														alt={student.name}
-													/>
-													<AvatarFallback>
-														{student.name.charAt(0)}
-													</AvatarFallback>
-												</Avatar>
-												<div>
-													<p className="font-medium">
-														{student.name}
-													</p>
-													<p className="text-sm text-muted-foreground">
-														{student.course}
-													</p>
-													<p className="text-xs text-destructive">
-														No interaction for 8+
-														days
-													</p>
+									{data &&
+									data.data.filter(
+										(student) => student.inactive
+									).length > 0 ? (
+										data.data
+											.filter(
+												(student) => student.inactive
+											)
+											.map((student) => (
+												<div
+													key={student.id}
+													className="flex items-center justify-between rounded-lg border p-4"
+												>
+													<div className="flex items-center gap-4">
+														<Avatar className="h-10 w-10">
+															<AvatarImage
+																src={
+																	student.name
+																}
+																alt={
+																	student.name
+																}
+															/>
+															<AvatarFallback>
+																{student.name.charAt(
+																	0
+																)}
+															</AvatarFallback>
+														</Avatar>
+														<div>
+															<p className="font-medium">
+																{student.name}
+															</p>
+															<p className="text-sm text-muted-foreground">
+																{
+																	student.courseName
+																}
+															</p>
+															<p className="text-xs text-destructive">
+																No interaction
+																for{' '}
+																{
+																	student.inactiveDays
+																}{' '}
+																days
+															</p>
+														</div>
+													</div>
+													<div className="flex gap-2">
+														<Button
+															size="sm"
+															variant="outline"
+														>
+															<MessageSquare className="mr-2 h-4 w-4" />
+															Message
+														</Button>
+														<Button
+															size="sm"
+															variant="outline"
+														>
+															<Calendar className="mr-2 h-4 w-4" />
+															Schedule
+														</Button>
+													</div>
 												</div>
-											</div>
-											<div className="flex gap-2">
-												<Button
-													size="sm"
-													variant="outline"
-												>
-													<MessageSquare className="mr-2 h-4 w-4" />
-													Message
-												</Button>
-												<Button
-													size="sm"
-													variant="outline"
-												>
-													<Calendar className="mr-2 h-4 w-4" />
-													Schedule
-												</Button>
-											</div>
-										</div>
-									))}
+											))
+									) : (
+										<p>There are No Inactive Students</p>
+									)}
 								</TabsContent>
 							</>
 						)}
