@@ -191,7 +191,9 @@ export default function BlogItemCard({ blog }: BlogItemCardProps) {
 									</Button>
 									<Button
 										disabled={deleteBlogPending}
-										onClick={handleBlogDelete}
+										onClick={async () =>
+											await handleBlogDelete()
+										}
 										variant="destructive"
 										size="sm"
 									>

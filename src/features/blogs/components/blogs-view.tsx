@@ -61,6 +61,8 @@ export function BlogView() {
 		// In a real app, you would add the comment to the blog post
 		setCommentDialogOpen(false);
 	};
+	console.log(getAllBlogsForCurrentUser);
+	console.log(getAllBlogsByCurrentUser);
 
 	return (
 		<>
