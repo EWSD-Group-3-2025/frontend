@@ -1,3 +1,4 @@
+//! TODO When updating start and end date the date is not correctly pick
 import {
 	Dialog,
 	DialogContent,
@@ -28,6 +29,7 @@ import { Button } from '@/components/ui/button';
 import { useOpenEventMutationDialogStore } from '../store/open-event-mutation-dialog-store';
 import DatePicker from '@/components/date-picker';
 import { USER_ROLE } from '@/constants';
+import { addDays } from 'date-fns';
 
 const eventCreateSchema = z.object({
 	title: z.string().min(5, {
@@ -60,6 +62,8 @@ export default function EventMutationDialog() {
 		defaultValues: {
 			title: '',
 			description: '',
+			startdate: initialEvent?.startdate,
+			enddate: initialEvent?.enddate,
 		},
 	});
 
@@ -145,10 +149,16 @@ export default function EventMutationDialog() {
 		}
 		const body = {
 			...values,
+			startdate: values.startdate,
+			enddate: values.enddate,
 			tutorId: user?.id,
 		};
 
 		if (!!initialEvent) {
+			await updateEventFn({
+				id: initialEvent.id,
+				updateEventBody: body,
+			});
 			toast.success('Successfully update the event');
 		} else {
 			const res = await createNewEventFn(body);
@@ -160,7 +170,14 @@ export default function EventMutationDialog() {
 		if (initialEvent) {
 			form.setValue('title', initialEvent.title);
 			form.setValue('description', initialEvent.description);
+			form.setValue('startdate', new Date(initialEvent.startdate));
+			form.setValue('enddate', new Date(initialEvent.enddate));
 		}
+
+		return () => {
+			form.resetField('startdate');
+			form.resetField('enddate');
+		};
 	}, [initialEvent]);
 
 	const isPending = createNewEventIsPending;

@@ -33,7 +33,6 @@ export function DocumentsView() {
 	const sharedDocuments = getAllDocuments?.data.filter(
 		(doc) => doc.userId !== user?.id
 	);
-	console.log({ myDocuments, docs: getAllDocuments?.data, user });
 
 	return (
 		<>

@@ -184,7 +184,7 @@ export function MeetingsView() {
 						upcomingMeetings.map((meeting) => (
 							<Card key={meeting.id}>
 								<CardContent className="p-6">
-									<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+									<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 										<div className="flex items-start gap-4">
 											<Avatar className="mt-1 h-10 w-10">
 												<AvatarImage
@@ -265,7 +265,7 @@ export function MeetingsView() {
 						pastMeetings.map((meeting) => (
 							<Card key={meeting.id}>
 								<CardContent className="p-6">
-									<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+									<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 										<div className="flex items-start gap-4">
 											<Avatar className="mt-1 h-10 w-10">
 												<AvatarImage

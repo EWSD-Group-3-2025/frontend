@@ -79,7 +79,7 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 			<DeleteConfirmDialog />
 			<Card key={doc.id}>
 				<CardContent className="p-6">
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex items-start gap-4">
 							<div className="rounded-lg bg-muted p-2">
 								<FileText className="h-8 w-8 text-primary" />

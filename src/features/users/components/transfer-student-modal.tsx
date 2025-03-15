@@ -218,8 +218,6 @@ const TransferStudentModal = ({
 		}
 	}, [tutorData]);
 
-	console.log(form.formState.errors);
-
 	return (
 		<ResponsiveModal
 			className="h-fit overflow-hidden p-7 sm:max-w-4xl md:w-3/4"

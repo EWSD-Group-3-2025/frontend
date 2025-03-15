@@ -27,7 +27,6 @@ export function EventsView() {
 				throw new Error('Fetch all events fail!');
 			}),
 	});
-	console.log(getAllEvents);
 
 	return (
 		<>
