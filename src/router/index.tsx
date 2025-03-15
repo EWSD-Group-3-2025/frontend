@@ -29,6 +29,7 @@ import EndUserDashboard from '@/features/users/pages/end-user/end-user-dashboard
 import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess';
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
 import AdminDashboard from '@/features/users/pages/management/Dashboard';
+import EventsPage from '@/features/users/pages/end-user/events-page';
 
 export type Route = {
 	name: string;
@@ -72,6 +73,11 @@ const endUserRouteList: Route[] = [
 		name: 'Documents',
 		path: '/dashboard/end-user/documents',
 		element: DocumentsPage,
+	},
+	{
+		name: 'Events',
+		path: '/dashboard/end-user/events',
+		element: EventsPage,
 	},
 	{
 		name: 'Blog',
