@@ -259,7 +259,7 @@ export default function CommentsContainer({ blog }: CommentsContainerProps) {
 								</div>
 							</div>
 						)}
-						{blog.authorId === user?.id && (
+						{comment.commenterId === user?.id && (
 							<div className="flex gap-2">
 								<Button
 									size="sm"

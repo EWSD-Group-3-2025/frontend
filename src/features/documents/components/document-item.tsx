@@ -9,18 +9,21 @@ import { downloadFile } from '@/utils/client-side-file-download';
 import { useOpenDocumentMutationDialogStore } from '../store/open-document-mutation-dialog-store';
 import { deleteItem } from '../api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/auth.context';
 
 interface DocumentItemProps {
 	doc: Document;
 }
 
 export default function DocumentItem({ doc }: DocumentItemProps) {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { setIsOpen } = useOpenDocumentMutationDialogStore();
 	const [DeleteConfirmDialog, deleteConfirm] = useConfirmDialog(
 		'Are you sure?',
 		'This process cannot be undo and will delete the document permanently.'
 	);
+	const isDocumentAuthor = user?.id === doc.userId;
 
 	const { mutateAsync: deleteDocumentFn, isPending: deleteDocumentPending } =
 		useMutation({
@@ -101,24 +104,31 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 								<Download className="mr-2 h-4 w-4" />
 								Download
 							</Button>
-							<Button
-								disabled={deleteDocumentPending}
-								onClick={() => {
-									setIsOpen({ isOpen: true, document: doc });
-								}}
-								variant="outline"
-								size="sm"
-							>
-								Edit
-							</Button>
-							<Button
-								disabled={deleteDocumentPending}
-								onClick={handleDocumentDelete}
-								variant="destructive"
-								size="sm"
-							>
-								Delete
-							</Button>
+							{isDocumentAuthor && (
+								<>
+									<Button
+										disabled={deleteDocumentPending}
+										onClick={() => {
+											setIsOpen({
+												isOpen: true,
+												document: doc,
+											});
+										}}
+										variant="outline"
+										size="sm"
+									>
+										Edit
+									</Button>
+									<Button
+										disabled={deleteDocumentPending}
+										onClick={handleDocumentDelete}
+										variant="destructive"
+										size="sm"
+									>
+										Delete
+									</Button>
+								</>
+							)}
 						</div>
 					</div>
 				</CardContent>
