@@ -5,27 +5,82 @@ import { USER_ROLE } from '@/constants';
 import EventMutationDialog from '@/features/events/components/event-mutation-dialog';
 import { useOpenEventMutationDialogStore } from '@/features/events/store/open-event-mutation-dialog-store';
 import { Event } from '@/features/events/types';
-import { getAll } from '@/features/events/api';
-import TaskCalendar from './task-calendar';
+import { getAll as getAllEvents } from '@/features/events/api';
+import TaskCalendar, { NormalizedDataInterface } from './task-calendar';
+import { Meeting } from '@/features/meetings/types';
+import { getAll as getAllMeetings } from '@/features/meetings/api';
+import { useEffect, useState } from 'react';
 
 export function CalendarView() {
 	const { setIsOpen } = useOpenEventMutationDialogStore();
+	const [normalizedData, setNormalizedData] = useState<
+		NormalizedDataInterface[]
+	>([]);
 	const { user } = useAuth();
 
-	const { data: getAllEvents, isLoading: isLoadingGetAllEvents } = useQuery<
-		HTTPResponse<Event[]>
-	>({
-		queryKey: ['get-all-events'],
-		queryFn: async (): Promise<HTTPResponse<Event[]>> =>
-			await getAll().then((response) => {
-				if (response.data.code === 200) {
-					return response.data;
-				}
+	const { data: getAllEventsData, isLoading: isLoadingGetAllEvents } =
+		useQuery<HTTPResponse<Event[]>>({
+			queryKey: ['get-all-events'],
+			queryFn: async (): Promise<HTTPResponse<Event[]>> =>
+				await getAllEvents().then((response) => {
+					if (response.data.code === 200) {
+						return response.data;
+					}
 
-				throw new Error('Fetch all events fail!');
-			}),
-	});
-	console.log(getAllEvents, isLoadingGetAllEvents);
+					throw new Error('Fetch all events fail!');
+				}),
+		});
+
+	const { data: getAllMeetingsData, isLoading: isLoadingGetAllMeetings } =
+		useQuery<HTTPResponse<Meeting[]>>({
+			queryKey: ['get-all-meetings'],
+			queryFn: async (): Promise<HTTPResponse<Meeting[]>> =>
+				await getAllMeetings().then((response) => {
+					if (response.data.code === 200) {
+						return response.data;
+					}
+
+					throw new Error('Fetch all meetings fail!');
+				}),
+		});
+
+	const isLoading = isLoadingGetAllEvents || isLoadingGetAllMeetings;
+
+	useEffect(() => {
+		const normalizedEvents = getAllEventsData?.data.map((meeting) => ({
+			id: meeting.id,
+			title: meeting.title,
+			description: meeting.description,
+			start: meeting.startdate,
+			end: meeting.enddate,
+			type: 'meeting',
+			location: null,
+			link: null,
+		}));
+
+		const normalizedMeetings = getAllMeetingsData?.data.map((event) => ({
+			id: event.id,
+			title: event.description,
+			description: event.description,
+			start: event.startTime,
+			end: event.endTime,
+			type: 'event',
+			location: null,
+			link: null,
+		}));
+
+		if (normalizedEvents && normalizedMeetings) {
+			const normalizedData = [
+				...normalizedEvents!,
+				...normalizedMeetings!,
+			].sort(
+				(a, b) =>
+					new Date(a.start).getTime() - new Date(b.start).getTime()
+			);
+
+			setNormalizedData(normalizedData);
+		}
+	}, [getAllMeetingsData, getAllEventsData]);
 
 	return (
 		<>
@@ -45,10 +100,10 @@ export function CalendarView() {
 						</Button>
 					)}
 				</div>
-				{isLoadingGetAllEvents ? (
+				{isLoading ? (
 					<p>Loading...</p>
 				) : (
-					<TaskCalendar data={getAllEvents?.data!} />
+					<TaskCalendar data={normalizedData!} />
 				)}
 			</div>
 		</>

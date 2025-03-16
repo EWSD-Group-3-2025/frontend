@@ -21,29 +21,51 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { create, update } from '../api';
 import { useAuth } from '@/context/auth.context';
 import { Button } from '@/components/ui/button';
 import DatePicker from '@/components/date-picker';
 import { USER_ROLE } from '@/constants';
 import { useOpenMeetingMutationDialogStore } from '../store/open-meeting-mutation-dialog-store';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { create, update } from '../api';
+import { getTutorAllocationStudents } from '@/features/users/api';
+import {
+	MultiSelector,
+	MultiSelectorContent,
+	MultiSelectorInput,
+	MultiSelectorItem,
+	MultiSelectorList,
+	MultiSelectorTrigger,
+} from '@/components/ui/multi-select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const meetingCreateSchema = z.object({
-	title: z.string().min(5, {
-		message: 'Title must be at least 5 characters.',
+	hostId: z.number({ required_error: 'Host id is required' }).optional(),
+	meetingType: z.string({ required_error: 'Meeting type is required' }),
+	description: z
+		.string({ required_error: 'Description is required' })
+		.min(10, {
+			message: 'Description must be at least 10 characters.',
+		}),
+	startTime: z.date({
+		required_error: 'Meeting start time is required.',
 	}),
-	description: z.string().min(10, {
-		message: 'Description must be at least 10 characters.',
+	endTime: z.date({
+		required_error: 'Meeting end time is required.',
 	}),
-	startdate: z.date({
-		required_error: 'Meeting start date is required.',
+	location: z.string({ required_error: 'Location is required' }).min(3, {
+		message: 'Location must be at least 3 characters.',
 	}),
-	enddate: z.date({
-		required_error: 'Meeting start date is required.',
-	}),
-	tutorId: z.number().optional(),
+	link: z.string().optional(),
+	participantIds: z.array(z.string()).optional(),
 });
 
 export type MeetingCreateSchema = z.infer<typeof meetingCreateSchema>;
@@ -59,11 +81,39 @@ export default function MeetingMutationDialog() {
 	const form = useForm<z.infer<typeof meetingCreateSchema>>({
 		resolver: zodResolver(meetingCreateSchema),
 		defaultValues: {
-			title: '',
+			link: '',
+			location: '',
 			description: '',
-			startdate: initialMeeting?.startdate,
-			enddate: initialMeeting?.enddate,
+			meetingType: '1',
+			startTime: initialMeeting?.startTime,
+			endTime: initialMeeting?.endTime,
 		},
+	});
+
+	const resetForm = () => {
+		form.resetField('startTime');
+		form.resetField('endTime');
+		form.resetField('description');
+		form.resetField('link');
+		form.resetField('location');
+		form.resetField('participantIds');
+	};
+
+	const {
+		data: getAllTutorStudents,
+		isLoading: isLoadingGetAllTutorStudents,
+	} = useQuery<HTTPResponse<{ id: number; name: string }[]>>({
+		queryKey: ['get-all-tutor-students', user?.id],
+		queryFn: async (): Promise<
+			HTTPResponse<{ id: number; name: string }[]>
+		> =>
+			await getTutorAllocationStudents(user?.id!).then((response) => {
+				if (response.data.code === 200) {
+					return response.data;
+				}
+
+				throw new Error('Fetch all get tutor students fail!');
+			}),
 	});
 
 	const {
@@ -75,12 +125,13 @@ export default function MeetingMutationDialog() {
 		): Promise<HTTPResponse> =>
 			await create(createMeetingBody)
 				.then((response) => {
-					if (response.status === 201) {
+					if (response.status === 200) {
 						queryClient.invalidateQueries({
 							queryKey: ['get-all-meetings'],
 						});
 
 						setIsOpen({ isOpen: false, meeting: null });
+						resetForm();
 						return response.data;
 					}
 
@@ -111,12 +162,13 @@ export default function MeetingMutationDialog() {
 		}): Promise<HTTPResponse> =>
 			await update(id, updateMeetingBody)
 				.then((response) => {
-					if (response.status === 204) {
+					if (response.status === 200) {
 						queryClient.invalidateQueries({
 							queryKey: ['get-all-meetings'],
 						});
 
 						setIsOpen({ isOpen: false, meeting: null });
+						resetForm();
 						return response.data;
 					}
 
@@ -148,9 +200,7 @@ export default function MeetingMutationDialog() {
 		}
 		const body = {
 			...values,
-			startdate: values.startdate,
-			enddate: values.enddate,
-			tutorId: user?.id,
+			hostId: user?.id,
 		};
 
 		if (!!initialMeeting) {
@@ -167,19 +217,27 @@ export default function MeetingMutationDialog() {
 
 	useEffect(() => {
 		if (initialMeeting) {
-			form.setValue('title', initialMeeting.title);
 			form.setValue('description', initialMeeting.description);
-			form.setValue('startdate', new Date(initialMeeting.startdate));
-			form.setValue('enddate', new Date(initialMeeting.enddate));
+			form.setValue('link', initialMeeting.link);
+			form.setValue('location', initialMeeting.location);
+			form.setValue('startTime', new Date(initialMeeting.startTime));
+			form.setValue('endTime', new Date(initialMeeting.endTime));
+			form.setValue(
+				'participantIds',
+				initialMeeting.meetingMembers
+					?.filter((m) => m.userId !== user?.id)
+					?.map((m) => m.userId.toString())
+			);
 		}
 
 		return () => {
-			form.resetField('startdate');
-			form.resetField('enddate');
+			resetForm();
 		};
 	}, [initialMeeting]);
 
-	const isPending = createNewMeetingIsPending;
+	const isPending = false;
+	const watched = form.watch();
+	console.log(createNewMeetingIsPending);
 
 	return (
 		<Dialog
@@ -187,7 +245,7 @@ export default function MeetingMutationDialog() {
 			onOpenChange={(isOpen) => {
 				setIsOpen({ isOpen, meeting: null });
 				if (!isOpen) {
-					form.reset();
+					resetForm();
 				}
 			}}
 		>
@@ -207,23 +265,6 @@ export default function MeetingMutationDialog() {
 					>
 						<FormField
 							control={form.control}
-							name="title"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input
-											disabled={isPending}
-											placeholder="New Meeting Title"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
 							name="description"
 							render={({ field }) => (
 								<FormItem>
@@ -241,11 +282,12 @@ export default function MeetingMutationDialog() {
 						/>
 						<FormField
 							control={form.control}
-							name="startdate"
+							name="startTime"
 							render={({ field }) => (
 								<FormItem className="flex flex-col space-y-4">
-									<FormLabel>Start Date</FormLabel>
+									<FormLabel>Start Time</FormLabel>
 									<DatePicker
+										enableTimePicker
 										value={field.value}
 										onChange={field.onChange}
 									/>
@@ -255,11 +297,12 @@ export default function MeetingMutationDialog() {
 						/>
 						<FormField
 							control={form.control}
-							name="enddate"
+							name="endTime"
 							render={({ field }) => (
 								<FormItem className="flex flex-col space-y-4">
-									<FormLabel>End Date</FormLabel>
+									<FormLabel>End Time</FormLabel>
 									<DatePicker
+										enableTimePicker
 										value={field.value}
 										onChange={field.onChange}
 									/>
@@ -267,6 +310,128 @@ export default function MeetingMutationDialog() {
 								</FormItem>
 							)}
 						/>
+						<FormField
+							control={form.control}
+							name="participantIds"
+							render={({ field }) => (
+								<FormItem className="flex flex-col space-y-4">
+									<FormLabel>
+										Select Meeting Participant
+									</FormLabel>
+									<FormControl>
+										{isLoadingGetAllTutorStudents ? (
+											<Skeleton className="h-[40px] w-full" />
+										) : (
+											<MultiSelector
+												values={
+													getAllTutorStudents?.data
+														?.map((ts) => {
+															if (
+																field.value?.includes(
+																	ts?.id.toString()
+																)
+															) {
+																return ts.name;
+															} else {
+																return '';
+															}
+														})
+														.filter(
+															(v) => v !== ''
+														)!
+												}
+												onValuesChange={field.onChange}
+											>
+												<MultiSelectorTrigger className="ring-gray-500 focus-within:ring-2 focus-within:ring-slate-500">
+													<MultiSelectorInput placeholder="Select Student" />
+												</MultiSelectorTrigger>
+												<MultiSelectorContent>
+													<MultiSelectorList>
+														{getAllTutorStudents?.data?.map(
+															(student) => (
+																<MultiSelectorItem
+																	key={student.id.toString()}
+																	value={student.id.toString()}
+																>
+																	{
+																		student.name
+																	}
+																</MultiSelectorItem>
+															)
+														)}
+													</MultiSelectorList>
+												</MultiSelectorContent>
+											</MultiSelector>
+										)}
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="meetingType"
+							render={({ field }) => (
+								<FormItem className="flex flex-col space-y-4">
+									<FormLabel>Meeting Type</FormLabel>
+									<Select
+										onValueChange={field.onChange}
+										defaultValue={field.value}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select meeting type" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectItem value="1">
+												Virtual
+											</SelectItem>
+											<SelectItem value="2">
+												In-Person
+											</SelectItem>
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="location"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Location</FormLabel>
+									<FormControl>
+										<Input
+											disabled={isPending}
+											placeholder="Meeting Location..."
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						{watched.meetingType === '1' && (
+							<FormField
+								control={form.control}
+								name="link"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Link</FormLabel>
+										<FormControl>
+											<Input
+												disabled={isPending}
+												placeholder="Meeting Link..."
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
 						<DialogFooter>
 							<Button disabled={isPending} type="submit">
 								{!!initialMeeting ? 'Save' : 'Create'}

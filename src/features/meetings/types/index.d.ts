@@ -1,13 +1,24 @@
 import { USER_ROLE } from '@/constants';
 
+export interface MeetingMember {
+	userId: number;
+	email: string;
+	name: string;
+	roleName: string;
+}
+
 export interface Meeting {
 	id: number;
-	title: string;
-	tutorId: number;
-	tutorName?: string;
+	location: string;
+	link: string;
+	meetingType: number;
 	description: string;
-	startdate: Date;
-	enddate: Date;
-	createdAt: Date;
-	updatedAt: Date;
+	meetingMembers: MeetingMember[];
+	startTime: Date;
+	endTime: Date;
+}
+
+export enum MeetingType {
+	'VIRTUAL' = 1,
+	'IN_PERSON' = 2,
 }

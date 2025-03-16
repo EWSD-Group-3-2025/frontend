@@ -15,10 +15,20 @@ import './task-calendar.css';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import CalendarEventCardItem from './calendar-event-card';
-import { Event } from '@/features/events/types';
+
+export interface NormalizedDataInterface {
+	id: number;
+	title: string;
+	description: string;
+	start: Date;
+	end: Date;
+	type: string;
+	location: null;
+	link: null;
+}
 
 interface TaskCalendarProps {
-	data: Event[];
+	data: NormalizedDataInterface[];
 }
 
 const locales = {
@@ -75,15 +85,16 @@ const CustomToolbar = ({
 
 export default function TaskCalendar({ data }: TaskCalendarProps) {
 	const [value, setValue] = useState(
-		data.length > 0 ? new Date(data[0].enddate) : new Date()
+		data.length > 0 ? new Date(data[0].end) : new Date()
 	);
 
 	// Convert event data into the format required by react-big-calendar
 	const events = data.map((task) => ({
 		id: task.id,
 		title: task.title, // Show event name
-		start: new Date(task.startdate), // Convert to Date object
-		end: new Date(task.enddate), // Convert to Date object
+		type: task.type, // Show event name
+		start: new Date(task.start), // Convert to Date object
+		end: new Date(task.end), // Convert to Date object
 		description: task.description, // Pass description for later use
 	}));
 
