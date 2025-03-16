@@ -8,8 +8,9 @@ export const userRoutes = {
 
 export const allocationRoutes = {
 	allocation: '/v1/allocations',
-	deallocationStudents: '/v1/allocations/deallocate-students',
-	transferStudent: '/v1/allocations/transfer',
+	deallocation: '/v1/allocations/deallocate',
+	transferStudents: '/v1/allocations/transfer',
+	getTutorAllocationStudents: '/v1/allocations/tutor/${id}/students',
 };
 
 export const dashboardRoutes = {

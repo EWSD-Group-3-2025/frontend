@@ -57,15 +57,18 @@ export const resetPasswordByAdmin = async () =>
 export const allocation = async (body: AllocateTutor) =>
 	await api.post(allocationRoutes.allocation, body);
 
-export const deallocationStudents = async (params: string = '') =>
-	await api.delete(
-		allocationRoutes.deallocationStudents.concat(`?${params}`)
-	);
+export const deallocation = async (params: string = '') =>
+	await api.delete(allocationRoutes.deallocation.concat(`?${params}`));
 
 export const transferStudent = async (body: TransferStudentFormValue) =>
 	await api.post<HTTPResponse<boolean>>(
-		allocationRoutes.transferStudent,
+		allocationRoutes.transferStudents,
 		body
+	);
+
+export const getTutorAllocationStudents = async (id: number) =>
+	await api.get<HTTPResponse<StudentUser[]>>(
+		buildURL(allocationRoutes.getTutorAllocationStudents, { id })
 	);
 
 export const getAdminDashboard = async () =>

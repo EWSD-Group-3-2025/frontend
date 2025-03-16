@@ -17,7 +17,10 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueries } from '@tanstack/react-query';
-import { getTutorDashboard, transferStudent } from '@/features/users/api';
+import {
+	getTutorAllocationStudents,
+	transferStudent,
+} from '@/features/users/api';
 import { StudentUser, TutorUser } from '@/features/users/types';
 import { ComboBox } from '@/components/ui/combo-box';
 import { useEffect, useState } from 'react';
@@ -97,14 +100,16 @@ const TransferStudentModal = ({
 			{
 				queryKey: ['first-tutor-students', tutorData.id],
 				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
-					await getTutorDashboard(tutorData.id).then((response) => {
-						if (response.data.code === 200) {
-							setFirstTutorStudents(response.data.data);
-							return response.data;
-						}
+					await getTutorAllocationStudents(tutorData.id).then(
+						(response) => {
+							if (response.data.code === 200) {
+								setFirstTutorStudents(response.data.data);
+								return response.data;
+							}
 
-						throw new Error('Fetch Tutor 1 Students Fail!');
-					}),
+							throw new Error('Fetch Tutor 1 Students Fail!');
+						}
+					),
 			},
 			{
 				queryKey: [
@@ -112,7 +117,7 @@ const TransferStudentModal = ({
 					form.watch('secondTutorId'),
 				],
 				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
-					await getTutorDashboard(
+					await getTutorAllocationStudents(
 						Number(form.watch('secondTutorId'))
 					).then((response) => {
 						if (response.data.code === 200) {
