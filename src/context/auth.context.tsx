@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { AxiosResponse } from 'axios';
 import { getBrowserName, getPageName } from '@/utils';
 import { useLocation } from 'react-router-dom';
+import { userStore } from '@/store/use-user-data-store';
 
 interface AuthContextProps {
 	user?: AuthUser | null;
@@ -40,6 +41,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+	const { logOut } = userStore();
 	const location = useLocation();
 	const queryClient = useQueryClient();
 
@@ -66,6 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			Cookies.remove(CONSTANTS.ACCESS_TOKEN_KEY);
 			Cookies.remove(CONSTANTS.REFRESH_TOKEN_KEY);
 			queryClient.removeQueries({ queryKey: ['authUser'] });
+			logOut();
 			toast.success('Logout successful');
 		},
 		onError: () => {

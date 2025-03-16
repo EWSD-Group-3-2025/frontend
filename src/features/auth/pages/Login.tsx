@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth.context';
 import { cn, getRedirectRoute, setNewUserFlag } from '@/utils';
+import { userStore } from '@/store/use-user-data-store';
 
 const formSchema = z.object({
 	email: z.string().trim().nonempty('Email or username required'),
@@ -30,6 +31,7 @@ export default function LoginPage() {
 	const auth = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { setUserData } = userStore();
 
 	const [showPassword, setShowPassword] = useState(false);
 
@@ -50,6 +52,7 @@ export default function LoginPage() {
 						response.data.data.refreshToken
 					);
 
+					setUserData(response.data.data.user);
 					form.reset();
 					const redirectRoute = getRedirectRoute(
 						response.data.data.user.roleName
