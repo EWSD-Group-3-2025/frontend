@@ -4,8 +4,8 @@ const blogRoutes = {
 	getBlogCommentBaseUrl: '/v1/comments',
 	getBlogReactBaseUrl: '/v1/reacts',
 	// ! TODO HERE remove mine
-	getBlogsForCurrentAuthUser: '/v1/blogs/mine?fetchFeed=true',
-	getBlogsByCurrentAuthUser: '/v1/blogs/mine?fetchFeed=false',
+	getBlogsForCurrentAuthUser: '/v1/blogs?fetchFeed=true',
+	getBlogsByCurrentAuthUser: '/v1/blogs?fetchFeed=false',
 };
 
 export default blogRoutes;

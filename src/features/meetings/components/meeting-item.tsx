@@ -4,18 +4,17 @@ import useConfirmDialog from '@/hooks/use-confirm-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Meeting } from '../types';
-import { Bell } from 'lucide-react';
-import { deleteItem } from '../api';
+import { Dot, Video } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/context/auth.context';
 import { useOpenMeetingMutationDialogStore } from '../store/open-meeting-mutation-dialog-store';
+import { deleteItem } from '../api';
+import { Link } from 'react-router-dom';
 
 interface MeetingItemProps {
 	meeting: Meeting;
 }
 
 export default function MeetingItem({ meeting }: MeetingItemProps) {
-	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { setIsOpen } = useOpenMeetingMutationDialogStore();
 	const [DeleteConfirmDialog, deleteConfirm] = useConfirmDialog(
@@ -23,14 +22,14 @@ export default function MeetingItem({ meeting }: MeetingItemProps) {
 		'This process cannot be undo and will delete the meeting permanently.'
 	);
 
-	const isMeetingAuthor = meeting.tutorId === user?.id;
+	const isMeetingAuthor = true;
 
 	const { mutateAsync: deleteMeetingFn, isPending: deleteDocumentPending } =
 		useMutation({
 			mutationFn: async ({ id }: { id: number }): Promise<HTTPResponse> =>
 				await deleteItem(id)
 					.then((response) => {
-						if (response.status === 204) {
+						if (response.status === 200) {
 							queryClient.invalidateQueries({
 								queryKey: ['get-all-meetings'],
 							});
@@ -77,31 +76,48 @@ export default function MeetingItem({ meeting }: MeetingItemProps) {
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex items-start gap-4">
 							<div className="rounded-lg bg-muted p-2">
-								<Bell className="h-8 w-8 text-primary" />
+								<Video className="h-8 w-8 text-primary" />
 							</div>
 							<div>
-								<h3 className="text-lg font-semibold">
-									{meeting.title}
-								</h3>
-								<h4 className="font-semibold text-muted-foreground">
-									{meeting.tutorName}
-								</h4>
-								<div className="flex flex-col text-sm text-muted-foreground">
+								<h2 className="text-lg">
+									{meeting.description}
+								</h2>
+								<div className="mt-2 flex items-center text-sm text-muted-foreground">
 									<span>
 										Start Date:{' '}
 										{new Date(
-											meeting.startdate
+											meeting.startTime
 										).toLocaleDateString()}
 									</span>
+									<Dot className="size-7" />
 									<span>
 										End Date:{' '}
 										{new Date(
-											meeting.enddate
+											meeting.endTime
 										).toLocaleDateString()}
 									</span>
 								</div>
-								<p className="mt-2 text-sm">
-									{meeting.description}
+								<p className="text-muted-foreground">
+									Type:{' '}
+									{meeting.meetingType === 1
+										? 'Virtual'
+										: 'In-Person'}
+								</p>
+								{meeting.meetingType === 1 &&
+									!!meeting.link && (
+										<div className="flex items-center gap-x-2">
+											<span>Link: </span>
+											<Link
+												to={meeting.link}
+												target="_blank"
+												className="hover:underline"
+											>
+												{meeting.link}
+											</Link>
+										</div>
+									)}
+								<p className="mt-2 text-muted-foreground">
+									Location: {meeting.location}
 								</p>
 							</div>
 						</div>

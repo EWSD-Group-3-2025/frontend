@@ -29,7 +29,6 @@ import { Button } from '@/components/ui/button';
 import { useOpenEventMutationDialogStore } from '../store/open-event-mutation-dialog-store';
 import DatePicker from '@/components/date-picker';
 import { USER_ROLE } from '@/constants';
-import { addDays } from 'date-fns';
 
 const eventCreateSchema = z.object({
 	title: z.string().min(5, {
@@ -42,7 +41,7 @@ const eventCreateSchema = z.object({
 		required_error: 'Event start date is required.',
 	}),
 	enddate: z.date({
-		required_error: 'Event start date is required.',
+		required_error: 'Event end date is required.',
 	}),
 	tutorId: z.number().optional(),
 });

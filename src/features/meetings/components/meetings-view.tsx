@@ -3,21 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Video } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
 import { useQuery } from '@tanstack/react-query';
-import { getAll } from '../api';
 import { USER_ROLE } from '@/constants';
 import { useOpenMeetingMutationDialogStore } from '@/features/meetings/store/open-meeting-mutation-dialog-store';
 import MeetingMutationDialog from './meeting-mutation-dialog';
-import { Event } from '@/features/events/types';
 import MeetingItem, { MeetingItemSkeleton } from './meeting-item';
+import { Meeting } from '../types';
+import { getAll } from '../api';
 
 export function MeetingsView() {
 	const { setIsOpen } = useOpenMeetingMutationDialogStore();
 	const { user } = useAuth();
 
 	const { data: getAllMeetings, isLoading: isLoadingGetAllMeetings } =
-		useQuery<HTTPResponse<Event[]>>({
+		useQuery<HTTPResponse<Meeting[]>>({
 			queryKey: ['get-all-meetings'],
-			queryFn: async (): Promise<HTTPResponse<Event[]>> =>
+			queryFn: async (): Promise<HTTPResponse<Meeting[]>> =>
 				await getAll().then((response) => {
 					if (response.data.code === 200) {
 						return response.data;

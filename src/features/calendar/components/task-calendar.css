@@ -33,3 +33,10 @@
 .rbc-today {
 	background: inherit;
 }
+
+.rbc-row-content-scroll-container {
+	max-height: 150px; /* Adjust height */
+	overflow-y: auto;
+	overflow-y: scroll !important;
+	padding-bottom: 100px;
+}
