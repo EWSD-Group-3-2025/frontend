@@ -3,7 +3,7 @@ import { KeyboardEvent, useRef } from 'react';
 import { Search } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
-import { useSearch } from '@/store/useSearch';
+import { useSearch } from '@/store/use-search';
 
 const SearchBox = ({ placeholder }: { placeholder?: string }) => {
 	const { setSearch } = useSearch();

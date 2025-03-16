@@ -21,7 +21,7 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/utils';
-import { useSearch } from '@/store/useSearch';
+import { useSearch } from '@/store/use-search';
 import CustomPagination from '@/components/custom-pagination';
 
 interface DataTableProps<TData, TValue> {

@@ -5,7 +5,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { useSearch } from '@/store/useSearch';
+import { useSearch } from '@/store/use-search';
 
 const AccountStatusDropDown = () => {
 	const { columnFilters, setColumnFilters } = useSearch();
