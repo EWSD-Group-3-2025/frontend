@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import {
+	Bell,
 	BookOpen,
 	Calendar,
 	FileText,
@@ -51,6 +52,12 @@ export function EndUserAppSidebar({
 			title: 'Calendar',
 			icon: Calendar,
 			url: '/dashboard/end-user/calendar',
+			role: [USER_ROLE.TUTOR, USER_ROLE.STUDENT],
+		},
+		{
+			title: 'Events',
+			icon: Bell,
+			url: '/dashboard/end-user/events',
 			role: [USER_ROLE.TUTOR, USER_ROLE.STUDENT],
 		},
 		{
