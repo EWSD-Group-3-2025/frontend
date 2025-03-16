@@ -17,7 +17,7 @@ import { TutorUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
-	deallocationStudents,
+	deallocation,
 	deleteUser,
 	getAllUsers,
 	resetPasswordByAdmin,
@@ -47,7 +47,7 @@ import dayjs from 'dayjs';
 import AllocateTutor from '@/features/users/components/allocate-tutor';
 import ExportButton from '@/components/export-button';
 import ResetPasswordConfirmationModal from '@/features/users/components/reset-password-confirmation-modal';
-import DeallocationStudent from '@/features/users/components/deallocation-student';
+import Deallocation from '@/features/users/components/deallocation';
 import { useNavigate } from 'react-router-dom';
 import TransferStudentModal from '@/features/users/components/transfer-student-modal';
 import { getGenderName } from '@/utils';
@@ -155,7 +155,7 @@ const TutorList = () => {
 
 	const { mutateAsync: handleDeallocationStudents } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
-			await deallocationStudents(`tutorId=${selectedTutorId}`)
+			await deallocation(`tutorId=${selectedTutorId}`)
 				.then((response) => {
 					if (response.status === 204) {
 						toast.success(
@@ -460,7 +460,8 @@ const TutorList = () => {
 				/>
 			)}
 
-			<DeallocationStudent
+			<Deallocation
+				type="tutor"
 				name={selectedTutorName}
 				isOpen={deallocationStudentConfirmation}
 				setIsOpen={setDeallocationStudentConfirmation}

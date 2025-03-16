@@ -12,13 +12,15 @@ type DeallocationStudentProps = {
 	isOpen: boolean;
 	setIsOpen: (isOpen: boolean) => void;
 	handleReset: () => void;
+	type: 'student' | 'tutor';
 };
 
-const DeallocationStudent = ({
+const Deallocation = ({
 	name,
 	isOpen,
 	setIsOpen,
 	handleReset,
+	type,
 }: DeallocationStudentProps) => {
 	return (
 		<ModalBox
@@ -30,10 +32,11 @@ const DeallocationStudent = ({
 				<CircleAlert className="mt-2 text-destructive" />
 				<DialogHeader>
 					<DialogTitle className="font-roboto-slab text-3xl">
-						Deallocate Student
+						Deallocate {type === 'student' ? 'Student' : 'Tutor'}
 					</DialogTitle>
 					<DialogDescription className="text-sm">
-						Are you sure you want to deallocate {name}'s students?
+						Are you sure you want to deallocate {name}'s{' '}
+						{type !== 'student' ? 'student' : 'tutor'}?
 					</DialogDescription>
 				</DialogHeader>
 			</div>
@@ -53,4 +56,4 @@ const DeallocationStudent = ({
 	);
 };
 
-export default DeallocationStudent;
+export default Deallocation;

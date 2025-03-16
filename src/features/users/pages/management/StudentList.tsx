@@ -17,6 +17,7 @@ import { StudentUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
+	deallocation,
 	deleteUser,
 	getAllUsers,
 	resetPasswordByAdmin,
@@ -50,6 +51,7 @@ import { useNavigate } from 'react-router-dom';
 import { getGenderName } from '@/utils';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
+import Deallocation from '@/features/users/components/deallocation';
 
 const StudentList = () => {
 	const { user } = useAuth();
@@ -70,6 +72,10 @@ const StudentList = () => {
 	const [selectedStudent, setSelectedStudent] = useState<StudentUser | null>(
 		null
 	);
+	const [
+		deallocationStudentConfirmation,
+		setDeallocationStudentConfirmation,
+	] = useState(false);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
 
@@ -120,6 +126,34 @@ const StudentList = () => {
 					}),
 		}
 	);
+
+	const { mutateAsync: handleDeallocationStudents } = useMutation({
+		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
+			await deallocation(`studentId=${selectedStudent?.id}`)
+				.then((response) => {
+					if (response.status === 204) {
+						toast.success(
+							`${selectedStudent?.name}'s students are deallocated`
+						);
+						setDeallocationStudentConfirmation(false);
+						setSelectedStudent(null);
+
+						return response.data;
+					}
+
+					throw new Error('Deallocation Fail!');
+				})
+				.catch((e) => {
+					setDeallocationStudentConfirmation(false);
+					setSelectedStudent(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
 
 	const { mutateAsync: handleResetPassword } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
@@ -296,7 +330,16 @@ const StudentList = () => {
 								</DropdownMenuItem>
 
 								<DropdownMenuItem
-									disabled={!params.row.original.status}
+									disabled={
+										!params.row.original.status ||
+										!params.row.original.allocateTutorId
+									}
+									onClick={() => {
+										setDeallocationStudentConfirmation(
+											true
+										);
+										setSelectedStudent(params.row.original);
+									}}
 								>
 									<UserRoundX /> Deallocate Tutor
 								</DropdownMenuItem>
@@ -340,6 +383,12 @@ const StudentList = () => {
 			setName('');
 		}
 	}, [resetPasswordConfirmation]);
+
+	useEffect(() => {
+		if (!deallocationStudentConfirmation) {
+			setSelectedStudent(null);
+		}
+	}, [deallocationStudentConfirmation]);
 
 	return (
 		<>
@@ -400,6 +449,14 @@ const StudentList = () => {
 				isOpen={resetPasswordConfirmation}
 				setIsOpen={setResetPasswordConfirmation}
 				handleReset={() => handleResetPassword()}
+			/>
+
+			<Deallocation
+				type="tutor"
+				name={selectedStudent?.name ?? ''}
+				isOpen={deallocationStudentConfirmation}
+				setIsOpen={setDeallocationStudentConfirmation}
+				handleReset={() => handleDeallocationStudents()}
 			/>
 
 			<DeleteDialog
