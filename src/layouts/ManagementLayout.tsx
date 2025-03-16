@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Separator } from '@/components/ui/separator';
+import WelcomeMessageDialog from '@/features/users/components/welcome-message-dialog';
 
 const ManagementLayout = () => {
 	return (
@@ -32,6 +33,7 @@ const ManagementLayout = () => {
 				</header>
 				<div className="flex-1 p-4 pt-0">
 					<Outlet />
+					<WelcomeMessageDialog />
 				</div>
 			</SidebarInset>
 		</SidebarProvider>
