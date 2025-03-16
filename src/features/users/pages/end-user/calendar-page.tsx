@@ -1,3 +1,5 @@
+import { CalendarView } from '@/features/calendar/components/calendar-view';
+
 export default function CalendarPage() {
-	return <div>Calendar page</div>;
+	return <CalendarView />;
 }
