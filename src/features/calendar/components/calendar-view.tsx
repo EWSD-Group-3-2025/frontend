@@ -1,16 +1,14 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
 import { useQuery } from '@tanstack/react-query';
-import { getAll } from '../api';
 import { USER_ROLE } from '@/constants';
-import EventItem, { EventItemSkeleton } from './event-item';
-import { useOpenEventMutationDialogStore } from '../store/open-event-mutation-dialog-store';
-import EventMutationDialog from './event-mutation-dialog';
-import { Event } from '../types';
+import EventMutationDialog from '@/features/events/components/event-mutation-dialog';
+import { useOpenEventMutationDialogStore } from '@/features/events/store/open-event-mutation-dialog-store';
+import { Event } from '@/features/events/types';
+import { getAll } from '@/features/events/api';
+import TaskCalendar from './task-calendar';
 
-export function EventsView() {
+export function CalendarView() {
 	const { setIsOpen } = useOpenEventMutationDialogStore();
 	const { user } = useAuth();
 
@@ -27,6 +25,7 @@ export function EventsView() {
 				throw new Error('Fetch all events fail!');
 			}),
 	});
+	console.log(getAllEvents, isLoadingGetAllEvents);
 
 	return (
 		<>
@@ -34,7 +33,7 @@ export function EventsView() {
 			<div className="flex flex-col gap-6">
 				<div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
 					<h1 className="text-2xl font-bold tracking-tight">
-						Events
+						Calendar View
 					</h1>
 					{user?.roleName === USER_ROLE.TUTOR && (
 						<Button
@@ -46,27 +45,11 @@ export function EventsView() {
 						</Button>
 					)}
 				</div>
-
-				<div className="space-y-4">
-					{isLoadingGetAllEvents ? (
-						[1, 2, 3].map((i) => <EventItemSkeleton key={i} />)
-					) : getAllEvents?.data && getAllEvents.data.length > 0 ? (
-						getAllEvents?.data?.map((event) => (
-							<EventItem key={event.id} event={event} />
-						))
-					) : (
-						<Card>
-							<CardContent className="flex flex-col items-center justify-center p-6">
-								<div className="rounded-full bg-muted p-3">
-									<Bell className="h-6 w-6 text-muted-foreground" />
-								</div>
-								<h3 className="mt-3 font-medium">
-									No event announcement found
-								</h3>
-							</CardContent>
-						</Card>
-					)}
-				</div>
+				{isLoadingGetAllEvents ? (
+					<p>Loading...</p>
+				) : (
+					<TaskCalendar data={getAllEvents?.data!} />
+				)}
 			</div>
 		</>
 	);

@@ -292,8 +292,6 @@ const AdminDashboard = () => {
 		);
 	};
 
-	console.log(mostActiveUsersData?.data);
-
 	return (
 		<>
 			<div className="mb-3 flex flex-col flex-wrap gap-3 md:flex-row">

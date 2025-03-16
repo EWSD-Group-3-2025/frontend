@@ -3,52 +3,47 @@ import { Card, CardContent } from '@/components/ui/card';
 import useConfirmDialog from '@/hooks/use-confirm-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Document } from '../types';
-import { Download, FileText } from 'lucide-react';
-import { downloadFile } from '@/utils/client-side-file-download';
-import { useOpenDocumentMutationDialogStore } from '../store/open-document-mutation-dialog-store';
+import { Meeting } from '../types';
+import { Bell } from 'lucide-react';
 import { deleteItem } from '../api';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/auth.context';
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { useOpenMeetingMutationDialogStore } from '../store/open-meeting-mutation-dialog-store';
 
-interface DocumentItemProps {
-	doc: Document;
+interface MeetingItemProps {
+	meeting: Meeting;
 }
 
-export default function DocumentItem({ doc }: DocumentItemProps) {
+export default function MeetingItem({ meeting }: MeetingItemProps) {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
-	const { setIsOpen } = useOpenDocumentMutationDialogStore();
+	const { setIsOpen } = useOpenMeetingMutationDialogStore();
 	const [DeleteConfirmDialog, deleteConfirm] = useConfirmDialog(
 		'Are you sure?',
-		'This process cannot be undo and will delete the document permanently.'
+		'This process cannot be undo and will delete the meeting permanently.'
 	);
-	const isDocumentAuthor = user?.id === doc.userId;
 
-	const { mutateAsync: deleteDocumentFn, isPending: deleteDocumentPending } =
+	const isMeetingAuthor = meeting.tutorId === user?.id;
+
+	const { mutateAsync: deleteMeetingFn, isPending: deleteDocumentPending } =
 		useMutation({
 			mutationFn: async ({ id }: { id: number }): Promise<HTTPResponse> =>
 				await deleteItem(id)
 					.then((response) => {
 						if (response.status === 204) {
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-documents'],
+								queryKey: ['get-all-meetings'],
 							});
 
 							return response.data;
 						}
 
-						throw new Error('Document delete Fail!');
+						throw new Error('Meeting delete Fail!');
 					})
 					.catch((e) => {
 						setIsOpen({
 							isOpen: false,
-							document: null,
+							meeting: null,
 						});
 
 						toast.error(
@@ -63,13 +58,13 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 					}),
 		});
 
-	const handleDocumentDelete = async () => {
-		if (doc) {
+	const handleMeetingDelete = async () => {
+		if (meeting) {
 			const isOk = await deleteConfirm();
 
 			if (isOk) {
-				await deleteDocumentFn({ id: doc.id });
-				toast.success('Successfully deleted the document');
+				await deleteMeetingFn({ id: meeting.id });
+				toast.success('Successfully deleted the meeting');
 			}
 		}
 	};
@@ -77,56 +72,48 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 	return (
 		<>
 			<DeleteConfirmDialog />
-			<Card key={doc.id}>
+			<Card key={meeting.id}>
 				<CardContent className="p-6">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex items-start gap-4">
 							<div className="rounded-lg bg-muted p-2">
-								<FileText className="h-8 w-8 text-primary" />
+								<Bell className="h-8 w-8 text-primary" />
 							</div>
 							<div>
-								<h3 className="font-semibold">{doc.title}</h3>
-								<p className="text-sm text-muted-foreground">
-									Uploaded on{' '}
-									{new Date(
-										doc.createdAt
-									).toLocaleDateString()}
-								</p>
-								<p className="mt-1 text-sm">
-									{doc.description}
+								<h3 className="text-lg font-semibold">
+									{meeting.title}
+								</h3>
+								<h4 className="font-semibold text-muted-foreground">
+									{meeting.tutorName}
+								</h4>
+								<div className="flex flex-col text-sm text-muted-foreground">
+									<span>
+										Start Date:{' '}
+										{new Date(
+											meeting.startdate
+										).toLocaleDateString()}
+									</span>
+									<span>
+										End Date:{' '}
+										{new Date(
+											meeting.enddate
+										).toLocaleDateString()}
+									</span>
+								</div>
+								<p className="mt-2 text-sm">
+									{meeting.description}
 								</p>
 							</div>
 						</div>
 						<div className="flex flex-wrap gap-2">
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Button
-										disabled={deleteDocumentPending}
-										variant="outline"
-										size="sm"
-										onClick={() => {
-											downloadFile(
-												doc.fileUrl,
-												doc.storedName
-											);
-										}}
-									>
-										<Download className="mr-2 h-4 w-4" />
-										Download
-									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Download the Document</p>
-								</TooltipContent>
-							</Tooltip>
-							{isDocumentAuthor && (
+							{isMeetingAuthor && (
 								<>
 									<Button
 										disabled={deleteDocumentPending}
 										onClick={() => {
 											setIsOpen({
 												isOpen: true,
-												document: doc,
+												meeting: meeting,
 											});
 										}}
 										variant="outline"
@@ -136,7 +123,7 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 									</Button>
 									<Button
 										disabled={deleteDocumentPending}
-										onClick={handleDocumentDelete}
+										onClick={handleMeetingDelete}
 										variant="destructive"
 										size="sm"
 									>
@@ -152,7 +139,7 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 	);
 }
 
-export const DocumentItemSkeleton = () => {
+export const MeetingItemSkeleton = () => {
 	return (
 		<Card className="space-y-2">
 			<Skeleton className="h-[70px] w-full" />

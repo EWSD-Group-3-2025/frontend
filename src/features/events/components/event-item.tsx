@@ -74,20 +74,33 @@ export default function EventItem({ event }: EventItemProps) {
 			<DeleteConfirmDialog />
 			<Card key={event.id}>
 				<CardContent className="p-6">
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex items-start gap-4">
 							<div className="rounded-lg bg-muted p-2">
 								<Bell className="h-8 w-8 text-primary" />
 							</div>
 							<div>
-								<h3 className="font-semibold">{event.title}</h3>
-								<p className="text-sm text-muted-foreground">
-									Created at{' '}
-									{new Date(
-										event.createdAt
-									).toLocaleDateString()}
-								</p>
-								<p className="mt-1 text-sm">
+								<h3 className="text-lg font-semibold">
+									{event.title}
+								</h3>
+								<h4 className="font-semibold text-muted-foreground">
+									{event.tutorName}
+								</h4>
+								<div className="flex flex-col text-sm text-muted-foreground">
+									<span>
+										Start Date:{' '}
+										{new Date(
+											event.startdate
+										).toLocaleDateString()}
+									</span>
+									<span>
+										End Date:{' '}
+										{new Date(
+											event.enddate
+										).toLocaleDateString()}
+									</span>
+								</div>
+								<p className="mt-2 text-sm">
 									{event.description}
 								</p>
 							</div>

@@ -26,12 +26,11 @@ import { toast } from 'sonner';
 import { create, update } from '../api';
 import { useAuth } from '@/context/auth.context';
 import { Button } from '@/components/ui/button';
-import { useOpenEventMutationDialogStore } from '../store/open-event-mutation-dialog-store';
 import DatePicker from '@/components/date-picker';
 import { USER_ROLE } from '@/constants';
-import { addDays } from 'date-fns';
+import { useOpenMeetingMutationDialogStore } from '../store/open-meeting-mutation-dialog-store';
 
-const eventCreateSchema = z.object({
+const meetingCreateSchema = z.object({
 	title: z.string().min(5, {
 		message: 'Title must be at least 5 characters.',
 	}),
@@ -39,58 +38,58 @@ const eventCreateSchema = z.object({
 		message: 'Description must be at least 10 characters.',
 	}),
 	startdate: z.date({
-		required_error: 'Event start date is required.',
+		required_error: 'Meeting start date is required.',
 	}),
 	enddate: z.date({
-		required_error: 'Event start date is required.',
+		required_error: 'Meeting start date is required.',
 	}),
 	tutorId: z.number().optional(),
 });
 
-export type EventCreateSchema = z.infer<typeof eventCreateSchema>;
+export type MeetingCreateSchema = z.infer<typeof meetingCreateSchema>;
 
-export default function EventMutationDialog() {
+export default function MeetingMutationDialog() {
 	const { user } = useAuth();
 	const {
-		event: initialEvent,
+		meeting: initialMeeting,
 		isOpen,
 		setIsOpen,
-	} = useOpenEventMutationDialogStore();
+	} = useOpenMeetingMutationDialogStore();
 	const queryClient = useQueryClient();
-	const form = useForm<z.infer<typeof eventCreateSchema>>({
-		resolver: zodResolver(eventCreateSchema),
+	const form = useForm<z.infer<typeof meetingCreateSchema>>({
+		resolver: zodResolver(meetingCreateSchema),
 		defaultValues: {
 			title: '',
 			description: '',
-			startdate: initialEvent?.startdate,
-			enddate: initialEvent?.enddate,
+			startdate: initialMeeting?.startdate,
+			enddate: initialMeeting?.enddate,
 		},
 	});
 
 	const {
-		mutateAsync: createNewEventFn,
-		isPending: createNewEventIsPending,
-	} = useMutation<HTTPResponse, unknown, EventCreateSchema>({
+		mutateAsync: createNewMeetingFn,
+		isPending: createNewMeetingIsPending,
+	} = useMutation<HTTPResponse, unknown, MeetingCreateSchema>({
 		mutationFn: async (
-			createEventBody: EventCreateSchema
+			createMeetingBody: MeetingCreateSchema
 		): Promise<HTTPResponse> =>
-			await create(createEventBody)
+			await create(createMeetingBody)
 				.then((response) => {
 					if (response.status === 201) {
 						queryClient.invalidateQueries({
-							queryKey: ['get-all-events'],
+							queryKey: ['get-all-meetings'],
 						});
 
-						setIsOpen({ isOpen: false, event: null });
+						setIsOpen({ isOpen: false, meeting: null });
 						return response.data;
 					}
 
-					throw new Error('Event creation Fail!');
+					throw new Error('Meeting creation Fail!');
 				})
 				.catch((e) => {
 					setIsOpen({
 						isOpen: false,
-						event: null,
+						meeting: null,
 					});
 
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
@@ -102,31 +101,31 @@ export default function EventMutationDialog() {
 				}),
 	});
 
-	const { mutateAsync: updateEventFn } = useMutation({
+	const { mutateAsync: updateMeetingFn } = useMutation({
 		mutationFn: async ({
 			id,
-			updateEventBody,
+			updateMeetingBody,
 		}: {
 			id: number;
-			updateEventBody: EventCreateSchema;
+			updateMeetingBody: MeetingCreateSchema;
 		}): Promise<HTTPResponse> =>
-			await update(id, updateEventBody)
+			await update(id, updateMeetingBody)
 				.then((response) => {
 					if (response.status === 204) {
 						queryClient.invalidateQueries({
-							queryKey: ['get-all-events'],
+							queryKey: ['get-all-meetings'],
 						});
 
-						setIsOpen({ isOpen: false, event: null });
+						setIsOpen({ isOpen: false, meeting: null });
 						return response.data;
 					}
 
-					throw new Error('Event update Fail!');
+					throw new Error('Meeting update Fail!');
 				})
 				.catch((e) => {
 					setIsOpen({
 						isOpen: false,
-						event: null,
+						meeting: null,
 					});
 
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
@@ -138,8 +137,8 @@ export default function EventMutationDialog() {
 				}),
 	});
 
-	const handleEventMutation = async (
-		values: z.infer<typeof eventCreateSchema>
+	const handleMeetingMutation = async (
+		values: z.infer<typeof meetingCreateSchema>
 	) => {
 		if (!user) {
 			return;
@@ -154,39 +153,39 @@ export default function EventMutationDialog() {
 			tutorId: user?.id,
 		};
 
-		if (!!initialEvent) {
-			await updateEventFn({
-				id: initialEvent.id,
-				updateEventBody: body,
+		if (!!initialMeeting) {
+			await updateMeetingFn({
+				id: initialMeeting.id,
+				updateMeetingBody: body,
 			});
-			toast.success('Successfully update the event');
+			toast.success('Successfully update the meeting');
 		} else {
-			const res = await createNewEventFn(body);
+			const res = await createNewMeetingFn(body);
 			toast.success(res.message);
 		}
 	};
 
 	useEffect(() => {
-		if (initialEvent) {
-			form.setValue('title', initialEvent.title);
-			form.setValue('description', initialEvent.description);
-			form.setValue('startdate', new Date(initialEvent.startdate));
-			form.setValue('enddate', new Date(initialEvent.enddate));
+		if (initialMeeting) {
+			form.setValue('title', initialMeeting.title);
+			form.setValue('description', initialMeeting.description);
+			form.setValue('startdate', new Date(initialMeeting.startdate));
+			form.setValue('enddate', new Date(initialMeeting.enddate));
 		}
 
 		return () => {
 			form.resetField('startdate');
 			form.resetField('enddate');
 		};
-	}, [initialEvent]);
+	}, [initialMeeting]);
 
-	const isPending = createNewEventIsPending;
+	const isPending = createNewMeetingIsPending;
 
 	return (
 		<Dialog
 			open={isOpen}
 			onOpenChange={(isOpen) => {
-				setIsOpen({ isOpen, event: null });
+				setIsOpen({ isOpen, meeting: null });
 				if (!isOpen) {
 					form.reset();
 				}
@@ -195,15 +194,15 @@ export default function EventMutationDialog() {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>
-						{!!initialEvent
-							? 'Edit Event'
-							: 'Create New Event'}{' '}
+						{!!initialMeeting
+							? 'Edit Meeting'
+							: 'Create New Meeting'}{' '}
 					</DialogTitle>
-					<DialogDescription>Announce an Event</DialogDescription>
+					<DialogDescription>Announce an Meeting</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
 					<form
-						onSubmit={form.handleSubmit(handleEventMutation)}
+						onSubmit={form.handleSubmit(handleMeetingMutation)}
 						className="space-y-4"
 					>
 						<FormField
@@ -215,7 +214,7 @@ export default function EventMutationDialog() {
 									<FormControl>
 										<Input
 											disabled={isPending}
-											placeholder="New Event Title"
+											placeholder="New Meeting Title"
 											{...field}
 										/>
 									</FormControl>
@@ -232,7 +231,7 @@ export default function EventMutationDialog() {
 									<FormControl>
 										<Textarea
 											disabled={isPending}
-											placeholder="Event description..."
+											placeholder="Meeting description..."
 											{...field}
 										/>
 									</FormControl>
@@ -270,7 +269,7 @@ export default function EventMutationDialog() {
 						/>
 						<DialogFooter>
 							<Button disabled={isPending} type="submit">
-								{!!initialEvent ? 'Save' : 'Create'}
+								{!!initialMeeting ? 'Save' : 'Create'}
 							</Button>
 						</DialogFooter>
 					</form>
