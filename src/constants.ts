@@ -1,8 +1,8 @@
 const CONSTANTS = {
 	ACCESS_TOKEN_KEY: 'EWSD_accessToken',
-	ACCESS_TOKEN_EXPIRE: 15 / (24 * 60), // 15 minutes in days
+	ACCESS_TOKEN_EXPIRE: 14,
 	REFRESH_TOKEN_KEY: 'EWSD_refreshToken',
-	REFRESH_TOKEN_EXPIRE: 7, // 7 days
+	REFRESH_TOKEN_EXPIRE: 14, // 7 days
 	NEW_USER: 'EWSD_NEW_USER',
 };
 
@@ -51,6 +51,19 @@ export const GENDER = Object.freeze({
 		value: 3,
 		key: 'OTHER',
 		label: 'Other',
+	},
+});
+
+export const MEETING = Object.freeze({
+	VIRTUAL: {
+		value: 1,
+		key: 'VIRTUAL',
+		label: 'Virtual',
+	},
+	INPRESON: {
+		value: 2,
+		key: 'INPRESON',
+		label: 'In Person',
 	},
 });
 

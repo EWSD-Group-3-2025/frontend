@@ -162,7 +162,7 @@ const CourseList = () => {
 									unknown
 								>[]
 							}
-							fileName="admin_list"
+							fileName="course_list"
 						/>
 					)}
 				</div>

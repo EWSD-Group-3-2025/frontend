@@ -13,6 +13,7 @@ import {
 	getPageName,
 	getRoleColor,
 	getGenderName,
+	getMeetingType,
 	convertNameToSlug,
 } from '@/utils/stringUtils';
 import api from '@/utils/axios';
@@ -29,6 +30,7 @@ export {
 	getRoleColor,
 	objectToArray,
 	getGenderName,
+	getMeetingType,
 	getBrowserName,
 	setNewUserFlag,
 	getAuthPathname,

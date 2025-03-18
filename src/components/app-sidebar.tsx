@@ -1,7 +1,17 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Cog, LayoutDashboard, Logs, UsersRound } from 'lucide-react';
+import {
+	Bell,
+	BookOpen,
+	Cog,
+	FilePenLine,
+	FileText,
+	LayoutDashboard,
+	Logs,
+	UsersRound,
+	Video,
+} from 'lucide-react';
 
 import {
 	Sidebar,
@@ -23,11 +33,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			icon: LayoutDashboard,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
 		},
+
 		{
 			title: 'Activity Logs',
 			url: '/dashboard/management/activity-logs',
 			icon: Logs,
 			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+		},
+
+		{
+			title: 'Content Management',
+			url: '#',
+			icon: FilePenLine,
+			role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+			items: [
+				{
+					title: 'Blogs',
+					url: '/dashboard/management/blogs',
+					icon: BookOpen,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Documents',
+					url: '/dashboard/management/documents',
+					icon: FileText,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Meetings',
+					url: '/dashboard/management/meetings',
+					icon: Video,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+				{
+					title: 'Events',
+					url: '/dashboard/management/events',
+					icon: Bell,
+					role: [USER_ROLE.ADMIN, USER_ROLE.STAFF],
+				},
+			],
 		},
 		{
 			title: 'User Management',

@@ -151,7 +151,7 @@ const DepartmentList = () => {
 									unknown
 								>[]
 							}
-							fileName="admin_list"
+							fileName="department_list"
 						/>
 					)}
 				</div>

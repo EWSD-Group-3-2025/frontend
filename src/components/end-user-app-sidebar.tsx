@@ -22,12 +22,12 @@ import {
 } from '@/components/ui/sidebar';
 import { USER_ROLE } from '@/constants';
 import { SidebarItem } from '@/components/sidebar-item';
-import { useAuth } from '@/context/auth.context';
+import { userStore } from '@/store/use-user-data-store';
 
 export function EndUserAppSidebar({
 	...props
 }: React.ComponentProps<typeof Sidebar>) {
-	const { user } = useAuth();
+	const { userData: user } = userStore();
 
 	const sidebarList = [
 		{

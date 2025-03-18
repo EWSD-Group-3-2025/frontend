@@ -30,6 +30,10 @@ import ResetPasswordSuccessPage from '@/features/auth/pages/ResetPasswordSuccess
 import SpecializationList from '@/features/specialization/pages/SpecializationList';
 import AdminDashboard from '@/features/users/pages/management/Dashboard';
 import EventsPage from '@/features/users/pages/end-user/events-page';
+import BlogList from '@/features/users/pages/management/BlogList';
+import MeetingList from '@/features/users/pages/management/MeetingList';
+import DocumentList from '@/features/users/pages/management/DocumentList';
+import EventList from '@/features/users/pages/management/EventList';
 
 export type Route = {
 	name: string;
@@ -175,6 +179,26 @@ const adminRouteList: Route[] = [
 		name: 'Activity Logs',
 		path: '/dashboard/management/activity-logs',
 		element: ActivityLogs,
+	},
+	{
+		name: 'Blogs',
+		path: '/dashboard/management/blogs',
+		element: BlogList,
+	},
+	{
+		name: 'Meetings',
+		path: '/dashboard/management/meetings',
+		element: MeetingList,
+	},
+	{
+		name: 'Documents',
+		path: '/dashboard/management/documents',
+		element: DocumentList,
+	},
+	{
+		name: 'Events',
+		path: '/dashboard/management/events',
+		element: EventList,
 	},
 	{
 		name: 'Not Found',

@@ -16,9 +16,9 @@ import {
 } from '@/components/ui/sidebar';
 import { useLocation } from 'react-router-dom';
 import { USER_ROLE } from '@/constants';
-import { useAuth } from '@/context/auth.context';
 import { useState } from 'react';
 import { cn } from '@/utils';
+import { userStore } from '@/store/use-user-data-store';
 
 export function SidebarItem({
 	items,
@@ -36,7 +36,7 @@ export function SidebarItem({
 	}[];
 }) {
 	const location = useLocation();
-	const { user } = useAuth();
+	const { userData: user } = userStore();
 
 	const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 

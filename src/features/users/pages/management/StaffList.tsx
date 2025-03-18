@@ -313,7 +313,7 @@ const StaffList = () => {
 									unknown
 								>[]
 							}
-							fileName="admin_list"
+							fileName="staff_list"
 						/>
 					)}
 				</div>

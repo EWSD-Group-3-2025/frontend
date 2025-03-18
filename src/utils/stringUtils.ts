@@ -1,7 +1,7 @@
 import { appRouteList } from '@/router';
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
-import { GENDER, USER_ROLE } from '@/constants';
+import { GENDER, MEETING, USER_ROLE } from '@/constants';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -38,6 +38,17 @@ export const getGenderName = (genderId: number): string => {
 			return GENDER.FEMALE.label;
 		case GENDER.OTHER.value:
 			return GENDER.OTHER.label;
+		default:
+			return 'Unknown';
+	}
+};
+
+export const getMeetingType = (meetingType: number): string => {
+	switch (meetingType) {
+		case MEETING.VIRTUAL.value:
+			return MEETING.VIRTUAL.label;
+		case MEETING.INPRESON.value:
+			return MEETING.INPRESON.label;
 		default:
 			return 'Unknown';
 	}

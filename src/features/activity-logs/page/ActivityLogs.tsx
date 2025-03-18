@@ -37,6 +37,13 @@ const ActivityLogs = () => {
 			accessorKey: 'routeName',
 		},
 		{
+			id: 'pageName',
+			header: ({ column }) => (
+				<HeaderSorting column={column} title="PageName" />
+			),
+			accessorKey: 'pageName',
+		},
+		{
 			id: 'browserName',
 			header: ({ column }) => (
 				<HeaderSorting column={column} title="BrowserName" />

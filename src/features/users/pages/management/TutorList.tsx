@@ -421,7 +421,7 @@ const TutorList = () => {
 									unknown
 								>[]
 							}
-							fileName="admin_list"
+							fileName="tutor_list"
 						/>
 					)}
 				</div>

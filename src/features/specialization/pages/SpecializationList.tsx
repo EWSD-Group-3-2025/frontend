@@ -172,7 +172,7 @@ const SpecializationList = () => {
 									unknown
 								>[]
 							}
-							fileName="admin_list"
+							fileName="specialization_list"
 						/>
 					)}
 				</div>

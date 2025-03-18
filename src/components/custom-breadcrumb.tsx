@@ -6,10 +6,10 @@ import {
 	BreadcrumbList,
 	BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { useAuth } from '@/context/auth.context';
+import { userStore } from '@/store/use-user-data-store';
 
 const CustomBreadcrumbs = () => {
-	const { user } = useAuth();
+	const { userData: user } = userStore();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const currentPath = location.pathname;

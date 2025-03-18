@@ -98,7 +98,7 @@ const TransferStudentModal = ({
 	] = useQueries({
 		queries: [
 			{
-				queryKey: ['first-tutor-students', tutorData.id],
+				queryKey: ['first-tutor-students'],
 				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
 					await getTutorAllocationStudents(tutorData.id).then(
 						(response) => {
@@ -222,6 +222,9 @@ const TransferStudentModal = ({
 			form.setValue('firstTutorName', tutorData.name);
 		}
 	}, [tutorData]);
+
+	console.log(firstTutorStudents);
+	console.log(secondTutorStudents);
 
 	return (
 		<ResponsiveModal
@@ -386,7 +389,11 @@ const TransferStudentModal = ({
 													<FormControl>
 														<ComboBox
 															data={
-																tutorList ?? []
+																tutorList.filter(
+																	(tutor) =>
+																		tutor.id !==
+																		tutorData.id
+																) ?? []
 															}
 															selectedValue={Number(
 																field.value
