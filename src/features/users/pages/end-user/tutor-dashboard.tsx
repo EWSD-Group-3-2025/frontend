@@ -47,9 +47,11 @@ export default function TutorDashboard() {
 	// Students with no interaction for 7 days
 	const inactiveStudents = students.slice(0, 2);
 
-	const { data, isLoading } = useQuery<HTTPResponse<StudentUser[]>>({
+	const { data, isLoading } = useQuery<
+		HTTPResponse<{ students: StudentUser[] }>
+	>({
 		queryKey: ['tutor-dashboard'],
-		queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
+		queryFn: async (): Promise<HTTPResponse<{ students: StudentUser[] }>> =>
 			await getTutorDashboard(id ? Number(id) : (user?.id ?? 0)).then(
 				(response) => {
 					if (response.data.code === 200) {
@@ -272,8 +274,10 @@ export default function TutorDashboard() {
 						) : (
 							<>
 								<TabsContent value="all" className="space-y-4">
-									{data && data.data && data.data.length > 0
-										? data.data.map((student) => (
+									{data &&
+									data.data?.students &&
+									data.data.students.length > 0
+										? data.data.students.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"
@@ -330,15 +334,16 @@ export default function TutorDashboard() {
 									value="active"
 									className="space-y-4"
 								>
-									{data &&
-									data.data.filter(
+									{!!data &&
+									!!data?.data.students &&
+									data?.data?.students?.filter(
 										(student) => !student.inactive
 									).length > 0 ? (
-										data.data
-											.filter(
+										data?.data?.students
+											?.filter(
 												(student) => !student.inactive
 											)
-											.map((student) => (
+											?.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"
@@ -397,15 +402,16 @@ export default function TutorDashboard() {
 									value="inactive"
 									className="space-y-4"
 								>
-									{data &&
-									data.data.filter(
+									{!!data &&
+									!!data?.data?.students &&
+									data?.data?.students.filter(
 										(student) => student.inactive
 									).length > 0 ? (
-										data.data
-											.filter(
+										data?.data?.students
+											?.filter(
 												(student) => student.inactive
 											)
-											.map((student) => (
+											?.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"

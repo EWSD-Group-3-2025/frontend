@@ -9,12 +9,20 @@ import { toast } from 'sonner';
 import { useOpenMeetingMutationDialogStore } from '../store/open-meeting-mutation-dialog-store';
 import { deleteItem } from '../api';
 import { Link } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 interface MeetingItemProps {
 	meeting: Meeting;
+	isOwner: boolean;
 }
 
-export default function MeetingItem({ meeting }: MeetingItemProps) {
+export default function MeetingItem({ meeting, isOwner }: MeetingItemProps) {
 	const queryClient = useQueryClient();
 	const { setIsOpen } = useOpenMeetingMutationDialogStore();
 	const [DeleteConfirmDialog, deleteConfirm] = useConfirmDialog(
@@ -22,7 +30,7 @@ export default function MeetingItem({ meeting }: MeetingItemProps) {
 		'This process cannot be undo and will delete the meeting permanently.'
 	);
 
-	const isMeetingAuthor = true;
+	const isMeetingAuthor = isOwner;
 
 	const { mutateAsync: deleteMeetingFn, isPending: deleteDocumentPending } =
 		useMutation({
@@ -85,16 +93,18 @@ export default function MeetingItem({ meeting }: MeetingItemProps) {
 								<div className="mt-2 flex items-center text-sm text-muted-foreground">
 									<span>
 										Start Date:{' '}
-										{new Date(
-											meeting.startTime
-										).toLocaleDateString()}
+										{format(
+											new Date(meeting.startTime),
+											'yyyy-MM-dd hh:mm a'
+										)}
 									</span>
 									<Dot className="size-7" />
 									<span>
 										End Date:{' '}
-										{new Date(
-											meeting.endTime
-										).toLocaleDateString()}
+										{format(
+											new Date(meeting.endTime),
+											'yyyy-MM-dd hh:mm a'
+										)}
 									</span>
 								</div>
 								<p className="text-muted-foreground">
@@ -119,6 +129,46 @@ export default function MeetingItem({ meeting }: MeetingItemProps) {
 								<p className="mt-2 text-muted-foreground">
 									Location: {meeting.location}
 								</p>
+
+								<div className="mt-3 flex items-center gap-x-2">
+									<p>Participants: </p>
+									{meeting.meetingMembers.map(
+										(member, index) => (
+											<Tooltip>
+												<TooltipTrigger>
+													<Avatar
+														key={index}
+														className={`size-10 border border-gray-300 dark:border-gray-600 ${
+															index !== 0
+																? '-ml-4'
+																: ''
+														}`}
+													>
+														<AvatarImage
+															src={member?.name}
+															alt={member?.name}
+														/>
+														<AvatarFallback className="text-xl">
+															{member?.name
+																.charAt(0)
+																.toUpperCase()}
+														</AvatarFallback>
+													</Avatar>
+												</TooltipTrigger>
+												<TooltipContent>
+													<p>{member.name}</p>(
+													<span>
+														{member.roleName ===
+														'ROLE_TUTOR'
+															? 'Host'
+															: 'Participant'}
+													</span>
+													)
+												</TooltipContent>
+											</Tooltip>
+										)
+									)}
+								</div>
 							</div>
 						</div>
 						<div className="flex flex-wrap gap-2">

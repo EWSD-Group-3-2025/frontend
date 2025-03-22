@@ -51,9 +51,21 @@ export function MeetingsView() {
 						[1, 2, 3].map((i) => <MeetingItemSkeleton key={i} />)
 					) : getAllMeetings?.data &&
 					  getAllMeetings.data.length > 0 ? (
-						getAllMeetings?.data?.map((meeting) => (
-							<MeetingItem key={meeting.id} meeting={meeting} />
-						))
+						getAllMeetings?.data?.map((meeting) => {
+							const isOwner = meeting.meetingMembers.some(
+								(mm) =>
+									mm.roleName === 'ROLE_TUTOR' &&
+									mm.userId === user?.id
+							);
+
+							return (
+								<MeetingItem
+									key={meeting.id}
+									meeting={meeting}
+									isOwner={isOwner}
+								/>
+							);
+						})
 					) : (
 						<Card>
 							<CardContent className="flex flex-col items-center justify-center p-6">
