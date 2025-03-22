@@ -53,6 +53,11 @@ export default function BlogMutationDialog() {
 		},
 	});
 
+	const resetForm = () => {
+		form.resetField('title');
+		form.resetField('content');
+	};
+
 	const { mutateAsync: createNewBlogFn, isPending: createNewBlogPending } =
 		useMutation<HTTPResponse, unknown, BlogCreateSchema>({
 			mutationFn: async (
@@ -68,6 +73,7 @@ export default function BlogMutationDialog() {
 								queryKey: ['get-all-blogs-by-current-user'],
 							});
 							setIsOpen({ isOpen: false, blog: null });
+							resetForm();
 							return response.data;
 						}
 
@@ -110,6 +116,7 @@ export default function BlogMutationDialog() {
 								queryKey: ['get-all-blogs-by-current-user'],
 							});
 							setIsOpen({ isOpen: false, blog: null });
+							resetForm();
 							return response.data;
 						}
 
@@ -153,6 +160,9 @@ export default function BlogMutationDialog() {
 			form.setValue('title', initialBlog.title);
 			form.setValue('content', initialBlog.content);
 		}
+		return () => {
+			resetForm();
+		};
 	}, [initialBlog]);
 
 	const isPending = createNewBlogPending || updateBlogPending;
@@ -162,6 +172,9 @@ export default function BlogMutationDialog() {
 			open={isOpen}
 			onOpenChange={(isOpen) => {
 				setIsOpen({ isOpen, blog: null });
+				if (!isOpen) {
+					resetForm();
+				}
 			}}
 		>
 			<DialogContent>

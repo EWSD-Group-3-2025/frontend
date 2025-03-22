@@ -6,7 +6,7 @@ export interface Document {
 	userId: number;
 	fileUrl: string;
 	entityType: number;
-	filetype: string;
+	fileType: string;
 	storedName: string;
 	storedUUID: number;
 	description: string;

@@ -10,6 +10,7 @@ import TaskCalendar, { NormalizedDataInterface } from './task-calendar';
 import { Meeting } from '@/features/meetings/types';
 import { getAll as getAllMeetings } from '@/features/meetings/api';
 import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function CalendarView() {
 	const { setIsOpen } = useOpenEventMutationDialogStore();
@@ -101,7 +102,7 @@ export function CalendarView() {
 					)}
 				</div>
 				{isLoading ? (
-					<p>Loading...</p>
+					<Skeleton className="h-500 w-full" />
 				) : (
 					<TaskCalendar data={normalizedData!} />
 				)}

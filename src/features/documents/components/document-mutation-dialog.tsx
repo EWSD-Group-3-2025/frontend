@@ -90,79 +90,89 @@ export default function DocumentMutationDialog() {
 		},
 	});
 
-	const { mutateAsync: createNewDocumentFn } = useMutation<
-		HTTPResponse,
-		unknown,
-		DocumentCreateSchema
-	>({
-		mutationFn: async (
-			createDocumentBody: DocumentCreateSchema
-		): Promise<HTTPResponse> =>
-			await create(createDocumentBody)
-				.then((response) => {
-					if (response.status === 201) {
-						queryClient.invalidateQueries({
-							queryKey: ['get-all-documents'],
+	const resetForm = () => {
+		form.resetField('title');
+		form.resetField('description');
+		setUploadCompleteObj(null);
+	};
+
+	const { mutateAsync: createNewDocumentFn, isPending: createPending } =
+		useMutation<HTTPResponse, unknown, DocumentCreateSchema>({
+			mutationFn: async (
+				createDocumentBody: DocumentCreateSchema
+			): Promise<HTTPResponse> =>
+				await create(createDocumentBody)
+					.then((response) => {
+						if (response.status === 201) {
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents'],
+							});
+
+							setIsOpen({ isOpen: false, document: null });
+							resetForm();
+							return response.data;
+						}
+
+						throw new Error('Document creation Fail!');
+					})
+					.catch((e) => {
+						setIsOpen({
+							isOpen: false,
+							document: null,
 						});
 
-						setIsOpen({ isOpen: false, document: null });
-						setUploadCompleteObj(null);
-						return response.data;
-					}
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
+						throw e;
+					}),
+		});
 
-					throw new Error('Document creation Fail!');
-				})
-				.catch((e) => {
-					setIsOpen({
-						isOpen: false,
-						document: null,
-					});
+	const { mutateAsync: updateDocumentFn, isPending: updatePending } =
+		useMutation({
+			mutationFn: async ({
+				id,
+				updateDocumentBody,
+			}: {
+				id: number;
+				updateDocumentBody: DocumentCreateSchema;
+			}): Promise<HTTPResponse> =>
+				await update(id, updateDocumentBody)
+					.then((response) => {
+						if (response.status === 204) {
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents'],
+							});
 
-					toast.error(e.response?.data?.data ?? 'Request Failed', {
-						description:
-							e.response?.data?.message ??
-							'Something wrong plz try again',
-					});
-					throw e;
-				}),
-	});
+							resetForm();
+							setIsOpen({ isOpen: false, document: null });
+							return response.data;
+						}
 
-	const { mutateAsync: updateDocumentFn } = useMutation({
-		mutationFn: async ({
-			id,
-			updateDocumentBody,
-		}: {
-			id: number;
-			updateDocumentBody: DocumentCreateSchema;
-		}): Promise<HTTPResponse> =>
-			await update(id, updateDocumentBody)
-				.then((response) => {
-					if (response.status === 204) {
-						queryClient.invalidateQueries({
-							queryKey: ['get-all-documents'],
+						throw new Error('Document update Fail!');
+					})
+					.catch((e) => {
+						setIsOpen({
+							isOpen: false,
+							document: null,
 						});
 
-						setUploadCompleteObj(null);
-						setIsOpen({ isOpen: false, document: null });
-						return response.data;
-					}
-
-					throw new Error('Document update Fail!');
-				})
-				.catch((e) => {
-					setIsOpen({
-						isOpen: false,
-						document: null,
-					});
-
-					toast.error(e.response?.data?.data ?? 'Request Failed', {
-						description:
-							e.response?.data?.message ??
-							'Something wrong plz try again',
-					});
-					throw e;
-				}),
-	});
+						toast.error(
+							e.response?.data?.data ?? 'Request Failed',
+							{
+								description:
+									e.response?.data?.message ??
+									'Something wrong plz try again',
+							}
+						);
+						throw e;
+					}),
+		});
 
 	const handleDocumentMutation = async (
 		values: z.infer<typeof documentCreateSchema>
@@ -202,10 +212,9 @@ export default function DocumentMutationDialog() {
 		if (initialDocument) {
 			form.setValue('title', initialDocument.title);
 			form.setValue('description', initialDocument.description);
-			form.setValue('fileType', initialDocument.filetype);
 
 			const newUploadObj = {
-				fileType: initialDocument.filetype,
+				fileType: initialDocument.fileType,
 				fileUrl: initialDocument.fileUrl,
 				storedName: initialDocument.storedName,
 				storedUUID: initialDocument.storedUUID,
@@ -213,9 +222,13 @@ export default function DocumentMutationDialog() {
 
 			setUploadCompleteObj(newUploadObj);
 		}
+
+		return () => {
+			resetForm();
+		};
 	}, [initialDocument]);
 
-	const isPending = false;
+	const isPending = createPending || updatePending;
 	const watchedValues = form.watch(['title', 'description']);
 	const formInputHaveValue =
 		watchedValues[0].length > 3 && watchedValues[1].length > 10;
@@ -226,8 +239,7 @@ export default function DocumentMutationDialog() {
 			onOpenChange={(isOpen) => {
 				setIsOpen({ isOpen, document: null });
 				if (!isOpen) {
-					form.reset();
-					setUploadCompleteObj(null);
+					resetForm();
 				}
 			}}
 		>
@@ -287,7 +299,7 @@ export default function DocumentMutationDialog() {
 								<div className="relative flex items-center gap-x-2">
 									<File className="size-10" />
 									<div className="">
-										<span className="text-sm">
+										<span className="text-wrap text-sm">
 											{uploadCompleteObj.storedName}
 										</span>
 									</div>
