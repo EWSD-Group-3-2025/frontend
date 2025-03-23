@@ -7,7 +7,9 @@ import {
 	ChangePasswordRequest,
 	MostBrowserUsagePieChart,
 	MostViewedPage,
+	StudentDashboard,
 	StudentUser,
+	TutorDashboard,
 	TutorUser,
 	User,
 } from '../types';
@@ -75,12 +77,14 @@ export const getAdminDashboard = async () =>
 	await api.get<HTTPResponse<AdminDashboard>>(dashboardRoutes.adminDashboard);
 
 export const getStudentDashboard = async (id: number) =>
-	await api.get<HTTPResponse<TutorUser | null>>(
+	await api.get<HTTPResponse<StudentDashboard>>(
 		buildURL(dashboardRoutes.studentDashboard, { id })
 	);
 
 export const getTutorDashboard = async (id: number) =>
-	await api.get(buildURL(dashboardRoutes.tutorDashboard, { id }));
+	await api.get<HTTPResponse<TutorDashboard>>(
+		buildURL(dashboardRoutes.tutorDashboard, { id })
+	);
 
 export const getBrowserCount = async () =>
 	await api.get<HTTPResponse<MostBrowserUsagePieChart[]>>(

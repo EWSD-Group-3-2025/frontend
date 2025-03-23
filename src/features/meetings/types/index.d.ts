@@ -16,6 +16,7 @@ export interface Meeting {
 	meetingMembers: MeetingMember[];
 	startTime: Date;
 	endTime: Date;
+	hostName: string;
 }
 
 export enum MeetingType {

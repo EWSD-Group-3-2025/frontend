@@ -79,7 +79,7 @@ const StudentList = () => {
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
 
-	const { data, isLoading } = useQuery<HTTPResponse<StudentUser[]>>({
+	const { data, isLoading, refetch } = useQuery<HTTPResponse<StudentUser[]>>({
 		queryKey: ['get-all-users-student'],
 		queryFn: async (): Promise<HTTPResponse<StudentUser[]>> => {
 			const response = await getAllUsers('role=student');
@@ -137,6 +137,7 @@ const StudentList = () => {
 						);
 						setDeallocationStudentConfirmation(false);
 						setSelectedStudent(null);
+						refetch();
 
 						return response.data;
 					}

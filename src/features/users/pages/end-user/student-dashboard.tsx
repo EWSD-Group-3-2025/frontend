@@ -7,30 +7,22 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Calendar, MessageSquare, FileText, Clock } from 'lucide-react';
-import { messages, meetings } from '@/data';
+import { Calendar, MessageSquare, Clock, Bell } from 'lucide-react';
 import { getStudentDashboard } from '@/features/users/api';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/auth.context';
-import { TutorUser } from '@/features/users/types';
+import { StudentDashboard as StudentDashboardType } from '@/features/users/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export function StudentDashboard() {
 	const { user } = useAuth();
+	const navigate = useNavigate();
 	const { id } = useParams();
-	// Get recent messages
-	const recentMessages = messages.slice(0, 3);
 
-	// Get upcoming meetings
-	const upcomingMeetings = meetings
-		.filter((meeting) => new Date(meeting.date) > new Date())
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-		.slice(0, 2);
-
-	const { data, isLoading } = useQuery<HTTPResponse<TutorUser | null>>({
+	const { data, isLoading } = useQuery<HTTPResponse<StudentDashboardType>>({
 		queryKey: ['student-dashboard'],
-		queryFn: async (): Promise<HTTPResponse<TutorUser | null>> =>
+		queryFn: async (): Promise<HTTPResponse<StudentDashboardType>> =>
 			await getStudentDashboard(id ? Number(id) : (user?.id ?? 0)).then(
 				(response) => {
 					if (response.data.code === 200) {
@@ -54,61 +46,73 @@ export function StudentDashboard() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="flex items-center gap-4">
+					<div className="flex flex-col items-center gap-4">
 						{isLoading ? (
-							<>
+							<div className="flex items-center gap-4">
 								<Skeleton className="h-12 w-12 rounded-full" />
 								<div>
 									<Skeleton className="mb-2 h-4 w-32" />
 									<Skeleton className="mb-1 h-3 w-40" />
 									<Skeleton className="h-3 w-48" />
 								</div>
+							</div>
+						) : data?.data?.tutorDto !== null ? (
+							<>
+								<div className="flex items-center gap-4">
+									<Avatar className="h-12 w-12">
+										<AvatarImage
+											src={
+												data?.data?.tutorDto.name ?? 'A'
+											}
+											alt={
+												data?.data?.tutorDto.name ?? 'A'
+											}
+										/>
+										<AvatarFallback>
+											{data?.data?.tutorDto.name?.charAt(
+												0
+											) ?? 'N/A'}
+										</AvatarFallback>
+									</Avatar>
+									<div>
+										<p className="font-medium">
+											{data?.data?.tutorDto.name ?? 'N/A'}
+										</p>
+										<p className="text-sm text-muted-foreground">
+											{data?.data?.tutorDto
+												.specializationName ??
+												'Specialization not provided'}
+										</p>
+										<p className="text-sm text-muted-foreground">
+											{data?.data?.tutorDto.email ??
+												'Email not available'}
+										</p>
+									</div>
+								</div>
+								<div className="mt-4 flex gap-2">
+									<Button
+										size="sm"
+										variant="outline"
+										className="w-full"
+									>
+										<MessageSquare className="mr-2 h-4 w-4" />
+										Message
+									</Button>
+									<Button
+										size="sm"
+										variant="outline"
+										className="w-full"
+									>
+										<Calendar className="mr-2 h-4 w-4" />
+										Schedule Meeting
+									</Button>
+								</div>
 							</>
 						) : (
-							<Avatar className="h-12 w-12">
-								<AvatarImage
-									src={data?.data?.name ?? 'A'}
-									alt={data?.data?.name ?? 'A'}
-								/>
-								<AvatarFallback>
-									{data?.data?.name?.charAt(0) ?? 'N/A'}
-								</AvatarFallback>
-							</Avatar>
-						)}
-						{!isLoading && (
-							<div>
-								<p className="font-medium">
-									{data?.data?.name ?? 'N/A'}
-								</p>
-								<p className="text-sm text-muted-foreground">
-									{data?.data?.specializationName ?? 'N/A'}
-								</p>
-								<p className="text-sm text-muted-foreground">
-									{data?.data?.email ?? 'N/A'}
-								</p>
+							<div className="text-center text-gray-500">
+								<p>No tutor available at the moment.</p>
 							</div>
 						)}
-					</div>
-
-					<div className="mt-4 flex gap-2">
-						<Button
-							size="sm"
-							variant="outline"
-							className="w-full"
-							disabled={!data?.data}
-						>
-							<MessageSquare className="mr-2 h-4 w-4" />
-							Message
-						</Button>
-						<Button
-							size="sm"
-							variant="outline"
-							className="w-full"
-							disabled={!data?.data}
-						>
-							<Calendar className="mr-2 h-4 w-4" />
-							Schedule Meeting
-						</Button>
 					</div>
 				</CardContent>
 			</Card>
@@ -119,47 +123,103 @@ export function StudentDashboard() {
 					<CardDescription>Your recent interactions</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="space-y-4">
-						<div className="flex items-center gap-4">
-							<div className="rounded-full bg-primary/10 p-2">
-								<MessageSquare className="h-4 w-4 text-primary" />
+					{data && (
+						<div className="space-y-4">
+							<div className="flex items-center gap-4">
+								<div className="rounded-full bg-primary/10 p-2">
+									<MessageSquare className="h-4 w-4 text-primary" />
+								</div>
+								<div>
+									<p className="text-sm font-medium">
+										{data.data.studentDashboardCount
+											.newMessageCountForToday > 0 ? (
+											<>
+												{
+													data.data
+														.studentDashboardCount
+														.newMessageCountForToday
+												}{' '}
+												new message
+												{data.data.studentDashboardCount
+													.newMessageCountForToday > 1
+													? 's'
+													: ''}{' '}
+												today
+											</>
+										) : (
+											<>No Messages</>
+										)}
+									</p>
+									<p className="text-xs text-muted-foreground">
+										Check your inbox for details
+									</p>
+								</div>
 							</div>
-							<div>
-								<p className="text-sm font-medium">
-									3 new messages
-								</p>
-								<p className="text-xs text-muted-foreground">
-									Last message 2 hours ago
-								</p>
+							<div className="flex items-center gap-4">
+								<div className="rounded-full bg-primary/10 p-2">
+									<Calendar className="h-4 w-4 text-primary" />
+								</div>
+								<div>
+									<p className="text-sm font-medium">
+										{data.data.studentDashboardCount
+											.meetingCountForToday > 0 ? (
+											<>
+												{
+													data.data
+														.studentDashboardCount
+														.meetingCountForToday
+												}{' '}
+												meeting
+												{data.data.studentDashboardCount
+													.meetingCountForToday > 1
+													? 's'
+													: ''}{' '}
+												upcoming today
+											</>
+										) : (
+											<>No Meeting today</>
+										)}
+									</p>
+									<p className="text-xs text-muted-foreground">
+										Check your schedule for details
+									</p>
+								</div>
+							</div>
+							<div className="flex items-center gap-4">
+								<div className="rounded-full bg-primary/10 p-2">
+									<Bell className="h-4 w-4 text-primary" />
+								</div>
+								<div>
+									<p className="text-sm font-medium">
+										{data.data.studentDashboardCount
+											.eventCountForToday > 0 ? (
+											<>
+												{
+													data.data
+														.studentDashboardCount
+														.eventCountForToday
+												}{' '}
+												event
+												{data.data.studentDashboardCount
+													.eventCountForToday > 1
+													? 's'
+													: ''}{' '}
+												today
+											</>
+										) : (
+											<>No Meeting today</>
+										)}
+									</p>
+									<p className="text-xs text-muted-foreground">
+										{data.data.studentDashboardCount
+											.eventCountForToday > 0
+											? "Don't miss your upcoming event!"
+											: 'No events scheduled for today.'}
+									</p>
+								</div>
 							</div>
 						</div>
-						<div className="flex items-center gap-4">
-							<div className="rounded-full bg-primary/10 p-2">
-								<Calendar className="h-4 w-4 text-primary" />
-							</div>
-							<div>
-								<p className="text-sm font-medium">
-									Upcoming meeting
-								</p>
-								<p className="text-xs text-muted-foreground">
-									Tomorrow at 10:00 AM
-								</p>
-							</div>
-						</div>
-						<div className="flex items-center gap-4">
-							<div className="rounded-full bg-primary/10 p-2">
-								<FileText className="h-4 w-4 text-primary" />
-							</div>
-							<div>
-								<p className="text-sm font-medium">
-									Document feedback
-								</p>
-								<p className="text-xs text-muted-foreground">
-									Received 1 day ago
-								</p>
-							</div>
-						</div>
-					</div>
+					)}
 				</CardContent>
 			</Card>
 
@@ -170,33 +230,57 @@ export function StudentDashboard() {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						{upcomingMeetings.map((meeting) => (
-							<div
-								key={meeting.id}
-								className="flex items-start gap-4"
-							>
-								<div className="rounded-full bg-primary/10 p-2">
-									<Clock className="h-4 w-4 text-primary" />
-								</div>
-								<div>
-									<p className="text-sm font-medium">
-										{meeting.title}
-									</p>
-									<p className="text-xs text-muted-foreground">
-										{new Date(
-											meeting.date
-										).toLocaleDateString()}{' '}
-										at {meeting.time}
-									</p>
-									<p className="text-xs text-muted-foreground">
-										{meeting.type}
-									</p>
-								</div>
-							</div>
-						))}
-						<Button size="sm" variant="outline" className="w-full">
-							View All Meetings
-						</Button>
+						{data &&
+							data.data.dashboardTodayMeetings
+								.sort(
+									(a, b) =>
+										new Date(a.startTime).getTime() -
+										new Date(b.startTime).getTime()
+								) // Sort by time
+								.slice(0, 3) // Show only top 3 items
+								.map((meeting) => (
+									<div
+										key={meeting.id}
+										className="flex items-start gap-4"
+									>
+										<div className="rounded-full bg-primary/10 p-2">
+											<Clock className="h-4 w-4 text-primary" />
+										</div>
+										<div>
+											<p className="text-sm font-medium">
+												{meeting.description}
+											</p>
+											<p className="text-xs text-muted-foreground">
+												{new Date(
+													meeting.startTime
+												).toLocaleDateString()}{' '}
+												at{' '}
+												{new Date(
+													meeting.startTime
+												).toLocaleTimeString()}
+											</p>
+											<p className="text-xs text-muted-foreground">
+												{meeting.meetingType}
+											</p>
+										</div>
+									</div>
+								))}
+
+						{data &&
+							data.data.dashboardTodayMeetings.some(
+								(student) => student
+							) && (
+								<Button
+									size="sm"
+									variant="outline"
+									className="w-full"
+									onClick={() =>
+										navigate('/dashboard/end-user/meetings')
+									}
+								>
+									View All Meeting
+								</Button>
+							)}
 					</div>
 				</CardContent>
 			</Card>
@@ -208,38 +292,58 @@ export function StudentDashboard() {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						{recentMessages.map((message) => (
-							<div
-								key={message.id}
-								className="flex items-start gap-4"
-							>
-								<Avatar className="h-8 w-8">
-									<AvatarImage
-										src={message.sender.avatar}
-										alt={message.sender.name}
-									/>
-									<AvatarFallback>
-										{message.sender.name.charAt(0)}
-									</AvatarFallback>
-								</Avatar>
-								<div className="flex-1">
-									<div className="flex items-center gap-2">
-										<p className="text-sm font-medium">
-											{message.sender.name}
-										</p>
-										<p className="text-xs text-muted-foreground">
-											{new Date(
-												message.timestamp
-											).toLocaleDateString()}
-										</p>
+						{data &&
+							data.data.dashboardChatMessages.map(
+								(message, i) => (
+									<div
+										key={i}
+										className="flex items-start gap-4"
+									>
+										<Avatar className="h-8 w-8">
+											<AvatarImage
+												src={message.senderUserName}
+												alt={message.senderUserName}
+											/>
+											<AvatarFallback>
+												{message.senderUserName.charAt(
+													0
+												)}
+											</AvatarFallback>
+										</Avatar>
+										<div className="flex-1">
+											<div className="flex items-center gap-2">
+												<p className="text-sm font-medium">
+													{message.senderUserName}
+												</p>
+												<p className="text-xs text-muted-foreground">
+													{new Date(
+														message.timestamp
+													).toLocaleDateString()}
+												</p>
+											</div>
+											<p className="text-sm">
+												{message.content}
+											</p>
+										</div>
 									</div>
-									<p className="text-sm">{message.content}</p>
-								</div>
-							</div>
-						))}
-						<Button size="sm" variant="outline" className="w-full">
-							View All Messages
-						</Button>
+								)
+							)}
+
+						{data &&
+							data.data.dashboardChatMessages.some(
+								(message) => message
+							) && (
+								<Button
+									size="sm"
+									variant="outline"
+									className="w-full"
+									onClick={() =>
+										navigate('/dashboard/end-user/messages')
+									}
+								>
+									View All Messages
+								</Button>
+							)}
 					</div>
 				</CardContent>
 			</Card>

@@ -24,8 +24,11 @@ import {
 } from '@/components/ui/sidebar';
 import { USER_ROLE } from '@/constants';
 import { SidebarItem } from '@/components/sidebar-item';
+import { userStore } from '@/store/use-user-data-store';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { userData: user } = userStore();
+
 	const sidebarList = [
 		{
 			title: 'Dashboard',
@@ -141,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 									/>
 								</div>
 								<div className="flex flex-col gap-0.5 text-lg font-semibold leading-none">
-									Admin Dashboard
+									{user?.name}'s Dashboard
 								</div>
 							</Link>
 						</SidebarMenuButton>
