@@ -1,5 +1,7 @@
+import { students } from '@/data';
 import { AdminDashboard } from '@/features/users/pages/management/Dashboard';
 import { USER_ROLE } from '@/constants';
+import { Meeting } from '@/features/meetings/types';
 
 export interface User {
 	id: number;
@@ -24,6 +26,31 @@ export interface StudentUser extends User {
 	allocateTutorId: number | null;
 	inactive: boolean;
 	inactiveDays: number;
+}
+
+export interface TutorDashboard {
+	students: StudentUser[];
+	tutorDashboardCount: {
+		newMessageCountForToday: number;
+		meetingCountForToday: number;
+		documentCountForToday: number;
+	};
+	dashboardTodayMeetings: Meeting[];
+}
+
+export interface StudentDashboard {
+	tutorDto: TutorUser | null;
+	dashboardTodayMeetings: Meeting[];
+	studentDashboardCount: {
+		newMessageCountForToday: number;
+		meetingCountForToday: number;
+		eventCountForToday: number;
+	};
+	dashboardChatMessages: {
+		senderUserName: string;
+		content: string;
+		timestamp: string;
+	}[];
 }
 
 export interface TutorUser extends User {

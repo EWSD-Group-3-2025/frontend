@@ -148,10 +148,10 @@ const TransferStudentModal = ({
 		mutateAsync({
 			firstTutorId: values.firstTutorId,
 			secondTutorId: values.secondTutorId,
-			studentsFromFirstToSecond: firstTutorStudents.map(
+			studentsFromFirstToSecond: secondTutorStudents.map(
 				(student) => student.id
 			),
-			studentsFromSecondToFirst: secondTutorStudents.map(
+			studentsFromSecondToFirst: firstTutorStudents.map(
 				(student) => student.id
 			),
 		});
@@ -223,8 +223,8 @@ const TransferStudentModal = ({
 		}
 	}, [tutorData]);
 
-	console.log(firstTutorStudents);
-	console.log(secondTutorStudents);
+	console.log(firstTutorStudents, 'FIRST STUDENT');
+	console.log(secondTutorStudents, 'SECOND STUDENT');
 
 	return (
 		<ResponsiveModal
