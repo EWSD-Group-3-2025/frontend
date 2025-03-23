@@ -12,8 +12,11 @@ import {
 	VerifyOtpRequest,
 } from '../types';
 
-export const login = async (body: LoginRequest) =>
-	await api.post<HTTPResponse<LoginResponse>>(authRoutes.login, body);
+export const login = async (body: LoginRequest, params: string = '') =>
+	await api.post<HTTPResponse<LoginResponse>>(
+		`${authRoutes.login}?${params}`,
+		body
+	);
 
 export const logout = async () => await api.post(authRoutes.logout);
 

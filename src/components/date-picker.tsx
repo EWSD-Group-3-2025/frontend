@@ -59,9 +59,9 @@ export default function DatePicker({
 					>
 						{value ? (
 							enableTimePicker ? (
-								`${format(value, 'PPP')} at ${format(value, 'HH:mm')}`
+								format(value, 'yyyy-MM-dd hh:mm a')
 							) : (
-								format(value, 'PPP')
+								format(value, 'yyyy-MM-dd')
 							)
 						) : (
 							<span>

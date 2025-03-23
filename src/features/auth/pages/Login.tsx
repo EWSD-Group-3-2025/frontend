@@ -19,7 +19,13 @@ import { login } from '@/features/auth/api';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth.context';
-import { cn, getRedirectRoute, setNewUserFlag } from '@/utils';
+import {
+	cn,
+	getBrowserName,
+	getPageName,
+	getRedirectRoute,
+	setNewUserFlag,
+} from '@/utils';
 import { userStore } from '@/store/use-user-data-store';
 
 const formSchema = z.object({
@@ -32,6 +38,8 @@ export default function LoginPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { setUserData } = userStore();
+	const browser = getBrowserName();
+	const page = getPageName(location.pathname);
 
 	const [showPassword, setShowPassword] = useState(false);
 
@@ -44,7 +52,10 @@ export default function LoginPage() {
 	});
 
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		await login(data)
+		await login(
+			data,
+			`routeName=${location.pathname}&browserName=${browser}&pageName=${page}`
+		)
 			.then((response) => {
 				if (response.data.code === 200) {
 					auth.assignLoginToken(

@@ -468,7 +468,7 @@ export default function TutorDashboard() {
 											.filter(
 												(student) => !student.inactive
 											)
-											.map((student) => (
+											?.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"
@@ -545,7 +545,7 @@ export default function TutorDashboard() {
 											.filter(
 												(student) => student.inactive
 											)
-											.map((student) => (
+											?.map((student) => (
 												<div
 													key={student.id}
 													className="flex items-center justify-between rounded-lg border p-4"
