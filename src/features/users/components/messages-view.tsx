@@ -21,6 +21,7 @@ export function MessagesView() {
 	const [newMessage, setNewMessage] = useState('');
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const socketRef = useRef<WebSocket | null>(null);
+	const [showChatRooms, setShowChatRooms] = useState(true);
 
 	useEffect(() => {
 		if (!user) return;
@@ -107,15 +108,22 @@ export function MessagesView() {
 		<div className="flex flex-col gap-6">
 			<div className="h-[calc(100vh-7rem)]">
 				<Card className="h-full">
-					<CardContent className="flex h-full gap-x-4 p-4">
-						<div className="min-w-[250px] space-y-1">
+					<CardContent className="flex h-full flex-col gap-4 p-4 md:flex-row">
+						{/* Chat Rooms List */}
+						<div
+							className={cn(
+								'min-w-[250px] space-y-1',
+								!showChatRooms && 'hidden md:block'
+							)}
+						>
 							{chatRooms.map((room) => (
 								<div
 									key={room.chatRoomId}
 									className={`flex cursor-pointer items-center gap-3 rounded-lg p-1 hover:bg-muted ${activeChatRoom === room.chatRoomId ? 'bg-muted' : ''}`}
-									onClick={() =>
-										setActiveChatRoom(room.chatRoomId)
-									}
+									onClick={() => {
+										setActiveChatRoom(room.chatRoomId);
+										setShowChatRooms(false);
+									}}
 								>
 									<Avatar className="h-10 w-10">
 										<AvatarFallback className="bg-gray-700 text-xl">
@@ -130,10 +138,25 @@ export function MessagesView() {
 								</div>
 							))}
 						</div>
-						<div className="h-full w-[1.5px] bg-neutral-200 dark:bg-neutral-800" />
+						{/* Divider */}
+						<div className="h-[1.5px] w-full bg-neutral-200 dark:bg-neutral-800 md:h-full md:w-[1.5px]" />
+						{/* Chat Messages */}
 						<div className="flex-1">
 							{activeChatRoom ? (
 								<div className="flex h-full flex-col">
+									{/* Chat Header */}
+									<div className="flex items-center justify-between border-b p-4 md:hidden">
+										<Button
+											variant="ghost"
+											onClick={() =>
+												setShowChatRooms(!showChatRooms)
+											}
+										>
+											{showChatRooms ? 'Hide' : 'Show'}{' '}
+											Chat Rooms
+										</Button>
+									</div>
+									{/* Messages */}
 									<div className="h-full w-full flex-1 space-y-1 overflow-y-auto p-4">
 										{messages.length > 0 ? (
 											messages.map((message) => (
@@ -183,6 +206,7 @@ export function MessagesView() {
 										)}
 										<div ref={messagesEndRef} />
 									</div>
+									{/* Message Input */}
 									<form
 										onSubmit={handleSendMessage}
 										className="flex w-full items-center gap-2 border-t p-4"
