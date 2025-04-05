@@ -10,7 +10,6 @@ import {
 	StudentDashboard,
 	StudentUser,
 	TutorDashboard,
-	TutorUser,
 	User,
 } from '../types';
 import { userRoutes, allocationRoutes, dashboardRoutes } from './routes';

@@ -105,7 +105,10 @@ export default function DocumentMutationDialog() {
 					.then((response) => {
 						if (response.status === 201) {
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-documents'],
+								queryKey: ['get-all-documents', true],
+							});
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents', false],
 							});
 
 							setIsOpen({ isOpen: false, document: null });
@@ -146,7 +149,10 @@ export default function DocumentMutationDialog() {
 					.then((response) => {
 						if (response.status === 204) {
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-documents'],
+								queryKey: ['get-all-documents', true],
+							});
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents', false],
 							});
 
 							resetForm();

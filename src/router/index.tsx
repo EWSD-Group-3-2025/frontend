@@ -34,6 +34,7 @@ import BlogList from '@/features/users/pages/management/BlogList';
 import MeetingList from '@/features/users/pages/management/MeetingList';
 import DocumentList from '@/features/users/pages/management/DocumentList';
 import EventList from '@/features/users/pages/management/EventList';
+import BooksPage from '@/features/users/pages/end-user/books-page';
 
 export type Route = {
 	name: string;
@@ -77,6 +78,11 @@ const endUserRouteList: Route[] = [
 		name: 'Documents',
 		path: '/dashboard/end-user/documents',
 		element: DocumentsPage,
+	},
+	{
+		name: 'Books',
+		path: '/dashboard/end-user/books',
+		element: BooksPage,
 	},
 	{
 		name: 'Events',

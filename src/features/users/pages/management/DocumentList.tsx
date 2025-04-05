@@ -21,9 +21,9 @@ const DocumentList = () => {
 	const { selectedId, setOpen, setSelectedId } = useDeleteModalStore();
 
 	const { data, isLoading } = useQuery<HTTPResponse<Document[]>>({
-		queryKey: ['get-all-documents'],
+		queryKey: ['get-all-documents', true],
 		queryFn: async (): Promise<HTTPResponse<Document[]>> =>
-			await getAll().then((response) => {
+			await getAll(true).then((response) => {
 				if (response.data.code === 200) {
 					return response.data;
 				}
@@ -38,7 +38,7 @@ const DocumentList = () => {
 				.then((response) => {
 					if (response.status === 204) {
 						queryClient.invalidateQueries({
-							queryKey: ['get-all-documents'],
+							queryKey: ['get-all-documents', true],
 						});
 						toast.success('Document Delete Successfully');
 						setOpen(false);

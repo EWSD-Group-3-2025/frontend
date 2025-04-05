@@ -37,7 +37,10 @@ export default function DocumentItem({ doc }: DocumentItemProps) {
 					.then((response) => {
 						if (response.status === 204) {
 							queryClient.invalidateQueries({
-								queryKey: ['get-all-documents'],
+								queryKey: ['get-all-documents', true],
+							});
+							queryClient.invalidateQueries({
+								queryKey: ['get-all-documents', false],
 							});
 
 							return response.data;
