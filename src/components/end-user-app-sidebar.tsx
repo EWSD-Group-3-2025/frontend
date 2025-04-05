@@ -7,6 +7,7 @@ import {
 	Calendar,
 	FileText,
 	LayoutDashboard,
+	LibraryIcon,
 	MessageSquare,
 	Video,
 } from 'lucide-react';
@@ -71,6 +72,17 @@ export function EndUserAppSidebar({
 			icon: BookOpen,
 			url: '/dashboard/end-user/blog',
 			role: [USER_ROLE.TUTOR, USER_ROLE.STUDENT],
+		},
+		{
+			title: 'Books',
+			icon: LibraryIcon,
+			url: '/dashboard/end-user/books',
+			role: [
+				USER_ROLE.TUTOR,
+				USER_ROLE.ADMIN,
+				USER_ROLE.STAFF,
+				USER_ROLE.STUDENT,
+			],
 		},
 	];
 

@@ -1,22 +1,19 @@
 import Cookies from 'js-cookie';
 import CONSTANTS from '@/constants';
 import api from '@/utils/axios';
-import { Document } from '../types';
 import documentRoutes from './routes';
-import { DocumentCreateSchema } from '../components/document-mutation-dialog';
+import { BookCreateSchema } from '../components/book-mutation-dialog';
 
-export const getAll = async (shared?: boolean) => {
+export const getAll = async () => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 
 	return await api.get<HTTPResponse<Document[]>>(
-		shared
-			? `${documentRoutes.baseDocumentUrl}?shared=true`
-			: `${documentRoutes.baseDocumentUrl}?shared=false`
+		documentRoutes.baseDocumentUrl
 	);
 };
 
-export const create = async (createRequest: DocumentCreateSchema) => {
+export const create = async (createRequest: BookCreateSchema) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 
@@ -26,10 +23,7 @@ export const create = async (createRequest: DocumentCreateSchema) => {
 	);
 };
 
-export const update = async (
-	id: number,
-	updateRequest: DocumentCreateSchema
-) => {
+export const update = async (id: number, updateRequest: BookCreateSchema) => {
 	const refreshToken = Cookies.get(CONSTANTS.REFRESH_TOKEN_KEY);
 	if (!refreshToken) throw new Error('No refresh token found');
 

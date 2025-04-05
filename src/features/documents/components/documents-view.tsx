@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, FileUp } from 'lucide-react';
+import { FileUp } from 'lucide-react';
 import { useAuth } from '@/context/auth.context';
 import { useOpenDocumentMutationDialogStore } from '../store/open-document-mutation-dialog-store';
 import DocumentMutationDialog from './document-mutation-dialog';
@@ -9,16 +9,18 @@ import DocumentItem, { DocumentItemSkeleton } from './document-item';
 import { useQuery } from '@tanstack/react-query';
 import { Document } from '../types';
 import { getAll } from '../api';
+import { useState } from 'react';
 
 export function DocumentsView() {
+	const [isShared, setIsShared] = useState(true);
 	const { setIsOpen } = useOpenDocumentMutationDialogStore();
 	const { user } = useAuth();
 
 	const { data: getAllDocuments, isLoading: isLoadingGetAllDocuments } =
 		useQuery<HTTPResponse<Document[]>>({
-			queryKey: ['get-all-documents'],
+			queryKey: ['get-all-documents', isShared],
 			queryFn: async (): Promise<HTTPResponse<Document[]>> =>
-				await getAll().then((response) => {
+				await getAll(isShared).then((response) => {
 					if (response.data.code === 200) {
 						return response.data;
 					}
@@ -29,9 +31,6 @@ export function DocumentsView() {
 
 	const myDocuments = getAllDocuments?.data.filter(
 		(doc) => doc.userId === user?.id
-	);
-	const sharedDocuments = getAllDocuments?.data.filter(
-		(doc) => doc.userId !== user?.id
 	);
 
 	return (
@@ -54,9 +53,22 @@ export function DocumentsView() {
 
 				<Tabs defaultValue="all">
 					<TabsList className="mb-4">
-						<TabsTrigger value="all">All Documents</TabsTrigger>
-						<TabsTrigger value="my">My Documents</TabsTrigger>
-						<TabsTrigger value="shared">Shared With Me</TabsTrigger>
+						<TabsTrigger
+							value="all"
+							onClick={() => {
+								setIsShared(true);
+							}}
+						>
+							All Documents
+						</TabsTrigger>
+						<TabsTrigger
+							value="my"
+							onClick={() => {
+								setIsShared(false);
+							}}
+						>
+							My Documents
+						</TabsTrigger>
 					</TabsList>
 					<TabsContent value="all" className="space-y-4">
 						{isLoadingGetAllDocuments ? (
@@ -113,32 +125,6 @@ export function DocumentsView() {
 									>
 										Upload Document
 									</Button>
-								</CardContent>
-							</Card>
-						)}
-					</TabsContent>
-					<TabsContent value="shared" className="space-y-4">
-						{isLoadingGetAllDocuments ? (
-							[1, 2, 3].map((i) => (
-								<DocumentItemSkeleton key={i} />
-							))
-						) : sharedDocuments && sharedDocuments?.length > 0 ? (
-							sharedDocuments.map((doc) => (
-								<DocumentItem key={doc.id} doc={doc} />
-							))
-						) : (
-							<Card>
-								<CardContent className="flex flex-col items-center justify-center p-6">
-									<div className="rounded-full bg-muted p-3">
-										<FileText className="h-6 w-6 text-muted-foreground" />
-									</div>
-									<h3 className="mt-3 font-medium">
-										No shared documents
-									</h3>
-									<p className="text-sm text-muted-foreground">
-										Documents shared with you will appear
-										here
-									</p>
 								</CardContent>
 							</Card>
 						)}
