@@ -21,6 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { userStore } from '@/store/use-user-data-store';
 import useConfirmDialog from '@/hooks/use-confirm-dialog';
 import { toast } from 'sonner';
+import { USER_ROLE } from '@/constants';
 
 enum BookCategory {
 	COMPUTER_SCIENCE = 1,
@@ -67,6 +68,7 @@ function canEditOrDelete(resourceUploaderId: number, authId: number): boolean {
 
 export function BooksView() {
 	const { setIsOpen } = useOpenBookMutationDialogStore();
+	const { userData } = userStore();
 
 	const { data, isLoading } = useQuery<HTTPResponse<Book[]>>({
 		queryKey: ['get-all-books'],
@@ -91,14 +93,16 @@ export function BooksView() {
 
 				<div className="flex flex-col items-end justify-end gap-4 sm:flex-row sm:items-center">
 					<div>
-						<Button
-							onClick={() => {
-								setIsOpen({ isOpen: true, book: null });
-							}}
-							size={'sm'}
-						>
-							Add New Book
-						</Button>
+						{userData?.roleName !== USER_ROLE.STUDENT && (
+							<Button
+								onClick={() => {
+									setIsOpen({ isOpen: true, book: null });
+								}}
+								size={'sm'}
+							>
+								Add New Book
+							</Button>
+						)}
 					</div>
 				</div>
 
