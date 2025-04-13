@@ -40,20 +40,28 @@ const bookCreateSchema = z.object({
 	bookName: z.string().min(5, {
 		message: 'Book name must be at least 3 characters.',
 	}),
-	bookDescription: z.string().min(10, {
-		message: 'Book Description must be at least 10 characters.',
+	description: z.string().min(10, {
+		message: 'Description must be at least 10 characters.',
 	}),
 	organizationName: z.string().min(3, {
 		message: 'Organization name must be at least 3 characters.',
 	}),
-	organizationUrl: z.string().min(3, {
-		message: 'Organization url must be at least 3 characters.',
+	organizationUrl: z.string().url({
+		message: 'Organization url must be a valid link.',
 	}),
 	categoryId: z.string(),
 	difficultyLevel: z.string().min(1, {
 		message: 'Book difficulty level must be at least 1 characters.',
 	}),
-	rating: z.number().positive(),
+	rating: z.string().refine(
+		(value) => {
+			const num = Number(value);
+			return num >= 0 && num <= 5;
+		},
+		{
+			message: 'Rating must be between 0 and 5.',
+		}
+	),
 	bookUrl: z.string({ required_error: 'Book url is required' }).optional(),
 	uploaderId: z.number().optional(),
 });
@@ -77,8 +85,20 @@ export default function BookMutationDialog() {
 	});
 
 	const resetForm = () => {
-		form.reset();
+		form.reset({
+			bookName: '',
+			description: '',
+			organizationName: '',
+			organizationUrl: '',
+			categoryId: '',
+			difficultyLevel: '',
+			rating: '',
+			bookUrl: '',
+			uploaderId: undefined,
+		});
+
 		setUploadCompleteObj(null);
+		setIsOpen({ isOpen: false, book: null });
 	};
 
 	const { mutateAsync: createNewBookFn, isPending: createPending } =
@@ -135,7 +155,6 @@ export default function BookMutationDialog() {
 							});
 
 							resetForm();
-							setIsOpen({ isOpen: false, book: null });
 							return response.data;
 						}
 
@@ -164,7 +183,6 @@ export default function BookMutationDialog() {
 		values: z.infer<typeof bookCreateSchema>
 	) => {
 		if (!!initialBook) {
-			// TODO Check why fileType is null for update
 			await updateBookFn({
 				id: initialBook.id,
 				updateBookBody: {
@@ -175,12 +193,6 @@ export default function BookMutationDialog() {
 			});
 			toast.success('Successfully update the book');
 		} else {
-			console.log({
-				...values,
-				bookUrl: uploadCompleteObj?.fileUrl,
-				uploaderId: user?.id,
-			});
-
 			const bookCreatedRes = await createNewBookFn({
 				...values,
 				bookUrl: uploadCompleteObj?.fileUrl,
@@ -193,9 +205,14 @@ export default function BookMutationDialog() {
 	useEffect(() => {
 		if (initialBook) {
 			form.setValue('bookName', initialBook.bookName);
-			form.setValue('bookDescription', initialBook.bookDescription);
+			form.setValue('description', initialBook.description);
 			form.setValue('organizationName', initialBook.organizationName);
 			form.setValue('organizationUrl', initialBook.organizationUrl);
+			form.setValue('categoryId', initialBook.categoryId.toString());
+			form.setValue('difficultyLevel', initialBook.difficultyLevel);
+			form.setValue('rating', initialBook.rating.toString());
+			form.setValue('bookUrl', initialBook.bookUrl);
+			form.setValue('uploaderId', initialBook.uploaderId);
 
 			const newUploadObj = {
 				fileUrl: initialBook.bookUrl,
@@ -205,9 +222,15 @@ export default function BookMutationDialog() {
 		}
 
 		return () => {
-			resetForm();
+			form.reset();
 		};
 	}, [initialBook]);
+
+	useEffect(() => {
+		if (!isOpen) {
+			resetForm();
+		}
+	}, [isOpen]);
 
 	const isPending = createPending || updatePending;
 
@@ -254,7 +277,7 @@ export default function BookMutationDialog() {
 						/>
 						<FormField
 							control={form.control}
-							name="bookDescription"
+							name="description"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Description</FormLabel>
@@ -285,19 +308,19 @@ export default function BookMutationDialog() {
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
-											<SelectItem value="0">
+											<SelectItem value="1">
 												COMPUTER SCIENCE
 											</SelectItem>
-											<SelectItem value="1">
+											<SelectItem value="2">
 												PROGRAMMING
 											</SelectItem>
-											<SelectItem value="2">
+											<SelectItem value="3">
 												PROJECT MANAGEMENT
 											</SelectItem>
-											<SelectItem value="3">
+											<SelectItem value="4">
 												DATABASE
 											</SelectItem>
-											<SelectItem value="4">
+											<SelectItem value="5">
 												OPERATION SYSTEM
 											</SelectItem>
 										</SelectContent>
@@ -346,7 +369,6 @@ export default function BookMutationDialog() {
 									<Input
 										disabled={isPending}
 										placeholder="Rating"
-										type="number"
 										min={1}
 										max={5}
 										{...field}

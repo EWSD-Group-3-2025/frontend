@@ -263,7 +263,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
 				const timeout = setTimeout(() => {
 					onValueChangeHandler(inputValue.trim());
 					setInputValue('');
-				}, 500);
+				}, 1500);
 
 				return () => clearTimeout(timeout);
 			}

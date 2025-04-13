@@ -237,7 +237,6 @@ export default function MeetingMutationDialog() {
 
 	const isPending = false;
 	const watched = form.watch();
-	console.log(createNewMeetingIsPending);
 
 	return (
 		<Dialog

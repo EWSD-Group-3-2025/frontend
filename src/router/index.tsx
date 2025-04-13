@@ -137,6 +137,11 @@ const adminRouteList: Route[] = [
 		element: DepartmentList,
 	},
 	{
+		name: 'Books',
+		path: '/dashboard/management/books',
+		element: BooksPage,
+	},
+	{
 		name: 'Courses',
 		path: '/dashboard/management/courses',
 		element: CourseList,

@@ -223,9 +223,6 @@ const TransferStudentModal = ({
 		}
 	}, [tutorData]);
 
-	console.log(firstTutorStudents, 'FIRST STUDENT');
-	console.log(secondTutorStudents, 'SECOND STUDENT');
-
 	return (
 		<ResponsiveModal
 			className="h-fit overflow-hidden p-7 sm:max-w-4xl md:w-3/4"
