@@ -65,7 +65,8 @@ const meetingCreateSchema = z.object({
 		message: 'Location must be at least 3 characters.',
 	}),
 	link: z.string().optional(),
-	participantIds: z.array(z.string()).optional(),
+	participantIds: z.array(z.string()),
+	participantNames: z.array(z.string()),
 });
 
 export type MeetingCreateSchema = z.infer<typeof meetingCreateSchema>;
@@ -97,6 +98,7 @@ export default function MeetingMutationDialog() {
 		form.resetField('link');
 		form.resetField('location');
 		form.resetField('participantIds');
+		form.resetField('participantNames');
 	};
 
 	const {
@@ -116,10 +118,11 @@ export default function MeetingMutationDialog() {
 			}),
 	});
 
-	const {
-		mutateAsync: createNewMeetingFn,
-		isPending: createNewMeetingIsPending,
-	} = useMutation<HTTPResponse, unknown, MeetingCreateSchema>({
+	const { mutateAsync: createNewMeetingFn } = useMutation<
+		HTTPResponse,
+		unknown,
+		MeetingCreateSchema
+	>({
 		mutationFn: async (
 			createMeetingBody: MeetingCreateSchema
 		): Promise<HTTPResponse> =>
@@ -198,6 +201,15 @@ export default function MeetingMutationDialog() {
 		if (user.roleName !== USER_ROLE.TUTOR) {
 			return;
 		}
+		if (values.participantIds.length === 0) {
+			toast.error('Meeting participant is required');
+			return;
+		}
+		if (values.participantNames.length === 0) {
+			toast.error('Meeting participant is required');
+			return;
+		}
+
 		const body = {
 			...values,
 			hostId: user?.id,
@@ -228,6 +240,12 @@ export default function MeetingMutationDialog() {
 					?.filter((m) => m.userId !== user?.id)
 					?.map((m) => m.userId.toString())
 			);
+			form.setValue(
+				'participantNames',
+				initialMeeting?.meetingMembers
+					?.filter((m) => m.userId !== user?.id)
+					?.map((m) => m.name)
+			);
 		}
 
 		return () => {
@@ -237,6 +255,23 @@ export default function MeetingMutationDialog() {
 
 	const isPending = false;
 	const watched = form.watch();
+
+	useEffect(() => {
+		if (watched?.participantNames?.length > 0) {
+			const participantIds = getAllTutorStudents?.data
+				?.map((ts) => {
+					if (watched?.participantNames?.includes(ts?.name)) {
+						return ts.id.toString();
+					} else {
+						return '';
+					}
+				})
+				.filter((v) => v !== '')!;
+			form.setValue('participantIds', participantIds);
+		} else {
+			form.setValue('participantIds', []);
+		}
+	}, [watched]);
 
 	return (
 		<Dialog
@@ -281,37 +316,7 @@ export default function MeetingMutationDialog() {
 						/>
 						<FormField
 							control={form.control}
-							name="startTime"
-							render={({ field }) => (
-								<FormItem className="flex flex-col space-y-4">
-									<FormLabel>Start Time</FormLabel>
-									<DatePicker
-										enableTimePicker
-										value={field.value}
-										onChange={field.onChange}
-									/>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="endTime"
-							render={({ field }) => (
-								<FormItem className="flex flex-col space-y-4">
-									<FormLabel>End Time</FormLabel>
-									<DatePicker
-										enableTimePicker
-										value={field.value}
-										onChange={field.onChange}
-									/>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="participantIds"
+							name="participantNames"
 							render={({ field }) => (
 								<FormItem className="flex flex-col space-y-4">
 									<FormLabel>
@@ -323,21 +328,8 @@ export default function MeetingMutationDialog() {
 										) : (
 											<MultiSelector
 												values={
-													getAllTutorStudents?.data
-														?.map((ts) => {
-															if (
-																field.value?.includes(
-																	ts?.id.toString()
-																)
-															) {
-																return ts.name;
-															} else {
-																return '';
-															}
-														})
-														.filter(
-															(v) => v !== ''
-														)!
+													field?.value?.map(String) ||
+													[]
 												}
 												onValuesChange={field.onChange}
 											>
@@ -350,7 +342,7 @@ export default function MeetingMutationDialog() {
 															(student) => (
 																<MultiSelectorItem
 																	key={student.id.toString()}
-																	value={student.id.toString()}
+																	value={student.name.toString()}
 																>
 																	{
 																		student.name
@@ -367,51 +359,85 @@ export default function MeetingMutationDialog() {
 								</FormItem>
 							)}
 						/>
-						<FormField
-							control={form.control}
-							name="meetingType"
-							render={({ field }) => (
-								<FormItem className="flex flex-col space-y-4">
-									<FormLabel>Meeting Type</FormLabel>
-									<Select
-										onValueChange={field.onChange}
-										defaultValue={field.value}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select meeting type" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value="1">
-												Virtual
-											</SelectItem>
-											<SelectItem value="2">
-												In-Person
-											</SelectItem>
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="location"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Location</FormLabel>
-									<FormControl>
-										<Input
-											disabled={isPending}
-											placeholder="Meeting Location..."
-											{...field}
+						<div className="flex w-full gap-x-4">
+							<FormField
+								control={form.control}
+								name="startTime"
+								render={({ field }) => (
+									<FormItem className="flex w-full flex-col space-y-4">
+										<FormLabel>Start Time</FormLabel>
+										<DatePicker
+											enableTimePicker
+											value={field.value}
+											onChange={field.onChange}
 										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="endTime"
+								render={({ field }) => (
+									<FormItem className="flex w-full flex-col space-y-4">
+										<FormLabel>End Time</FormLabel>
+										<DatePicker
+											enableTimePicker
+											value={field.value}
+											onChange={field.onChange}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div className="flex w-full gap-x-4">
+							<FormField
+								control={form.control}
+								name="meetingType"
+								render={({ field }) => (
+									<FormItem className="flex w-full flex-col space-y-4">
+										<FormLabel>Meeting Type</FormLabel>
+										<Select
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select meeting type" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<SelectItem value="1">
+													Virtual
+												</SelectItem>
+												<SelectItem value="2">
+													In-Person
+												</SelectItem>
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="location"
+								render={({ field }) => (
+									<FormItem className="flex w-full flex-col space-y-4">
+										<FormLabel>Location</FormLabel>
+										<FormControl>
+											<Input
+												disabled={isPending}
+												placeholder="Meeting Location..."
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
 						{watched.meetingType === '1' && (
 							<FormField
 								control={form.control}

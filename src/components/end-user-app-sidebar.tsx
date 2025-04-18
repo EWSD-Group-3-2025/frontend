@@ -101,7 +101,10 @@ export function EndUserAppSidebar({
 									/>
 								</div>
 								<div className="flex flex-col gap-0.5 text-lg font-semibold leading-none">
-									{user?.name}'s Dashboard
+									<span className="max-w-[150px] truncate text-ellipsis">
+										{user?.name}
+									</span>
+									Dashboard
 								</div>
 							</Link>
 						</SidebarMenuButton>

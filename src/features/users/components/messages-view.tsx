@@ -10,7 +10,7 @@ import {
 	messagesForChatRoom,
 } from '@/features/chats/api';
 import { ChatRoom, ChatRoomMessage } from '@/features/chats/types';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/utils';
 
 export function MessagesView() {
@@ -41,6 +41,7 @@ export function MessagesView() {
 
 		(async () => {
 			const res = await messagesForChatRoom(activeChatRoom);
+
 			setMessages(res.data.data);
 		})();
 	}, [activeChatRoom]);
@@ -110,9 +111,10 @@ export function MessagesView() {
 				<Card className="h-full">
 					<CardContent className="flex h-full flex-col gap-4 p-4 md:flex-row">
 						{/* Chat Rooms List */}
+
 						<div
 							className={cn(
-								'min-w-[250px] space-y-1',
+								'min-w-[250px] space-y-1 overflow-auto',
 								!showChatRooms && 'hidden md:block'
 							)}
 						>
@@ -185,12 +187,9 @@ export function MessagesView() {
 																	: 'text-muted-foreground'
 															)}
 														>
-															{formatDistanceToNow(
+															{format(
 																message.timestamp,
-																{
-																	addSuffix:
-																		true,
-																}
+																'yyyy-MM-dd'
 															)}
 														</span>
 													</div>
