@@ -116,10 +116,11 @@ export default function MeetingMutationDialog() {
 			}),
 	});
 
-	const {
-		mutateAsync: createNewMeetingFn,
-		isPending: createNewMeetingIsPending,
-	} = useMutation<HTTPResponse, unknown, MeetingCreateSchema>({
+	const { mutateAsync: createNewMeetingFn } = useMutation<
+		HTTPResponse,
+		unknown,
+		MeetingCreateSchema
+	>({
 		mutationFn: async (
 			createMeetingBody: MeetingCreateSchema
 		): Promise<HTTPResponse> =>
