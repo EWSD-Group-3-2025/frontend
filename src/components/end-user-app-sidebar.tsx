@@ -103,7 +103,10 @@ export function EndUserAppSidebar({
 									/>
 								</div>
 								<div className="flex flex-col gap-0.5 text-lg font-semibold leading-none">
-									{user?.name ?? userData?.name}'s Dashboard
+									<span className="max-w-[150px] truncate text-ellipsis">
+										{user?.name ?? userData?.name}'s'
+									</span>
+									Dashboard
 								</div>
 							</Link>
 						</SidebarMenuButton>

@@ -18,6 +18,11 @@ import { Link } from 'react-router-dom';
 import { useOpenProfileStore } from '../store/use-open-profile-store';
 import { useEffect, useState } from 'react';
 import { USER_ROLE } from '@/constants';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export default function UserProfile() {
 	const { user } = useAuth();
@@ -54,7 +59,9 @@ export default function UserProfile() {
 					</AvatarFallback>
 				</Avatar>
 				<div>
-					<p className="text-2xl font-medium">{user?.name}</p>
+					<p className="max-w-xs truncate text-ellipsis text-2xl font-medium">
+						{user?.name}
+					</p>
 					<p className="text-base text-muted-foreground">
 						@{user?.username}
 					</p>
@@ -113,26 +120,58 @@ export default function UserProfile() {
 						<span>Contact information</span>
 						<div className="mt-3 flex flex-col items-center justify-between gap-x-2 gap-y-3 lg:flex-row">
 							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
-								<div className="flex items-center gap-x-2">
-									<Mail />
-									<div className="flex flex-col items-start">
-										<span className="text-xs">Email</span>
-										<span className="text-sm text-blue-600">
-											{user?.email}
-										</span>
-									</div>
-								</div>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div
+											className="flex cursor-pointer items-center gap-x-2"
+											onClick={() => {
+												navigator.clipboard.writeText(
+													user?.email
+												);
+											}}
+										>
+											<Mail />
+											<div className="flex flex-col items-start">
+												<span className="text-xs">
+													Email
+												</span>
+												<span className="text-sm text-blue-600">
+													{user?.email}
+												</span>
+											</div>
+										</div>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Click to copy the email</p>
+									</TooltipContent>
+								</Tooltip>
 							</div>
 							<div className="flex w-full items-center justify-between gap-x-2 bg-secondary px-2 py-1 text-secondary-foreground shadow-sm transition-all hover:bg-secondary/80">
-								<div className="flex items-center gap-x-2">
-									<MessageCircle />
-									<div className="flex flex-col items-start">
-										<span className="text-xs">Chat</span>
-										<span className="text-sm text-blue-600">
-											{user?.email}
-										</span>
-									</div>
-								</div>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div
+											className="flex cursor-pointer items-center gap-x-2"
+											onClick={() => {
+												navigator.clipboard.writeText(
+													user?.email
+												);
+											}}
+										>
+											<MessageCircle />
+											<div className="flex flex-col items-start">
+												<span className="text-xs">
+													Chat
+												</span>
+												<span className="text-sm text-blue-600">
+													{user?.email}
+												</span>
+											</div>
+										</div>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Click to copy the email</p>
+									</TooltipContent>
+								</Tooltip>
 							</div>
 						</div>
 					</div>

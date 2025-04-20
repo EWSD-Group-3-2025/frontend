@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Book } from '../types';
 
 interface OpenBookMutationDialogStoreProps {
 	isOpen: boolean;
