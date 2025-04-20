@@ -244,7 +244,7 @@ export default function BookMutationDialog() {
 				}
 			}}
 		>
-			<DialogContent>
+			<DialogContent className="h-[90vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>
 						{!!initialBook ? 'Edit Book' : 'Upload New Book'}{' '}
@@ -309,19 +309,19 @@ export default function BookMutationDialog() {
 										</FormControl>
 										<SelectContent>
 											<SelectItem value="1">
-												COMPUTER SCIENCE
+												Computer Science
 											</SelectItem>
 											<SelectItem value="2">
-												PROGRAMMING
+												Programming
 											</SelectItem>
 											<SelectItem value="3">
-												PROJECT MANAGEMENT
+												Project Management
 											</SelectItem>
 											<SelectItem value="4">
-												DATABASE
+												Database
 											</SelectItem>
 											<SelectItem value="5">
-												OPERATION SYSTEM
+												Operation System
 											</SelectItem>
 										</SelectContent>
 									</Select>
@@ -329,54 +329,55 @@ export default function BookMutationDialog() {
 								</FormItem>
 							)}
 						/>
-						<FormField
-							control={form.control}
-							name="difficultyLevel"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Difficulty Level</FormLabel>
-									<Select
-										onValueChange={field.onChange}
-										defaultValue={field?.value?.toString()}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select a Difficulty Level" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value="Beginner">
-												Beginner
-											</SelectItem>
-											<SelectItem value="Intermediate">
-												Intermediate
-											</SelectItem>
-											<SelectItem value="Advanced">
-												Advanced
-											</SelectItem>
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="rating"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Rating</FormLabel>
-									<Input
-										disabled={isPending}
-										placeholder="Rating"
-										min={1}
-										max={5}
-										{...field}
-									/>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						<div className="flex items-center justify-between gap-3">
+							<FormField
+								control={form.control}
+								name="difficultyLevel"
+								render={({ field }) => (
+									<FormItem className="flex-1">
+										<FormLabel>Difficulty Level</FormLabel>
+										<Select
+											onValueChange={field.onChange}
+											defaultValue={field?.value?.toString()}
+										>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a Difficulty Level" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<SelectItem value="Beginner">
+													Beginner
+												</SelectItem>
+												<SelectItem value="Intermediate">
+													Intermediate
+												</SelectItem>
+												<SelectItem value="Advanced">
+													Advanced
+												</SelectItem>
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="rating"
+								render={({ field }) => (
+									<FormItem className="flex-1">
+										<FormLabel>Rating</FormLabel>
+										<Input
+											disabled={isPending}
+											placeholder="Rating"
+											type="number"
+											{...field}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
 						<FormField
 							control={form.control}
 							name="organizationName"

@@ -4,6 +4,7 @@ export const userRoutes = {
 	users: '/v1/users',
 	userId: '/v1/users/${id}',
 	resetPasswordByAdmin: '/v1/users/reset-password',
+	changeStatus: '/v1/users/change-status/${id}',
 };
 
 export const allocationRoutes = {

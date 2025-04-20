@@ -46,7 +46,7 @@ export function StudentDashboard() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="flex flex-col items-center gap-4">
+					<div className="flex flex-col gap-4">
 						{isLoading ? (
 							<div className="flex items-center gap-4">
 								<Skeleton className="h-12 w-12 rounded-full" />
@@ -58,7 +58,7 @@ export function StudentDashboard() {
 							</div>
 						) : data?.data?.tutorDto !== null ? (
 							<>
-								<div className="flex items-center gap-4">
+								<div className="flex gap-4">
 									<Avatar className="h-12 w-12">
 										<AvatarImage
 											src={
@@ -75,25 +75,25 @@ export function StudentDashboard() {
 										</AvatarFallback>
 									</Avatar>
 									<div>
-										<p className="font-medium">
+										<p className="break-all font-medium">
 											{data?.data?.tutorDto.name ?? 'N/A'}
 										</p>
-										<p className="text-sm text-muted-foreground">
+										<p className="break-all text-sm text-muted-foreground">
 											{data?.data?.tutorDto
 												.specializationName ??
 												'Specialization not provided'}
 										</p>
-										<p className="text-sm text-muted-foreground">
+										<p className="break-all text-sm text-muted-foreground">
 											{data?.data?.tutorDto.email ??
 												'Email not available'}
 										</p>
 									</div>
 								</div>
-								<div className="mt-4 flex gap-2">
+								<div className="mt-4 flex flex-wrap gap-2">
 									<Button
 										size="sm"
 										variant="outline"
-										className="w-full"
+										className="flex-1"
 									>
 										<MessageSquare className="mr-2 h-4 w-4" />
 										Message
@@ -101,7 +101,7 @@ export function StudentDashboard() {
 									<Button
 										size="sm"
 										variant="outline"
-										className="w-full"
+										className="flex-1"
 									>
 										<Calendar className="mr-2 h-4 w-4" />
 										Schedule Meeting
@@ -294,39 +294,47 @@ export function StudentDashboard() {
 					<div className="space-y-4">
 						{data &&
 							data.data.dashboardChatMessages.map(
-								(message, i) => (
-									<div
-										key={i}
-										className="flex items-start gap-4"
-									>
-										<Avatar className="h-8 w-8">
-											<AvatarImage
-												src={message.senderUserName}
-												alt={message.senderUserName}
-											/>
-											<AvatarFallback>
-												{message.senderUserName.charAt(
-													0
-												)}
-											</AvatarFallback>
-										</Avatar>
-										<div className="flex-1">
-											<div className="flex items-center gap-2">
-												<p className="text-sm font-medium">
-													{message.senderUserName}
-												</p>
-												<p className="text-xs text-muted-foreground">
-													{new Date(
-														message.timestamp
-													).toLocaleDateString()}
+								(message, i) => {
+									console.log(message.senderUsername, 'AAA');
+
+									return (
+										<div
+											key={i}
+											className="flex items-start gap-4"
+										>
+											<Avatar className="h-8 w-8">
+												<AvatarImage
+													src={
+														message?.senderUsername
+													}
+													alt={
+														message?.senderUsername
+													}
+												/>
+												<AvatarFallback>
+													{message?.senderUsername?.charAt(
+														0
+													)}
+												</AvatarFallback>
+											</Avatar>
+											<div className="flex-1">
+												<div className="flex items-center gap-2">
+													<p className="text-sm font-medium">
+														{message.senderUsername}
+													</p>
+													<p className="text-xs text-muted-foreground">
+														{new Date(
+															message.timestamp
+														).toLocaleDateString()}
+													</p>
+												</div>
+												<p className="text-sm">
+													{message.content}
 												</p>
 											</div>
-											<p className="text-sm">
-												{message.content}
-											</p>
 										</div>
-									</div>
-								)
+									);
+								}
 							)}
 
 						{data &&

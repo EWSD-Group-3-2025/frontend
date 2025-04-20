@@ -8,6 +8,7 @@ import {
 	LockKeyholeOpen,
 	Mail,
 	MessageCircle,
+	MapPin,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
@@ -15,6 +16,8 @@ import UserProfileEditForm from './user-profile-edit-form';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useOpenProfileStore } from '../store/use-open-profile-store';
+import { useEffect, useState } from 'react';
+import { USER_ROLE } from '@/constants';
 import {
 	Tooltip,
 	TooltipContent,
@@ -26,9 +29,25 @@ export default function UserProfile() {
 	const { isOpen: isOpenProfile, setIsOpen: setIsOpenProfile } =
 		useOpenProfileStore();
 
+	const [country, setCountry] = useState(null);
+
 	if (!user) {
 		return null;
 	}
+
+	useEffect(() => {
+		const fetchCountry = async () => {
+			try {
+				const res = await fetch('https://ipapi.co/json/');
+				const data = await res.json();
+				setCountry(data.country_name); // e.g., United States
+			} catch (error) {
+				console.error('Failed to fetch country info:', error);
+			}
+		};
+
+		fetchCountry();
+	}, []);
 
 	return (
 		<div className="px-5 py-4">
@@ -66,11 +85,35 @@ export default function UserProfile() {
 						</div>
 						<Separator />
 						<div className="flex items-center gap-x-3">
-							<Clock className="size-5" />{' '}
-							<span className="text-sm">
-								{format(new Date(), 'hh:mm a')} - Your local
-								time
-							</span>
+							<MapPin className="size-5" />
+							<span className="text-sm">{country}</span>
+						</div>
+						<Separator />
+						<div className="flex items-center gap-x-3">
+							{user.roleName === USER_ROLE.ADMIN ||
+							user.roleName === USER_ROLE.STAFF ? (
+								<>
+									<KeyRound className="size-5" />
+									<span className="text-sm">
+										Department: {user.departmentName}
+									</span>
+								</>
+							) : user.roleName === USER_ROLE.TUTOR ? (
+								<>
+									<LockKeyholeOpen className="size-5" />
+									<span className="text-sm">
+										Specialization:{' '}
+										{user.specializationName}
+									</span>
+								</>
+							) : user.roleName === USER_ROLE.STUDENT ? (
+								<>
+									<Clock className="size-5" />
+									<span className="text-sm">
+										Course: {user.courseName}
+									</span>
+								</>
+							) : null}
 						</div>
 					</div>
 					<div>

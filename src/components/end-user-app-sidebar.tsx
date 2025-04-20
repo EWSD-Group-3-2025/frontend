@@ -22,13 +22,15 @@ import {
 	SidebarRail,
 } from '@/components/ui/sidebar';
 import { USER_ROLE } from '@/constants';
+import { useAuth } from '@/context/auth.context';
 import { SidebarItem } from '@/components/sidebar-item';
 import { userStore } from '@/store/use-user-data-store';
 
 export function EndUserAppSidebar({
 	...props
 }: React.ComponentProps<typeof Sidebar>) {
-	const { userData: user } = userStore();
+	const { userData } = userStore();
+	const { user } = useAuth();
 
 	const sidebarList = [
 		{
@@ -102,7 +104,7 @@ export function EndUserAppSidebar({
 								</div>
 								<div className="flex flex-col gap-0.5 text-lg font-semibold leading-none">
 									<span className="max-w-[150px] truncate text-ellipsis">
-										{user?.name}
+										{user?.name ?? userData?.name}'s'
 									</span>
 									Dashboard
 								</div>

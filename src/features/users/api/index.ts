@@ -103,3 +103,6 @@ export const getMostActiveUsers = async () =>
 
 export const getInactivityStudents = async () =>
 	await api.get(dashboardRoutes.inactivityStudents);
+
+export const changeUserStatus = async (id: number) =>
+	await api.post(buildURL(userRoutes.changeStatus, { id }));

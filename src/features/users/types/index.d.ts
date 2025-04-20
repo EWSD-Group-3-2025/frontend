@@ -47,7 +47,7 @@ export interface StudentDashboard {
 		eventCountForToday: number;
 	};
 	dashboardChatMessages: {
-		senderUserName: string;
+		senderUsername: string;
 		content: string;
 		timestamp: string;
 	}[];

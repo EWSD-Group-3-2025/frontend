@@ -4,6 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	CircleUser,
 	Ellipsis,
+	Power,
+	PowerOff,
 	SquareAsterisk,
 	SquarePen,
 	Trash2,
@@ -14,6 +16,7 @@ import { User } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
+	changeUserStatus,
 	deleteUser,
 	getAllUsers,
 	resetPasswordByAdmin,
@@ -46,6 +49,7 @@ import { useNavigate } from 'react-router-dom';
 import { getGenderName } from '@/utils';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
+import ChangeStatusToggleModal from '@/features/users/components/change-status-toggle-modal';
 
 const StaffList = () => {
 	const queryClient = useQueryClient();
@@ -64,8 +68,10 @@ const StaffList = () => {
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [statusUserId, setStatusUserId] = useState<number | null>(null);
+	const [statusOpen, setStatusOpen] = useState(false);
 
-	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
+	const { data, isLoading, refetch } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-staff'],
 		queryFn: async (): Promise<HTTPResponse<User[]>> =>
 			await getAllUsers('role=staff').then((response) => {
@@ -138,6 +144,35 @@ const StaffList = () => {
 					throw e;
 				}),
 	});
+
+	const { mutateAsync: toggleUserStatus } = useMutation({
+		mutationFn: async (id: number) =>
+			await changeUserStatus(id)
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setStatusOpen(false);
+						setStatusUserId(null);
+						refetch();
+					}
+				})
+				.catch((e) => {
+					setStatusOpen(false);
+					setStatusUserId(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const handleToggleStatus = () => {
+		if (statusUserId) {
+			toggleUserStatus(statusUserId);
+		}
+	};
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
@@ -273,6 +308,22 @@ const StaffList = () => {
 								>
 									<Trash2 /> Delete
 								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setStatusUserId(params.row.original.id);
+										setStatusOpen(true);
+									}}
+								>
+									{params.row.original.status ? (
+										<>
+											<PowerOff /> Make Inactive
+										</>
+									) : (
+										<>
+											<Power /> Make Active
+										</>
+									)}
+								</DropdownMenuItem>
 							</DropdownMenuGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -344,6 +395,14 @@ const StaffList = () => {
 				title="Delete User"
 				description={`Are you sure to delete ${deletedName}`}
 				handleDelete={handleMutationDelete}
+			/>
+
+			<ChangeStatusToggleModal
+				open={statusOpen}
+				setOpen={setStatusOpen}
+				title="Change User Status"
+				description="Are u sure to change the status"
+				handleStatus={handleToggleStatus}
 			/>
 		</>
 	);
