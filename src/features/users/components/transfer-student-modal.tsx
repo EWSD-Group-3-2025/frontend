@@ -98,7 +98,7 @@ const TransferStudentModal = ({
 	] = useQueries({
 		queries: [
 			{
-				queryKey: ['first-tutor-students'],
+				queryKey: ['first-tutor-students', tutorData],
 				queryFn: async (): Promise<HTTPResponse<StudentUser[]>> =>
 					await getTutorAllocationStudents(tutorData.id).then(
 						(response) => {
@@ -110,6 +110,8 @@ const TransferStudentModal = ({
 							throw new Error('Fetch Tutor 1 Students Fail!');
 						}
 					),
+				gcTime: 0,
+				staleTime: 0,
 			},
 			{
 				queryKey: [
@@ -127,6 +129,8 @@ const TransferStudentModal = ({
 
 						throw new Error('Fetch Tutor 2 Students Fail!');
 					}),
+				gcTime: 0,
+				staleTime: 0,
 				enabled: !!form.watch('secondTutorId'),
 			},
 		],

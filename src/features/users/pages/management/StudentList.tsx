@@ -4,6 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	CircleUser,
 	Ellipsis,
+	Power,
+	PowerOff,
 	SquareAsterisk,
 	SquarePen,
 	Trash2,
@@ -17,6 +19,7 @@ import { StudentUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
+	changeUserStatus,
 	deallocation,
 	deleteUser,
 	getAllUsers,
@@ -52,6 +55,7 @@ import { getGenderName } from '@/utils';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
 import Deallocation from '@/features/users/components/deallocation';
+import ChangeStatusToggleModal from '@/features/users/components/change-status-toggle-modal';
 
 const StudentList = () => {
 	const { user } = useAuth();
@@ -78,6 +82,8 @@ const StudentList = () => {
 	] = useState(false);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [statusUserId, setStatusUserId] = useState<number | null>(null);
+	const [statusOpen, setStatusOpen] = useState(false);
 
 	const { data, isLoading, refetch } = useQuery<HTTPResponse<StudentUser[]>>({
 		queryKey: ['get-all-users-student'],
@@ -181,6 +187,35 @@ const StudentList = () => {
 					throw e;
 				}),
 	});
+
+	const { mutateAsync: toggleUserStatus } = useMutation({
+		mutationFn: async (id: number) =>
+			await changeUserStatus(id)
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setStatusOpen(false);
+						setStatusUserId(null);
+						refetch();
+					}
+				})
+				.catch((e) => {
+					setStatusOpen(false);
+					setStatusUserId(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const handleToggleStatus = () => {
+		if (statusUserId) {
+			toggleUserStatus(statusUserId);
+		}
+	};
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
@@ -371,6 +406,22 @@ const StudentList = () => {
 								>
 									<Trash2 /> Delete
 								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setStatusUserId(params.row.original.id);
+										setStatusOpen(true);
+									}}
+								>
+									{params.row.original.status ? (
+										<>
+											<PowerOff /> Make Inactive
+										</>
+									) : (
+										<>
+											<Power /> Make Active
+										</>
+									)}
+								</DropdownMenuItem>
 							</DropdownMenuGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -471,6 +522,14 @@ const StudentList = () => {
 				setIsOpen={setIsOpenAllocationModal}
 				setSelectedStudent={setSelectedStudent}
 				selectedStudent={selectedStudent}
+			/>
+
+			<ChangeStatusToggleModal
+				open={statusOpen}
+				setOpen={setStatusOpen}
+				title="Change User Status"
+				description="Are u sure to change the status"
+				handleStatus={handleToggleStatus}
 			/>
 		</>
 	);

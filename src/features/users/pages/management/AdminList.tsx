@@ -10,6 +10,8 @@ import {
 	SquarePen,
 	Trash2,
 	UserPlus,
+	Power,
+	PowerOff,
 } from 'lucide-react';
 
 import {
@@ -30,6 +32,7 @@ import ExportButton from '@/components/export-button';
 import { HeaderSorting } from '@/components/header-sorting';
 import ContainerWrapper from '@/components/container-wrapper';
 import {
+	changeUserStatus,
 	deleteUser,
 	getAllUsers,
 	resetPasswordByAdmin,
@@ -42,6 +45,7 @@ import ResetPasswordConfirmationModal from '@/features/users/components/reset-pa
 import { getGenderName } from '@/utils';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
+import ChangeStatusToggleModal from '@/features/users/components/change-status-toggle-modal';
 
 const AdminList = () => {
 	const queryClient = useQueryClient();
@@ -58,8 +62,10 @@ const AdminList = () => {
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [statusUserId, setStatusUserId] = useState<number | null>(null);
+	const [statusOpen, setStatusOpen] = useState(false);
 
-	const { data, isLoading } = useQuery<HTTPResponse<User[]>>({
+	const { data, isLoading, refetch } = useQuery<HTTPResponse<User[]>>({
 		queryKey: ['get-all-users-admin'],
 		queryFn: async (): Promise<HTTPResponse<User[]>> =>
 			await getAllUsers('role=admin').then((response) => {
@@ -131,6 +137,35 @@ const AdminList = () => {
 					throw e;
 				}),
 	});
+
+	const { mutateAsync: toggleUserStatus } = useMutation({
+		mutationFn: async (id: number) =>
+			await changeUserStatus(id)
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setStatusOpen(false);
+						setStatusUserId(null);
+						refetch();
+					}
+				})
+				.catch((e) => {
+					setStatusOpen(false);
+					setStatusUserId(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const handleToggleStatus = () => {
+		if (statusUserId) {
+			toggleUserStatus(statusUserId);
+		}
+	};
 
 	const handleMutationDelete = () => {
 		if (selectedId) {
@@ -251,6 +286,22 @@ const AdminList = () => {
 								>
 									<Trash2 /> Delete
 								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setStatusUserId(params.row.original.id);
+										setStatusOpen(true);
+									}}
+								>
+									{params.row.original.status ? (
+										<>
+											<PowerOff /> Make Inactive
+										</>
+									) : (
+										<>
+											<Power /> Make Active
+										</>
+									)}
+								</DropdownMenuItem>
 							</DropdownMenuGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -322,6 +373,14 @@ const AdminList = () => {
 				title="Delete User"
 				description={`Are you sure to delete ${deletedName}`}
 				handleDelete={handleMutationDelete}
+			/>
+
+			<ChangeStatusToggleModal
+				open={statusOpen}
+				setOpen={setStatusOpen}
+				title="Change User Status"
+				description="Are u sure to change the status"
+				handleStatus={handleToggleStatus}
 			/>
 		</>
 	);

@@ -4,6 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
 	CircleUser,
 	Ellipsis,
+	Power,
+	PowerOff,
 	RefreshCcw,
 	SquareAsterisk,
 	SquarePen,
@@ -17,6 +19,7 @@ import { TutorUser } from '@/features/users/types';
 import DataTable from '@/components/data-table';
 import SearchBox from '@/components/search-box';
 import {
+	changeUserStatus,
 	deallocation,
 	deleteUser,
 	getAllUsers,
@@ -53,6 +56,7 @@ import TransferStudentModal from '@/features/users/components/transfer-student-m
 import { getGenderName } from '@/utils';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
+import ChangeStatusToggleModal from '@/features/users/components/change-status-toggle-modal';
 
 const TutorList = () => {
 	const { user } = useAuth();
@@ -78,8 +82,10 @@ const TutorList = () => {
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
 	const [isTransferStudentModal, setIsTransferStudentModal] = useState(false);
+	const [statusUserId, setStatusUserId] = useState<number | null>(null);
+	const [statusOpen, setStatusOpen] = useState(false);
 
-	const { data, isLoading } = useQuery<HTTPResponse<TutorUser[]>>({
+	const { data, isLoading, refetch } = useQuery<HTTPResponse<TutorUser[]>>({
 		queryKey: ['get-all-users-tutor'],
 		queryFn: async (): Promise<HTTPResponse<TutorUser[]>> =>
 			await getAllUsers('role=tutor').then((response) => {
@@ -152,6 +158,35 @@ const TutorList = () => {
 					throw e;
 				}),
 	});
+
+	const { mutateAsync: toggleUserStatus } = useMutation({
+		mutationFn: async (id: number) =>
+			await changeUserStatus(id)
+				.then((response) => {
+					if (response.data.code === 200) {
+						toast.success(response.data.message);
+						setStatusOpen(false);
+						setStatusUserId(null);
+						refetch();
+					}
+				})
+				.catch((e) => {
+					setStatusOpen(false);
+					setStatusUserId(null);
+					toast.error(e.response?.data?.data ?? 'Request Failed', {
+						description:
+							e.response?.data?.message ??
+							'Something wrong plz try again',
+					});
+					throw e;
+				}),
+	});
+
+	const handleToggleStatus = () => {
+		if (statusUserId) {
+			toggleUserStatus(statusUserId);
+		}
+	};
 
 	const { mutateAsync: handleDeallocationStudents } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
@@ -367,6 +402,22 @@ const TutorList = () => {
 								>
 									<Trash2 /> Delete
 								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										setStatusUserId(params.row.original.id);
+										setStatusOpen(true);
+									}}
+								>
+									{params.row.original.status ? (
+										<>
+											<PowerOff /> Make Inactive
+										</>
+									) : (
+										<>
+											<Power /> Make Active
+										</>
+									)}
+								</DropdownMenuItem>
 							</DropdownMenuGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -479,6 +530,14 @@ const TutorList = () => {
 				setIsOpen={setIsOpenAllocationModal}
 				selectedTutorId={selectedTutorId}
 				setSelectedTutorId={setSelectedTutorId}
+			/>
+
+			<ChangeStatusToggleModal
+				open={statusOpen}
+				setOpen={setStatusOpen}
+				title="Change User Status"
+				description="Are u sure to change the status"
+				handleStatus={handleToggleStatus}
 			/>
 		</>
 	);

@@ -274,7 +274,12 @@ function ResourceCard({ resource }: { resource: Book }) {
 					<div className="flex items-center gap-2 text-sm text-muted-foreground">
 						{resource.organizationUrl && (
 							<div className="flex items-center gap-1">
-								<span>{resource.organizationUrl}</span>
+								<a
+									href={resource.organizationUrl}
+									className="break-all text-sky-300"
+								>
+									{resource.organizationUrl}
+								</a>
 							</div>
 						)}
 					</div>
