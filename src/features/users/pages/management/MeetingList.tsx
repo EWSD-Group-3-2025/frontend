@@ -6,7 +6,7 @@ import ContainerWrapper from '@/components/container-wrapper';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDeleteModalStore } from '@/hooks/useDeleteModalStore';
-import { Meeting } from '@/features/meetings/types';
+import { Meeting, MeetingMember } from '@/features/meetings/types';
 import { deleteItem, getAll } from '@/features/meetings/api';
 import { toast } from 'sonner';
 import { ColumnDef } from '@tanstack/react-table';
@@ -15,6 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { getMeetingType } from '@/utils';
 import { Badge } from '@/components/ui/badge';
+
+interface ExportColumn {
+	key: string;
+	header: string;
+	transform?: (value: any) => string;
+}
 
 const MeetingList = () => {
 	const queryClient = useQueryClient();
@@ -125,6 +131,51 @@ const MeetingList = () => {
 		},
 	];
 
+	const exportColumns: ExportColumn[] = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'description',
+			header: 'Description',
+		},
+		{
+			key: 'startTime',
+			header: 'Start Date',
+			transform: (value: Date): string =>
+				new Date(value).toISOString().replace('T', ' ').slice(0, 19),
+		},
+		{
+			key: 'endTime',
+			header: 'End Date',
+			transform: (value: Date): string =>
+				new Date(value).toISOString().replace('T', ' ').slice(0, 19),
+		},
+		{
+			key: 'link',
+			header: 'Link',
+		},
+		{
+			key: 'location',
+			header: 'Location',
+		},
+		{
+			key: 'meetingType',
+			header: 'Meeting Type',
+			transform: (value: number): string =>
+				value === 1 ? 'Virtual' : 'In Person',
+		},
+		{
+			key: 'meetingMembers',
+			header: 'Meeting Members',
+			transform: (value: MeetingMember[]) =>
+				Array.isArray(value)
+					? value.map((item) => item.name).join(',')
+					: '',
+		},
+	];
+
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
@@ -143,6 +194,7 @@ const MeetingList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="meeting_list"
 						/>
 					)}

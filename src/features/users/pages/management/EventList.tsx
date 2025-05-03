@@ -132,6 +132,41 @@ const EventList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'tutorName',
+			header: 'Tutor Name',
+		},
+		{
+			key: 'title',
+			header: 'Title',
+		},
+		{
+			key: 'description',
+			header: 'Description',
+		},
+		{
+			key: 'startdate',
+			header: 'Start Date',
+			transform: (value: unknown): string =>
+				value && typeof value === 'string'
+					? new Date(value).toISOString().slice(0, 10)
+					: '',
+		},
+		{
+			key: 'enddate',
+			header: 'End Date',
+			transform: (value: unknown): string =>
+				value && typeof value === 'string'
+					? new Date(value).toISOString().slice(0, 10)
+					: '',
+		},
+	];
+
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
@@ -150,6 +185,7 @@ const EventList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="event_list"
 						/>
 					)}

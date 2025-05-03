@@ -15,7 +15,11 @@ import { toast } from 'sonner';
 type ExportButtonProps<T> = {
 	data: T[];
 	fileName?: string;
-	columns?: { key: keyof T; header: string }[]; // New prop for column customization
+	columns?: {
+		key: keyof T;
+		header: string;
+		transform?: (value: T[keyof T]) => string | number | boolean; // New optional transform function
+	}[];
 };
 
 const ExportButton = <T extends Record<string, unknown>>({
@@ -30,12 +34,17 @@ const ExportButton = <T extends Record<string, unknown>>({
 		const timestamp = new Date().getTime();
 		const fullFileName = `${fileName}_${timestamp}`;
 
-		// Preprocess data based on columns
+		// Preprocess data based on columns with transformations
 		const processedData = columns
 			? data.map((row) =>
 					columns.reduce(
 						(acc, col) => {
-							acc[col.header] = row[col.key as keyof T];
+							const key = col.key;
+							const rawValue = row[key as keyof T]; // rawValue: T[keyof T]
+							// @ts-ignore
+							acc[col.header] = col.transform
+								? col.transform(rawValue as any)
+								: rawValue;
 							return acc;
 						},
 						{} as Record<string, unknown>

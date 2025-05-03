@@ -177,6 +177,8 @@ const UserFormModal = ({
 				queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
 					await showUser(Number(selectedUserId)).then((response) => {
 						if (response.data.code === 200) {
+							console.log('ENTERRRR');
+
 							Object.entries(response.data.data).forEach(
 								([key, value]) => {
 									if (value !== null && value !== undefined) {
@@ -364,6 +366,8 @@ const UserFormModal = ({
 		}
 	}
 
+	console.log(form.getValues());
+
 	useEffect(() => {
 		if (!searchName && !selectedUserId) {
 			setIsLoadingSearchName(false);
@@ -530,6 +534,7 @@ const UserFormModal = ({
 											Gender <RequiredStar />
 										</FormLabel>
 										<Select
+											value={field.value?.toString()}
 											onValueChange={(value) =>
 												field.onChange(Number(value))
 											}

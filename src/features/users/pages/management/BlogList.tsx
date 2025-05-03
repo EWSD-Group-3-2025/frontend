@@ -138,6 +138,25 @@ const BlogList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'Id',
+			header: 'ID',
+		},
+		{
+			key: 'authorName',
+			header: 'Author',
+		},
+		{
+			key: 'title',
+			header: 'Title',
+		},
+		{
+			key: 'content',
+			header: 'Content',
+		},
+	];
+
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
@@ -156,6 +175,7 @@ const BlogList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="blog_list"
 						/>
 					)}

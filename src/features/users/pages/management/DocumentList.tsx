@@ -130,6 +130,29 @@ const DocumentList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'userName',
+			header: 'Uploader',
+		},
+		{
+			key: 'fileUrl',
+			header: 'File URL',
+		},
+		{
+			key: 'title',
+			header: 'Title',
+		},
+		{
+			key: 'description',
+			header: 'Description',
+		},
+	];
+
 	return (
 		<>
 			<div className="mb-3 flex justify-between">
@@ -148,6 +171,7 @@ const DocumentList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="document_list"
 						/>
 					)}

@@ -62,7 +62,15 @@ function getCategoryColor(categoryName: string) {
 	}
 }
 
-function canEditOrDelete(resourceUploaderId: number, authId: number): boolean {
+function canEdit(resourceUploaderId: number, authId: number): boolean {
+	return resourceUploaderId === authId;
+}
+
+function canDelete(
+	resourceUploaderId: number,
+	authId: number,
+	roleName: string
+): boolean {
 	return resourceUploaderId === authId;
 }
 
@@ -212,13 +220,9 @@ function ResourceCard({ resource }: { resource: Book }) {
 	return (
 		<>
 			<DeleteConfirmDialog />
-
 			<Card className="relative flex h-full flex-col overflow-hidden">
 				<div className="absolute right-2 top-2 flex gap-1">
-					{canEditOrDelete(
-						resource.uploaderId,
-						userData?.id ?? 0
-					) && (
+					{canEdit(resource.uploaderId, userData?.id ?? 0) && (
 						<>
 							<Button
 								variant="ghost"
@@ -229,14 +233,20 @@ function ResourceCard({ resource }: { resource: Book }) {
 							>
 								<Edit className="h-4 w-4" />
 							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								onClick={async () => await handleDelete()}
-							>
-								<Trash className="h-4 w-4 text-red-500" />
-							</Button>
 						</>
+					)}
+					{canDelete(
+						resource.uploaderId,
+						userData?.id ?? 0,
+						userData?.roleName ?? ''
+					) && (
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={async () => await handleDelete()}
+						>
+							<Trash className="h-4 w-4 text-red-500" />
+						</Button>
 					)}
 				</div>
 				<CardHeader className="pb-3">
