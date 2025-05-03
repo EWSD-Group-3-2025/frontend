@@ -59,7 +59,7 @@ export function DocumentsView() {
 								setIsShared(true);
 							}}
 						>
-							All Documents
+							Other Documents
 						</TabsTrigger>
 						<TabsTrigger
 							value="my"
