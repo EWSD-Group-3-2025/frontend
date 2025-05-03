@@ -426,6 +426,33 @@ const TutorList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'name',
+			header: 'Name',
+		},
+		{
+			key: 'email',
+			header: 'Email',
+		},
+		{
+			key: 'username',
+			header: 'Username',
+		},
+		{
+			key: 'specializationName',
+			header: 'Specialization',
+		},
+		{
+			key: 'genderName',
+			header: 'Gender',
+		},
+	];
+
 	useEffect(() => {
 		if (!resetPasswordConfirmation) {
 			setSelectedTutorName('');
@@ -472,6 +499,7 @@ const TutorList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="tutor_list"
 						/>
 					)}

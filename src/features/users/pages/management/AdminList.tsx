@@ -310,6 +310,33 @@ const AdminList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'name',
+			header: 'Name',
+		},
+		{
+			key: 'email',
+			header: 'Email',
+		},
+		{
+			key: 'username',
+			header: 'Username',
+		},
+		{
+			key: 'departmentName',
+			header: 'Department',
+		},
+		{
+			key: 'genderName',
+			header: 'Gender',
+		},
+	];
+
 	useEffect(() => {
 		if (!resetPasswordConfirmation) {
 			setName('');
@@ -342,6 +369,7 @@ const AdminList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="admin_list"
 						/>
 					)}

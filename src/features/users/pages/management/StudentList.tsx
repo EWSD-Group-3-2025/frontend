@@ -430,6 +430,33 @@ const StudentList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'name',
+			header: 'Name',
+		},
+		{
+			key: 'email',
+			header: 'Email',
+		},
+		{
+			key: 'username',
+			header: 'Username',
+		},
+		{
+			key: 'courseName',
+			header: 'Course',
+		},
+		{
+			key: 'genderName',
+			header: 'Gender',
+		},
+	];
+
 	useEffect(() => {
 		if (!resetPasswordConfirmation) {
 			setName('');
@@ -476,6 +503,7 @@ const StudentList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="student_list"
 						/>
 					)}

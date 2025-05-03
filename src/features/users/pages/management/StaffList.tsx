@@ -332,6 +332,33 @@ const StaffList = () => {
 		},
 	];
 
+	const exportColumns = [
+		{
+			key: 'id',
+			header: 'ID',
+		},
+		{
+			key: 'name',
+			header: 'Name',
+		},
+		{
+			key: 'email',
+			header: 'Email',
+		},
+		{
+			key: 'username',
+			header: 'Username',
+		},
+		{
+			key: 'departmentName',
+			header: 'Department',
+		},
+		{
+			key: 'genderName',
+			header: 'Gender',
+		},
+	];
+
 	useEffect(() => {
 		if (!resetPasswordConfirmation) {
 			setName('');
@@ -364,6 +391,7 @@ const StaffList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="staff_list"
 						/>
 					)}

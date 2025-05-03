@@ -15,32 +15,47 @@ import { toast } from 'sonner';
 type ExportButtonProps<T> = {
 	data: T[];
 	fileName?: string;
+	columns?: { key: keyof T; header: string }[]; // New prop for column customization
 };
 
 const ExportButton = <T extends Record<string, unknown>>({
 	data,
 	fileName = 'exported_data',
+	columns,
 }: ExportButtonProps<T>) => {
 	const handleExport = <T extends Record<string, unknown>>(
 		data: T[],
-		formate: 'csv' | 'xlsx'
+		format: 'csv' | 'xlsx'
 	) => {
 		const timestamp = new Date().getTime();
 		const fullFileName = `${fileName}_${timestamp}`;
 
-		if (formate === 'csv') {
-			if (!data.length) {
+		// Preprocess data based on columns
+		const processedData = columns
+			? data.map((row) =>
+					columns.reduce(
+						(acc, col) => {
+							acc[col.header] = row[col.key as keyof T];
+							return acc;
+						},
+						{} as Record<string, unknown>
+					)
+				)
+			: data;
+
+		if (format === 'csv') {
+			if (!processedData.length) {
 				console.error('No data available to export.');
 				return;
 			}
 
-			const csvData = Papa.unparse(data);
+			const csvData = Papa.unparse(processedData);
 			const blob = new Blob([csvData], {
 				type: 'text/csv;charset=utf-8;',
 			});
 			saveAs(blob, `${fullFileName}.csv`);
-		} else if (formate === 'xlsx') {
-			const worksheet = XLSX.utils.json_to_sheet(data);
+		} else if (format === 'xlsx') {
+			const worksheet = XLSX.utils.json_to_sheet(processedData);
 			const workbook = XLSX.utils.book_new();
 			XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
