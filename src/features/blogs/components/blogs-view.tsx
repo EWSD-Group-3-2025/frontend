@@ -79,7 +79,7 @@ export function BlogView() {
 
 				<Tabs defaultValue="all">
 					<TabsList className="mb-4">
-						<TabsTrigger value="all">All Blogs</TabsTrigger>
+						<TabsTrigger value="all">Other Blogs</TabsTrigger>
 						<TabsTrigger value="my">My Blogs</TabsTrigger>
 					</TabsList>
 					<TabsContent value="all" className="space-y-6">
