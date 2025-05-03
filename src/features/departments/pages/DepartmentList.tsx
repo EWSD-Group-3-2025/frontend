@@ -22,6 +22,21 @@ import ExportButton from '@/components/export-button';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
 
+export const exportColumns = [
+	{
+		key: 'id',
+		header: 'ID',
+	},
+	{
+		key: 'name',
+		header: 'Name',
+	},
+	{
+		key: 'staffName',
+		header: 'Staff Name',
+	},
+];
+
 const DepartmentList = () => {
 	const queryClient = useQueryClient();
 	const { selectedId, setOpen, setSelectedId } = useDeleteModalStore();
@@ -151,6 +166,7 @@ const DepartmentList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="department_list"
 						/>
 					)}

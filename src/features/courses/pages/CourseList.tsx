@@ -20,6 +20,7 @@ import CourseUpdateModal from '@/features/courses/components/CourseUpdateModal';
 import ExportButton from '@/components/export-button';
 import ResponsiveTitle from '@/components/responsive/responsive-title';
 import ResponsiveButton from '@/components/responsive/responsive-button';
+import { exportColumns } from '@/features/departments/pages/DepartmentList';
 
 const courseCreateSchema = z.object({
 	name: z.array(z.string()).nonempty('Please at least one item'),
@@ -162,6 +163,7 @@ const CourseList = () => {
 									unknown
 								>[]
 							}
+							columns={exportColumns}
 							fileName="course_list"
 						/>
 					)}
