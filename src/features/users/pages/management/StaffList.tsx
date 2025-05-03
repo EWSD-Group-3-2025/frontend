@@ -68,6 +68,10 @@ const StaffList = () => {
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [resetPasswordUserId, setResetPasswordUserId] = useState<
+		number | null
+	>(null);
+
 	const [statusUserId, setStatusUserId] = useState<number | null>(null);
 	const [statusOpen, setStatusOpen] = useState(false);
 
@@ -119,14 +123,16 @@ const StaffList = () => {
 		}
 	);
 
+	console.log(resetPasswordUserId, 'AAA');
 	const { mutateAsync: handleResetPassword } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
-			await resetPasswordByAdmin()
+			await resetPasswordByAdmin(`userId=${resetPasswordUserId}`)
 				.then((response) => {
 					if (response.data.code === 200) {
 						toast.success(response.data.message);
 						setResetPasswordConfirmation(false);
 						setName('');
+						setResetPasswordUserId(null);
 
 						return response.data;
 					}
@@ -279,6 +285,9 @@ const StaffList = () => {
 									onClick={() => {
 										setResetPasswordConfirmation(true);
 										setName(params.row.original.name);
+										setResetPasswordUserId(
+											params.row.original.id
+										);
 									}}
 								>
 									<SquareAsterisk /> Reset Password

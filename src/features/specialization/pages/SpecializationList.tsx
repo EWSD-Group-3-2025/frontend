@@ -131,6 +131,7 @@ const SpecializationList = () => {
 						onClick={() => {
 							setOpenModal(true);
 							setSpecializationId(params.row.original.id);
+							setSpecializationName(params.row.original.name);
 						}}
 					>
 						<SquarePen />

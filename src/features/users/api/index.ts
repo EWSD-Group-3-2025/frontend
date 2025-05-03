@@ -52,8 +52,8 @@ export const deleteUser = async (id: number) =>
 		buildURL(userRoutes.userId, { id })
 	);
 
-export const resetPasswordByAdmin = async () =>
-	await api.post(userRoutes.resetPasswordByAdmin);
+export const resetPasswordByAdmin = async (params: string) =>
+	await api.post(userRoutes.resetPasswordByAdmin + `?${params}`);
 
 export const allocation = async (body: AllocateTutor) =>
 	await api.post(allocationRoutes.allocation, body);

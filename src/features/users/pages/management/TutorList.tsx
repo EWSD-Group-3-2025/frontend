@@ -78,6 +78,9 @@ const TutorList = () => {
 		deallocationStudentConfirmation,
 		setDeallocationStudentConfirmation,
 	] = useState(false);
+	const [resetPasswordUserId, setResetPasswordUserId] = useState<
+		number | null
+	>(null);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
@@ -135,12 +138,13 @@ const TutorList = () => {
 
 	const { mutateAsync: handleResetPassword } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
-			await resetPasswordByAdmin()
+			await resetPasswordByAdmin(`userId=${resetPasswordUserId}`)
 				.then((response) => {
 					if (response.data.code === 200) {
 						toast.success(response.data.message);
 						setResetPasswordConfirmation(false);
 						setSelectedTutorName('');
+						setResetPasswordUserId(null);
 
 						return response.data;
 					}
@@ -322,6 +326,9 @@ const TutorList = () => {
 										setResetPasswordConfirmation(true);
 										setSelectedTutorName(
 											params.row.original.name
+										);
+										setResetPasswordUserId(
+											params.row.original.id
 										);
 									}}
 								>

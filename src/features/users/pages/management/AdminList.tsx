@@ -62,6 +62,9 @@ const AdminList = () => {
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const [resetPasswordConfirmation, setResetPasswordConfirmation] =
 		useState(false);
+	const [resetPasswordUserId, setResetPasswordUserId] = useState<
+		number | null
+	>(null);
 	const [statusUserId, setStatusUserId] = useState<number | null>(null);
 	const [statusOpen, setStatusOpen] = useState(false);
 
@@ -114,7 +117,7 @@ const AdminList = () => {
 
 	const { mutateAsync: handleResetPassword } = useMutation({
 		mutationFn: async (): Promise<HTTPResponse<boolean>> =>
-			await resetPasswordByAdmin()
+			await resetPasswordByAdmin(`userId=${resetPasswordUserId}`)
 				.then((response) => {
 					if (response.data.code === 200) {
 						toast.success(response.data.message);
@@ -129,6 +132,7 @@ const AdminList = () => {
 				.catch((e) => {
 					setResetPasswordConfirmation(false);
 					setName('');
+					setResetPasswordUserId(null);
 					toast.error(e.response?.data?.data ?? 'Request Failed', {
 						description:
 							e.response?.data?.message ??
@@ -257,6 +261,9 @@ const AdminList = () => {
 									onClick={() => {
 										setResetPasswordConfirmation(true);
 										setName(params.row.original.name);
+										setResetPasswordUserId(
+											params.row.original.id
+										);
 									}}
 								>
 									<SquareAsterisk /> Reset Password
