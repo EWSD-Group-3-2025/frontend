@@ -71,7 +71,7 @@ function canDelete(
 	authId: number,
 	roleName: string
 ): boolean {
-	return resourceUploaderId === authId && roleName === USER_ROLE.ADMIN;
+	return resourceUploaderId === authId || roleName === USER_ROLE.ADMIN;
 }
 
 export function BooksView() {

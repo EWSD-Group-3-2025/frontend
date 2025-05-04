@@ -56,10 +56,10 @@ const bookCreateSchema = z.object({
 	rating: z.string().refine(
 		(value) => {
 			const num = Number(value);
-			return num >= 0 && num <= 5;
+			return Number.isInteger(num) && num >= 0 && num <= 5;
 		},
 		{
-			message: 'Rating must be between 0 and 5.',
+			message: 'Rating must be an integer between 0 and 5.',
 		}
 	),
 	bookUrl: z.string({ required_error: 'Book url is required' }).optional(),

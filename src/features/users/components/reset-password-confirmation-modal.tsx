@@ -34,9 +34,9 @@ const ResetPasswordConfirmationModal = ({
 					</DialogTitle>
 					<DialogDescription className="text-sm">
 						Are you sure you want to reset{' '}
-						<span className="font-bold text-white">{name}'s</span>{' '}
-						password? A reset email will be sent random password to
-						their registered email address.
+						<span className="font-bold">{name}'s</span> password? A
+						reset email will be sent random password to their
+						registered email address.
 					</DialogDescription>
 				</DialogHeader>
 			</div>

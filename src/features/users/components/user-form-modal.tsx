@@ -25,7 +25,7 @@ import { CheckCircle2, Loader, XCircle } from 'lucide-react';
 import { getAllDepartments } from '@/features/departments/api';
 import { getAllCourses } from '@/features/courses/api';
 import { getAllSpecializations } from '@/features/specialization/api';
-import { GENDER } from '@/constants';
+import { GENDER, USER_ROLE } from '@/constants';
 import { ComboBox } from '@/components/ui/combo-box';
 import {
 	Select,
@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import RequiredStar from '@/components/ui/required-star';
+import { userStore } from '@/store/use-user-data-store';
 
 type UserFormModalProp = {
 	isOpen: boolean;
@@ -59,6 +60,7 @@ const userFormSchema = z
 		email: z.string().nonempty('Email Required'),
 		roleId: z.number(),
 		gender: z.number(),
+		admin: z.boolean().optional(),
 		departmentId: z.number().nullable(),
 		specializationId: z.number().nullable(),
 		courseId: z.number().nullable(),
@@ -104,6 +106,7 @@ const UserFormModal = ({
 }: UserFormModalProp) => {
 	const queryClient = useQueryClient();
 	const transform = transformObjects({ GENDER });
+	const { userData } = userStore();
 	const [searchName, setSearchName] = useState('');
 	const [username, setUsername] = useState('');
 	const [isLoadingSearchName, setIsLoadingSearchName] = useState(false);
@@ -177,8 +180,6 @@ const UserFormModal = ({
 				queryFn: async (): Promise<HTTPResponse<UserFormValue>> =>
 					await showUser(Number(selectedUserId)).then((response) => {
 						if (response.data.code === 200) {
-							console.log('ENTERRRR');
-
 							Object.entries(response.data.data).forEach(
 								([key, value]) => {
 									if (value !== null && value !== undefined) {
@@ -186,6 +187,12 @@ const UserFormModal = ({
 											key as keyof UserFormValue,
 											value
 										);
+										if (
+											userData?.roleName ===
+											USER_ROLE.ADMIN
+										) {
+											form.setValue('admin', true);
+										}
 									}
 								}
 							);
@@ -353,6 +360,7 @@ const UserFormModal = ({
 			roleId: roleId,
 			gender: undefined,
 			departmentId: null,
+			admin: false,
 			specializationId: null,
 			courseId: null,
 		},
@@ -397,7 +405,17 @@ const UserFormModal = ({
 
 	useEffect(() => {
 		if (!isOpen) {
-			form.reset();
+			form.reset({
+				name: '',
+				email: '',
+				username: '',
+				roleId: roleId,
+				gender: undefined,
+				departmentId: null,
+				admin: false,
+				specializationId: null,
+				courseId: null,
+			});
 			setSearchName('');
 			setIsLoadingSearchName(false);
 			setSelectedUserId(null);
